@@ -1,0 +1,32 @@
+name: vertex_ai_pyme
+description: "VERTEX AI Pyme: clientes, ventas, cobros y tablero para MiPymes, funciona sin señal."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # Versiones base; `flutter pub add` / `flutter pub upgrade --major-versions`
+  # las ajusta a las vigentes si hay incompatibilidades.
+  sqflite_sqlcipher: ^3.1.0
+  flutter_secure_storage: ^9.2.2
+  path: ^1.9.0
+  uuid: ^4.5.1
+  supabase_flutter: ^2.8.0
+  connectivity_plus: ^6.1.0
+  url_launcher: ^6.3.1
+  intl: any # la fija flutter_localizations
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  sqflite_common_ffi: ^2.3.4
+
+flutter:
+  uses-material-design: true
