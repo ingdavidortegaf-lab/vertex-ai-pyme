@@ -8,8 +8,12 @@
 - `flutter test`: **55 de 55 pruebas pasan**.
 - `flutter build apk --release --obfuscate --split-debug-info=build\debug-info`:
   **compila** (64,1 MB, modo solo local, sin claves).
-- Pendiente: probarla en un celular real. El emulador no arranca en este PC
-  porque falta el controlador de virtualización.
+- Celular real (Xiaomi 14T, HyperOS): el APK se instala y **la app abre bien**
+  (16 nov. 2026), así que la base cifrada con SQLCipher y la clave en el Keystore
+  funcionan en el dispositivo. Falta confirmar paso a paso el flujo en modo
+  avión y el botón de WhatsApp.
+- El emulador no arranca en este PC porque falta el controlador de
+  virtualización; se prueba en el celular real.
 
 ## 1. Segunda revisión: cambios hechos
 | # | Problema | Riesgo | Solución |
