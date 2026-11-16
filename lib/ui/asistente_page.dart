@@ -13,6 +13,7 @@ class AsistentePage extends StatefulWidget {
 
 class _AsistentePageState extends State<AsistentePage> {
   final _q = TextEditingController();
+  final _scroll = ScrollController();
   RespuestaAsistente? _resp;
   String? _pregunta;
   bool _cargando = false;
@@ -38,6 +39,7 @@ class _AsistentePageState extends State<AsistentePage> {
   void dispose() {
     LocalDb.instance.cambios.removeListener(_cargarConsejos);
     _q.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
@@ -69,6 +71,15 @@ class _AsistentePageState extends State<AsistentePage> {
       _cargando = false;
     });
     _q.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scroll.hasClients) return;
+      final quieto = MediaQuery.disableAnimationsOf(context);
+      final destino = _scroll.position.maxScrollExtent;
+      quieto
+          ? _scroll.jumpTo(destino)
+          : _scroll.animateTo(destino,
+              duration: const Duration(milliseconds: 300), curve: Curves.easeOutCubic);
+    });
   }
 
   @override
@@ -79,7 +90,10 @@ class _AsistentePageState extends State<AsistentePage> {
     final resp = _resp;
     return Column(children: [
       Expanded(
-        child: ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 16), children: [
+        child: ListView(
+            controller: _scroll,
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(
               width: 48,

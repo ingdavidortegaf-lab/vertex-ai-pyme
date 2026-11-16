@@ -147,7 +147,7 @@ class FilaMovimiento extends StatelessWidget {
     final cliente = v['cliente_nombre'] as String?;
     final fecha = fmt.format(DateTime.parse(v['fecha'] as String).toLocal());
     final partes = [
-      etiqueta,
+      if (etiqueta != v['concepto']) etiqueta,
       if (mostrarCliente && cliente != null) cliente,
       fecha,
     ];
@@ -426,6 +426,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               maxLength: 80,
               decoration: InputDecoration(
                 labelText: _tipo == 'egreso' ? 'En qué fue el gasto' : 'Concepto (opcional)',
+                counterText: '',
                 hintText: switch (_tipo) {
                   'egreso' => 'Ej.: arriendo, mercancía',
                   'abono' => 'Abono',

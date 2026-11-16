@@ -116,7 +116,7 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
     if (c == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    final fmt = DateFormat('d MMM y, h:mm a', 'es_CO');
+    final fmt = DateFormat('d MMM, h:mm a', 'es_CO');
     final p = Paleta.of(context);
     final t = Theme.of(context).textTheme;
     final esquema = Theme.of(context).colorScheme;

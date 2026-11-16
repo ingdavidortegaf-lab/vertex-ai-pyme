@@ -64,7 +64,9 @@ class _TableroPageState extends State<TableroPage> {
                 etiqueta: 'Venta',
                 icono: Icons.add_rounded,
                 fondo: p.ventas,
-                tinta: Colors.white,
+                tinta: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : const Color(0xFF0B2018),
                 onTap: () => mostrarFormMovimiento(context),
               ),
             ),
@@ -144,7 +146,7 @@ class _PizarraDelDia extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = Paleta.of(context);
     final t = Theme.of(context).textTheme;
-    final hoy = DateFormat("EEEE d 'de' MMMM", 'es_CO').format(DateTime.now());
+    final hoy = DateFormat('EEEE d MMM', 'es_CO').format(DateTime.now());
     final n = d.nVentasHoy;
     return Container(
       decoration: BoxDecoration(
@@ -402,8 +404,8 @@ class _PorCobrar extends StatelessWidget {
                 style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
           ]),
         ),
-        for (final c in deben.take(5)) ...[
-          const Divider(indent: 72),
+        for (final (i, c) in deben.take(5).indexed) ...[
+          Divider(indent: i == 0 ? 0 : 72),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             leading: AvatarCliente(nombre: c.nombre, clave: c.nombre),
