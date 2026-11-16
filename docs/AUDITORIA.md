@@ -45,6 +45,8 @@
 | 22 | Fallo del almacén seguro = app cerrada sin explicación | Mala experiencia | Pantalla de error en español |
 | 23 | http:// se aceptaba como URL de Supabase | Tráfico sin TLS | Solo se activa la nube con `https://` |
 | 24 | Copias de seguridad de Android 12+ por `dataExtractionRules` | La base podía salir del equipo | `data_extraction_rules.xml` excluye todo |
+| 25 | `mi_empresa()` (SECURITY DEFINER) se podía llamar por `/rest/v1/rpc` | Superficie de API innecesaria (linter de Supabase) | Movida al esquema `privado`, que la API no expone; 0 avisos de seguridad |
+| 26 | Políticas RLS evaluaban `auth.uid()` por cada fila | Lentitud con muchos datos | `(select auth.uid())` y `(select privado.mi_empresa())`: una vez por consulta |
 
 ## 2. Hallazgos de la primera revisión (se mantienen)
 Inicialización de fechas en español, mes en hora local de Colombia, borrado
