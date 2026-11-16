@@ -10,8 +10,11 @@
   **compila** (64,1 MB, modo solo local, sin claves).
 - Celular real (Xiaomi 14T, HyperOS): el APK se instala y **la app abre bien**
   (16 nov. 2026), así que la base cifrada con SQLCipher y la clave en el Keystore
-  funcionan en el dispositivo. Falta confirmar paso a paso el flujo en modo
-  avión y el botón de WhatsApp.
+  funcionan en el dispositivo. **Flujo en modo avión verificado** por el
+  usuario: clientes, venta, gasto y venta fiada, tablero actualizado,
+  asistente («¿cuánto vendí esta semana?», «¿quién me debe?»), mensaje de
+  WhatsApp y datos que siguen ahí al reabrir la app.
+- Falta probar la sincronización con Supabase (requiere URL y clave anon).
 - El emulador no arranca en este PC porque falta el controlador de
   virtualización; se prueba en el celular real.
 
