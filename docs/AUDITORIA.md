@@ -55,6 +55,8 @@
 | 24 | Copias de seguridad de Android 12+ por `dataExtractionRules` | La base podía salir del equipo | `data_extraction_rules.xml` excluye todo |
 | 25 | `mi_empresa()` (SECURITY DEFINER) se podía llamar por `/rest/v1/rpc` | Superficie de API innecesaria (linter de Supabase) | Movida al esquema `privado`, que la API no expone; 0 avisos de seguridad |
 | 26 | Políticas RLS evaluaban `auth.uid()` por cada fila | Lentitud con muchos datos | `(select auth.uid())` y `(select privado.mi_empresa())`: una vez por consulta |
+| 27 | La Edge Function confiaba solo en el gateway | Si se desactivaba `verify_jwt`, cualquiera gastaría la cuota de IA | La función valida el token contra Supabase Auth antes de llamar al modelo (probado: sin sesión responde 401) |
+| 28 | Las cuentas solo se creaban desde el panel | El negocio no podía empezar solo | Pantalla «Tu cuenta»: entrar, crear cuenta (clave ≥ 8), perfil, cerrar sesión avisando lo pendiente; errores en español; bloqueo tras 5 intentos |
 
 ## 2. Hallazgos de la primera revisión (se mantienen)
 Inicialización de fechas en español, mes en hora local de Colombia, borrado
@@ -97,9 +99,13 @@ lógico, validación de montos colombianos, reintento por cambio de red,
 
 ## 6. Pendiente / riesgos conocidos
 - Probado en un solo celular (Xiaomi 14T, Android). Sin probar todavía:
-  la sincronización entre dos celulares de la misma empresa, el asistente
-  con IA en el servidor (Edge Function sin desplegar) e iOS. Las pruebas
-  automáticas usan SQLite sin cifrar sobre Windows.
+  la sincronización entre dos celulares de la misma empresa, la respuesta
+  real del modelo de IA (la Edge Function está desplegada pero falta el
+  secreto `GEMINI_API_KEY`), la creación de cuenta desde la app (depende de
+  la confirmación por correo de Supabase) e iOS. Las pruebas automáticas
+  usan SQLite sin cifrar sobre Windows.
+- Rediseño visual (16 nov.): revisado con capturas generadas en Windows
+  (`tool/capturas_test.dart`) en claro y oscuro; falta verlo en el celular.
 - Se cambió `anonKey` por `publishableKey` en `Supabase.initialize`
   (supabase_flutter 2.18 marcó `anonKey` como obsoleto); se le pasa la misma clave anon.
 - Roles: existe la columna `rol` (admin/vendedor) pero el prototipo usa solo admin.
