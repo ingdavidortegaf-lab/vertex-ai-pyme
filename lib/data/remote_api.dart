@@ -62,9 +62,13 @@ class SupabaseRemote implements RemoteApi {
       // ventas: ON CONFLICT DO NOTHING (solo se agregan, sin duplicados).
       // clientes: ON CONFLICT DO UPDATE; el trigger merge_cliente conserva
       // el campo más reciente.
+      // inventario también solo se agrega; productos se une por campo
+      // (trigger merge_producto).
       await _sb
           .from(tabla)
-          .upsert(fila, onConflict: 'id', ignoreDuplicates: tabla == 'ventas')
+          .upsert(fila,
+              onConflict: 'id',
+              ignoreDuplicates: tabla == 'ventas' || tabla == 'inventario')
           .timeout(_timeout);
     } catch (e) {
       _traducir(e);

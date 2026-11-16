@@ -22,7 +22,8 @@ class LocalDb {
   /// Fallos del servidor tolerados antes de apartar un registro (no se borra:
   /// queda en estado "error" y se reintenta al abrir la app o a mano).
   static const maxIntentos = 5;
-  static const _tablasSync = {'clientes', 'ventas'};
+  static const _tablasSync = {'clientes', 'ventas', 'productos', 'inventario'};
+  static const motivosInventario = {'venta', 'entrada', 'ajuste'};
   static const tiposMovimiento = {'ingreso', 'egreso', 'abono'};
 
   Database? _db;
@@ -46,7 +47,13 @@ class LocalDb {
     }
     final path = p.join(await getDatabasesPath(), 'vertex.db');
     _db = await openDatabase(path,
-        password: key, version: 1, onCreate: (d, _) => crearEsquema(d));
+        password: key,
+        version: 2,
+        onCreate: (d, _) => crearEsquema(d),
+        onUpgrade: (d, viejo, _) async {
+          // v2: inventario. Los datos anteriores se conservan.
+          if (viejo < 2) await crearInventario(d);
+        });
   }
 
   /// Solo para pruebas: usa una base ya abierta (sqflite_common_ffi).
@@ -92,6 +99,33 @@ class LocalDb {
       creado TEXT NOT NULL)''');
     await d.execute(
         'CREATE TABLE ajustes(clave TEXT PRIMARY KEY, valor TEXT NOT NULL)');
+    await crearInventario(d);
+  }
+
+  /// Productos (campos con marca de tiempo, como clientes) y movimientos de
+  /// inventario (solo se agregan; el stock es la suma de las cantidades).
+  static Future<void> crearInventario(Database d) async {
+    await d.execute('''CREATE TABLE productos(
+      id TEXT PRIMARY KEY,
+      nombre TEXT NOT NULL, nombre_ts TEXT NOT NULL,
+      precio REAL NOT NULL DEFAULT 0, precio_ts TEXT NOT NULL,
+      costo REAL NOT NULL DEFAULT 0, costo_ts TEXT NOT NULL,
+      minimo REAL NOT NULL DEFAULT 0, minimo_ts TEXT NOT NULL,
+      deleted INTEGER NOT NULL DEFAULT 0, deleted_ts TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      sync TEXT NOT NULL DEFAULT 'pendiente')''');
+    await d.execute('''CREATE TABLE inventario(
+      id TEXT PRIMARY KEY,
+      producto_id TEXT NOT NULL,
+      cantidad REAL NOT NULL CHECK (cantidad <> 0),
+      motivo TEXT NOT NULL CHECK (motivo IN ('venta','entrada','ajuste')),
+      venta_id TEXT,
+      precio_unit REAL,
+      costo_unit REAL,
+      fecha TEXT NOT NULL,
+      sync TEXT NOT NULL DEFAULT 'pendiente')''');
+    await d.execute('CREATE INDEX inventario_producto_idx ON inventario(producto_id)');
+    await d.execute('CREATE INDEX inventario_fecha_idx ON inventario(motivo, fecha)');
   }
 
   String newId() => _uuid.v4();
@@ -193,8 +227,10 @@ class LocalDb {
           [ahora]);
       await t.rawUpdate(
           "UPDATE clientes SET sync = 'pendiente' WHERE sync = 'error'");
-      await t.rawUpdate(
-          "UPDATE ventas SET sync = 'pendiente' WHERE sync = 'error'");
+      for (final tabla in const ['ventas', 'productos', 'inventario']) {
+        await t.rawUpdate(
+            "UPDATE $tabla SET sync = 'pendiente' WHERE sync = 'error'");
+      }
       return c;
     });
     if (n > 0) _avisar();
@@ -397,6 +433,8 @@ class LocalDb {
     final lunes = hoy.subtract(Duration(days: hoy.weekday - 1));
     final (vHoy, nHoy) = await ventasDesde(hoy);
     final (vSem, nSem) = await ventasDesde(lunes);
+    final ini = DateTime(now.year, now.month);
+    final fin = DateTime(now.year, now.month + 1);
     return DatosAsistente(
       mes: await resumenMes(),
       ventasHoy: vHoy,
@@ -405,7 +443,249 @@ class LocalDb {
       nVentasSemana: nSem,
       clientes: await clientesConSaldo(),
       topClientes: await topClientesMes(),
+      productos: await productos(),
+      topProductos: await topProductos(ini, fin),
+      gananciaProductosMes: (await resumenPeriodo(ini, fin)).gananciaProductos,
+      nombreNegocio: await ajuste('negocio_nombre') ?? '',
+      metaMensual: double.tryParse(await ajuste('negocio_meta') ?? '') ?? 0,
     );
+  }
+
+  // ------------------------------------------------------------ inventario
+  static const _stockSql =
+      'COALESCE((SELECT SUM(i.cantidad) FROM inventario i '
+      'WHERE i.producto_id = p.id), 0)';
+
+  Future<List<ProductoStock>> productos() async {
+    final r = await db.rawQuery(
+        'SELECT p.*, $_stockSql AS stock FROM productos p WHERE p.deleted = 0 '
+        'ORDER BY p.nombre COLLATE NOCASE');
+    return [
+      for (final x in r)
+        ProductoStock(
+          id: x['id'] as String,
+          nombre: x['nombre'] as String,
+          precio: _dbl(x['precio']),
+          costo: _dbl(x['costo']),
+          minimo: _dbl(x['minimo']),
+          stock: _dbl(x['stock']),
+          sync: x['sync'] as String? ?? 'pendiente',
+        )
+    ];
+  }
+
+  Map<String, Object?> _filaInventario(String id, String productoId,
+          double cantidad, String motivo,
+          {String? ventaId, double? precio, double? costo}) =>
+      {
+        'id': id,
+        'producto_id': productoId,
+        'cantidad': cantidad,
+        'motivo': motivo,
+        'venta_id': ventaId,
+        'precio_unit': precio,
+        'costo_unit': costo,
+        'fecha': _ahora(),
+      };
+
+  Future<void> _insertarInventario(
+      DatabaseExecutor t, Map<String, Object?> fila) async {
+    await t.insert('inventario', {...fila, 'sync': 'pendiente'});
+    await _enqueue(t, 'inventario', fila['id'] as String, fila);
+  }
+
+  /// Crea o edita un producto. Solo cambia la marca de tiempo de los campos
+  /// que cambiaron. [stockInicial] (al crear) se registra como entrada.
+  Future<String> saveProducto(String nombre,
+      {required double precio,
+      double costo = 0,
+      double minimo = 0,
+      double stockInicial = 0,
+      String? id}) async {
+    if (nombre.trim().isEmpty) throw ArgumentError('nombre');
+    if (!precio.isFinite || precio < 0 || !costo.isFinite || costo < 0) {
+      throw ArgumentError('precio');
+    }
+    final pid = id ?? newId();
+    final ts = _ahora();
+    var cambio = false;
+    await db.transaction((t) async {
+      final prev = await t.query('productos', where: 'id = ?', whereArgs: [pid]);
+      final nuevos = <String, Object>{
+        'nombre': nombre.trim(),
+        'precio': precio,
+        'costo': costo,
+        'minimo': minimo < 0 ? 0 : minimo,
+      };
+      final Map<String, Object?> row;
+      if (prev.isEmpty) {
+        row = {
+          'id': pid,
+          ...nuevos,
+          'deleted': 0,
+          for (final c in ProductoCampos.campos) '${c}_ts': ts,
+          'updated_at': ts,
+          'sync': 'pendiente',
+        };
+        await t.insert('productos', row);
+        if (stockInicial > 0) {
+          await _insertarInventario(
+              t, _filaInventario(newId(), pid, stockInicial, 'entrada', costo: costo));
+        }
+      } else {
+        row = Map<String, Object?>.of(prev.first);
+        for (final e in nuevos.entries) {
+          if (row[e.key] != e.value) {
+            row[e.key] = e.value;
+            row['${e.key}_ts'] = ts;
+            cambio = true;
+          }
+        }
+        if (!cambio) return;
+        row['updated_at'] = ts;
+        row['sync'] = 'pendiente';
+        await t.update('productos', row, where: 'id = ?', whereArgs: [pid]);
+      }
+      cambio = true;
+      await _enqueue(t, 'productos', pid, ProductoCampos.fromLocal(row).toRemote());
+    });
+    if (cambio) _avisar();
+    return pid;
+  }
+
+  Future<void> deleteProducto(String id) async {
+    final ts = _ahora();
+    await db.transaction((t) async {
+      final prev = await t.query('productos', where: 'id = ?', whereArgs: [id]);
+      if (prev.isEmpty) return;
+      final row = Map<String, Object?>.of(prev.first)
+        ..['deleted'] = 1
+        ..['deleted_ts'] = ts
+        ..['updated_at'] = ts
+        ..['sync'] = 'pendiente';
+      await t.update('productos', row, where: 'id = ?', whereArgs: [id]);
+      await _enqueue(t, 'productos', id, ProductoCampos.fromLocal(row).toRemote());
+    });
+    _avisar();
+  }
+
+  /// Entrada de mercancía (cantidad > 0) o ajuste por conteo (+/−).
+  Future<void> moverStock(String productoId, double cantidad,
+      {String motivo = 'entrada', double? costo}) async {
+    if (!cantidad.isFinite || cantidad == 0) throw ArgumentError('cantidad');
+    if (motivo == 'entrada' && cantidad < 0) throw ArgumentError('cantidad');
+    if (!motivosInventario.contains(motivo) || motivo == 'venta') {
+      throw ArgumentError('motivo');
+    }
+    await db.transaction((t) => _insertarInventario(
+        t, _filaInventario(newId(), productoId, cantidad, motivo, costo: costo)));
+    _avisar();
+  }
+
+  /// Venta con productos: un movimiento de venta por el total y una salida de
+  /// inventario por cada producto, todo en una sola transacción.
+  Future<String> saveVentaProductos(List<ItemVenta> items,
+      {bool fiado = false, String? clienteId, String? concepto}) async {
+    final validos = items.where((i) => i.cantidad > 0).toList();
+    if (validos.isEmpty) throw ArgumentError('items');
+    if (fiado && clienteId == null) throw ArgumentError('cliente');
+    final total = validos.fold(0.0, (s, i) => s + i.total);
+    if (total <= 0) throw ArgumentError('monto');
+    String cant(double c) =>
+        c == c.roundToDouble() ? c.toInt().toString() : c.toString();
+    var texto = concepto?.trim().isNotEmpty == true
+        ? concepto!.trim()
+        : validos.map((i) => '${cant(i.cantidad)} × ${i.nombre}').join(', ');
+    if (texto.length > 120) texto = '${texto.substring(0, 117)}…';
+    final id = newId();
+    final venta = <String, Object?>{
+      'id': id,
+      'cliente_id': clienteId,
+      'concepto': texto,
+      'monto': total,
+      'tipo': 'ingreso',
+      'credito': fiado ? 1 : 0,
+      'fecha': _ahora(),
+    };
+    await db.transaction((t) async {
+      await t.insert('ventas', {...venta, 'sync': 'pendiente'});
+      await _enqueue(t, 'ventas', id, {...venta, 'credito': fiado});
+      for (final i in validos) {
+        await _insertarInventario(
+            t,
+            _filaInventario(newId(), i.productoId, -i.cantidad, 'venta',
+                ventaId: id, precio: i.precio, costo: i.costo));
+      }
+    });
+    _avisar();
+    return id;
+  }
+
+  // -------------------------------------------------------------- reportes
+  /// Totales entre [desde] y [hasta] (fechas locales; hasta excluido).
+  Future<ResumenPeriodo> resumenPeriodo(DateTime desde, DateTime hasta) async {
+    final a = isoUtc(desde), b = isoUtc(hasta);
+    final r = (await db.rawQuery(
+            "SELECT COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN monto END), 0) ven, "
+            "COUNT(CASE WHEN tipo = 'ingreso' THEN 1 END) nven, "
+            "COALESCE(SUM(CASE WHEN tipo = 'ingreso' AND credito = 1 THEN monto END), 0) fia, "
+            "COALESCE(SUM(CASE WHEN tipo = 'egreso' THEN monto END), 0) gas, "
+            "COALESCE(SUM(CASE WHEN tipo = 'abono' THEN monto END), 0) abo "
+            'FROM ventas WHERE fecha >= ? AND fecha < ?',
+            [a, b]))
+        .first;
+    final g = await db.rawQuery(
+        'SELECT COALESCE(SUM(-cantidad * (COALESCE(precio_unit, 0) - '
+        "COALESCE(costo_unit, 0))), 0) FROM inventario WHERE motivo = 'venta' "
+        'AND fecha >= ? AND fecha < ?',
+        [a, b]);
+    final ventas = _dbl(r['ven']), fiado = _dbl(r['fia']);
+    return ResumenPeriodo(
+      ventas: ventas,
+      nVentas: (r['nven'] as num?)?.toInt() ?? 0,
+      gastos: _dbl(r['gas']),
+      fiado: fiado,
+      contado: ventas - fiado,
+      abonos: _dbl(r['abo']),
+      gananciaProductos: _dbl(g.first.values.first),
+    );
+  }
+
+  /// Ventas y gastos por día local entre [desde] y [hasta] (días completos).
+  Future<List<DiaSerie>> seriePorDia(DateTime desde, DateTime hasta) async {
+    final r = await db.rawQuery(
+        "SELECT tipo, monto, fecha FROM ventas WHERE tipo IN ('ingreso','egreso') "
+        'AND fecha >= ? AND fecha < ?',
+        [isoUtc(desde), isoUtc(hasta)]);
+    final ven = <DateTime, double>{}, gas = <DateTime, double>{};
+    for (final x in r) {
+      final f = DateTime.parse(x['fecha'] as String).toLocal();
+      final d = DateTime(f.year, f.month, f.day);
+      final m = x['tipo'] == 'ingreso' ? ven : gas;
+      m[d] = (m[d] ?? 0) + _dbl(x['monto']);
+    }
+    final out = <DiaSerie>[];
+    for (var d = DateTime(desde.year, desde.month, desde.day);
+        d.isBefore(hasta);
+        d = DateTime(d.year, d.month, d.day + 1)) {
+      out.add(DiaSerie(d, ven[d] ?? 0, gas[d] ?? 0));
+    }
+    return out;
+  }
+
+  Future<List<TopProducto>> topProductos(DateTime desde, DateTime hasta,
+      {int limite = 5}) async {
+    final r = await db.rawQuery(
+        'SELECT p.nombre, SUM(-i.cantidad) cant, '
+        'SUM(-i.cantidad * COALESCE(i.precio_unit, 0)) total '
+        'FROM inventario i JOIN productos p ON p.id = i.producto_id '
+        "WHERE i.motivo = 'venta' AND i.fecha >= ? AND i.fecha < ? "
+        'GROUP BY i.producto_id ORDER BY total DESC LIMIT ?',
+        [isoUtc(desde), isoUtc(hasta), limite]);
+    return [
+      for (final x in r)
+        TopProducto(x['nombre'] as String, _dbl(x['cant']), _dbl(x['total']))
+    ];
   }
 
   // ------------------------------------------ cambios que llegan de la nube
@@ -464,6 +744,64 @@ class LocalDb {
     _avisar();
   }
 
+  /// Productos descargados: unión campo por campo, como clientes.
+  Future<void> aplicarProductosRemotos(List<Map<String, dynamic>> filas) async {
+    if (filas.isEmpty) return;
+    await db.transaction((t) async {
+      for (final f in filas) {
+        final ProductoCampos remoto;
+        try {
+          remoto = ProductoCampos.fromRemote(f);
+        } catch (_) {
+          continue;
+        }
+        final prev =
+            await t.query('productos', where: 'id = ?', whereArgs: [remoto.id]);
+        if (prev.isEmpty) {
+          await t.insert('productos', {...remoto.toLocalRow(), 'sync': 'enviado'});
+        } else {
+          final unido = ProductoCampos.fromLocal(prev.first).merge(remoto);
+          await t.update(
+              'productos', {...unido.toLocalRow(), 'sync': prev.first['sync']},
+              where: 'id = ?', whereArgs: [remoto.id]);
+        }
+      }
+    });
+    _avisar();
+  }
+
+  /// Movimientos de inventario descargados: se agregan; repetidos se ignoran.
+  Future<void> aplicarInventarioRemoto(List<Map<String, dynamic>> filas) async {
+    if (filas.isEmpty) return;
+    final b = db.batch();
+    for (final f in filas) {
+      final cantidad = (f['cantidad'] as num?)?.toDouble() ?? 0;
+      final fecha = DateTime.tryParse('${f['fecha']}');
+      if (cantidad == 0 ||
+          !motivosInventario.contains(f['motivo']) ||
+          fecha == null ||
+          f['producto_id'] is! String) {
+        continue;
+      }
+      b.insert(
+          'inventario',
+          {
+            'id': f['id'],
+            'producto_id': f['producto_id'],
+            'cantidad': cantidad,
+            'motivo': f['motivo'],
+            'venta_id': f['venta_id'],
+            'precio_unit': (f['precio_unit'] as num?)?.toDouble(),
+            'costo_unit': (f['costo_unit'] as num?)?.toDouble(),
+            'fecha': isoUtc(fecha),
+            'sync': 'enviado',
+          },
+          conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
+    await b.commit(noResult: true);
+    _avisar();
+  }
+
   // ------------------------------------------------ preguntas para la IA
   Future<String> guardarPreguntaIA(String pregunta, {String? respuesta}) async {
     final id = newId();
@@ -498,7 +836,14 @@ class LocalDb {
   /// en la nube se suprime escribiendo al canal de derechos.
   Future<void> borrarDatosLocales() async {
     await db.transaction((t) async {
-      for (final tabla in ['cola_sync', 'ventas', 'clientes', 'preguntas_ia']) {
+      for (final tabla in [
+        'cola_sync',
+        'ventas',
+        'clientes',
+        'preguntas_ia',
+        'inventario',
+        'productos'
+      ]) {
         await t.delete(tabla);
       }
       await t.delete('ajustes', where: "clave LIKE 'pull_%'");

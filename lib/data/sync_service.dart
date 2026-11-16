@@ -185,15 +185,20 @@ class SyncService {
   static const _lote = 500;
 
   Future<void> _descargar(RemoteApi api) async {
-    for (final tabla in const ['clientes', 'ventas']) {
+    for (final tabla in const ['clientes', 'ventas', 'productos', 'inventario']) {
       var cursor = await db.ajuste('pull_$tabla');
       while (true) {
         final filas = await api.descargar(tabla, cursor, _lote);
         if (filas.isEmpty) break;
-        if (tabla == 'clientes') {
-          await db.aplicarClientesRemotos(filas);
-        } else {
-          await db.aplicarVentasRemotas(filas);
+        switch (tabla) {
+          case 'clientes':
+            await db.aplicarClientesRemotos(filas);
+          case 'ventas':
+            await db.aplicarVentasRemotas(filas);
+          case 'productos':
+            await db.aplicarProductosRemotos(filas);
+          default:
+            await db.aplicarInventarioRemoto(filas);
         }
         final ultimo = filas.last['recibido_at'];
         if (ultimo is! String) break;

@@ -24,6 +24,8 @@ class ServidorFalso implements RemoteApi {
   final tablas = <String, Map<String, Map<String, dynamic>>>{
     'clientes': {},
     'ventas': {},
+    'productos': {},
+    'inventario': {},
   };
   int envios = 0;
   int _reloj = 0;
@@ -53,8 +55,14 @@ class ServidorFalso implements RemoteApi {
     final id = fila['id'] as String;
     if (rechazar.contains(id)) throw const RechazoServidor('23514');
     final t = tablas[tabla]!;
-    if (tabla == 'ventas') {
+    if (tabla == 'ventas' || tabla == 'inventario') {
       t.putIfAbsent(id, () => {...fila, 'recibido_at': _marca()});
+    } else if (tabla == 'productos') {
+      final nuevo = ProductoCampos.fromRemote(fila);
+      final previo = t[id];
+      final unido =
+          previo == null ? nuevo : ProductoCampos.fromRemote(previo).merge(nuevo);
+      t[id] = {...unido.toRemote(), 'recibido_at': _marca()};
     } else {
       final nuevo = ClienteCampos.fromRemote(fila);
       final previo = t[id];

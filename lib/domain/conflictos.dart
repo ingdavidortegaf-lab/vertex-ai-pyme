@@ -101,6 +101,65 @@ class ClienteCampos {
       };
 }
 
+/// Producto del inventario: misma regla que clientes (gana el cambio más
+/// reciente de cada campo). El stock NO es un campo: se calcula sumando los
+/// movimientos de inventario, que solo se agregan.
+class ProductoCampos {
+  static const campos = ['nombre', 'precio', 'costo', 'minimo', 'deleted'];
+
+  final String id;
+  final Map<String, Object> valores;
+  final Map<String, DateTime> ts;
+  const ProductoCampos(this.id, this.valores, this.ts);
+
+  String get nombre => valores['nombre'] as String;
+  double get precio => (valores['precio'] as num).toDouble();
+  double get costo => (valores['costo'] as num).toDouble();
+  double get minimo => (valores['minimo'] as num).toDouble();
+  bool get deleted => valores['deleted'] == true;
+
+  DateTime get updatedAt =>
+      ts.values.reduce((a, b) => b.isAfter(a) ? b : a);
+
+  ProductoCampos merge(ProductoCampos otro) {
+    final v = Map<String, Object>.of(valores);
+    final t = Map<String, DateTime>.of(ts);
+    for (final c in campos) {
+      if (otro.ts[c]!.isAfter(ts[c]!)) {
+        v[c] = otro.valores[c]!;
+        t[c] = otro.ts[c]!;
+      }
+    }
+    return ProductoCampos(id, v, t);
+  }
+
+  static ProductoCampos _leer(Map<String, Object?> r, bool local) {
+    final v = <String, Object>{
+      'nombre': r['nombre'] as String,
+      'precio': (r['precio'] as num).toDouble(),
+      'costo': (r['costo'] as num? ?? 0).toDouble(),
+      'minimo': (r['minimo'] as num? ?? 0).toDouble(),
+      'deleted': local ? (r['deleted'] as int? ?? 0) == 1 : r['deleted'] == true,
+    };
+    final t = {for (final c in campos) c: DateTime.parse(r['${c}_ts'] as String)};
+    return ProductoCampos(r['id'] as String, v, t);
+  }
+
+  factory ProductoCampos.fromLocal(Map<String, Object?> r) => _leer(r, true);
+  factory ProductoCampos.fromRemote(Map<String, dynamic> r) => _leer(r, false);
+
+  Map<String, Object?> _fila(bool local) => {
+        'id': id,
+        for (final c in campos)
+          c: c == 'deleted' && local ? (deleted ? 1 : 0) : valores[c],
+        for (final c in campos) '${c}_ts': isoUtc(ts[c]!),
+        'updated_at': isoUtc(updatedAt),
+      };
+
+  Map<String, Object?> toLocalRow() => _fila(true);
+  Map<String, dynamic> toRemote() => _fila(false);
+}
+
 /// Espera antes de reintentar un registro que el servidor rechazó:
 /// 15 s, 30 s, 1 min, 2 min, 4 min… con tope de 30 min.
 Duration esperaReintento(int intentos) {
