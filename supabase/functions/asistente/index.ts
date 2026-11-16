@@ -3,16 +3,35 @@
 // Despliegue (CLI de Supabase, gratis):
 //   supabase functions deploy asistente
 //   supabase secrets set GEMINI_API_KEY=xxxx GEMINI_MODEL=<modelo gratuito vigente>
+// (o en el panel: Edge Functions > Secrets > Add new secret).
 //
 // - La clave del modelo vive SOLO aquí (secreto del servidor), nunca en la app
 //   ni en el repositorio.
-// - verify_jwt está activo por defecto: solo usuarios con sesión la llaman.
+// - Solo usuarios con sesión: verify_jwt activo y, además, la función valida
+//   el token contra Supabase Auth antes de llamar al modelo.
 // - Minimización (Ley 1581): la app solo envía totales y la pregunta sin
 //   nombres, celulares ni correos. Aquí se vuelve a limpiar por si acaso.
 // - No se registran (log) preguntas ni respuestas.
 
 const MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-flash-latest";
 const KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
+const SB_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SB_ANON = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+
+/** El token debe ser de un usuario real con sesión vigente. */
+async function usuarioValido(req: Request): Promise<boolean> {
+  const auth = req.headers.get("Authorization") ?? "";
+  if (!auth.startsWith("Bearer ") || !SB_URL) return false;
+  try {
+    const r = await fetch(`${SB_URL}/auth/v1/user`, {
+      headers: { Authorization: auth, apikey: SB_ANON },
+      signal: AbortSignal.timeout(5000),
+    });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -63,6 +82,7 @@ function promptMensaje(b: Record<string, unknown>): string {
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method" }, 405);
+  if (!(await usuarioValido(req))) return json({ error: "auth" }, 401);
   if (!KEY) return json({ error: "no_key" }, 503);
 
   const largo = Number(req.headers.get("content-length") ?? "0");
@@ -85,7 +105,9 @@ Deno.serve(async (req) => {
         headers: { "Content-Type": "application/json", "x-goog-api-key": KEY },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 300, temperature: 0.4 },
+          // Margen amplio: los modelos que "piensan" gastan tokens antes de
+          // responder; la longitud la controla el prompt.
+          generationConfig: { maxOutputTokens: 1024, temperature: 0.4 },
         }),
         signal: AbortSignal.timeout(15000),
       },

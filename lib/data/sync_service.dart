@@ -64,6 +64,11 @@ class SyncService {
   final pendientes = ValueNotifier<int>(0);
   final errores = ValueNotifier<int>(0);
 
+  /// Registros subidos desde la última vez que el usuario miró la barra.
+  /// Se queda a la vista hasta que la toca.
+  final subidos = ValueNotifier<int>(0);
+  void verSubidos() => subidos.value = 0;
+
   bool _syncing = false;
   bool _otraVez = false;
   Timer? _timer;
@@ -149,6 +154,7 @@ class SyncService {
         try {
           await api.enviar(tabla, fila);
           await db.confirmarEnvio(n, tabla, id);
+          subidos.value++;
         } on RechazoServidor catch (e) {
           await db.marcarFallo(n, tabla, id, item['intentos'] as int, e.codigo);
         }

@@ -4,6 +4,8 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import 'cliente_detalle_page.dart';
 import 'comun.dart';
+import 'ilustraciones.dart';
+import 'tema.dart';
 
 class ClientesPage extends StatefulWidget {
   const ClientesPage({super.key});
@@ -14,6 +16,7 @@ class ClientesPage extends StatefulWidget {
 class _ClientesPageState extends State<ClientesPage> {
   List<Map<String, Object?>> _items = [];
   bool _cargado = false;
+  String _filtro = '';
 
   @override
   void initState() {
@@ -38,58 +41,128 @@ class _ClientesPageState extends State<ClientesPage> {
     }
   }
 
+  static String _sinTildes(String s) => s
+      .toLowerCase()
+      .replaceAll(RegExp('[áà]'), 'a')
+      .replaceAll(RegExp('[éè]'), 'e')
+      .replaceAll(RegExp('[íì]'), 'i')
+      .replaceAll(RegExp('[óò]'), 'o')
+      .replaceAll(RegExp('[úùü]'), 'u');
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => mostrarFormCliente(context),
-          icon: const Icon(Icons.person_add_alt),
-          label: const Text('Cliente'),
-        ),
-        body: !_cargado
-            ? const Center(child: CircularProgressIndicator())
-            : _items.isEmpty
-                ? const Center(
-                    child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Text('Aún no hay clientes. Toca «Cliente» para agregar el primero.',
-                        textAlign: TextAlign.center),
-                  ))
-                : ListView.separated(
-                    padding: const EdgeInsets.only(bottom: 88),
-                    itemCount: _items.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (_, i) {
-                      final c = _items[i];
-                      final tel = (c['telefono'] as String?) ?? '';
-                      final saldo = (c['saldo'] as num?)?.toDouble() ?? 0;
-                      final nombre = c['nombre'] as String;
-                      return ListTile(
-                        leading: CircleAvatar(
-                            child: Text(nombre.isEmpty ? '?' : nombre[0].toUpperCase())),
-                        title: Text(nombre),
-                        subtitle: Text(tel.isEmpty ? 'Sin celular' : mostrarTelefono(tel)),
-                        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                          if (saldo > 0)
-                            Text('Debe ${cop(saldo)}',
-                                style: const TextStyle(
-                                    color: Colors.red, fontWeight: FontWeight.w600)),
-                          const SizedBox(width: 6),
-                          iconoSync(c['sync']),
-                        ]),
-                        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) =>
-                                ClienteDetallePage(clienteId: c['id'] as String))),
-                      );
-                    },
+  Widget build(BuildContext context) {
+    final p = Paleta.of(context);
+    final t = Theme.of(context).textTheme;
+    final esquema = Theme.of(context).colorScheme;
+    final f = _sinTildes(_filtro.trim());
+    final digitos = _filtro.replaceAll(RegExp(r'\D'), '');
+    final lista = f.isEmpty
+        ? _items
+        : _items.where((c) {
+            final nombre = _sinTildes(c['nombre'] as String);
+            final tel = (c['telefono'] as String?) ?? '';
+            return nombre.contains(f) || (digitos.length >= 3 && tel.contains(digitos));
+          }).toList();
+    final deudores = _items.where((c) => ((c['saldo'] as num?) ?? 0) > 0).length;
+
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => mostrarFormCliente(context),
+        icon: const Icon(Icons.person_add_alt),
+        label: const Text('Cliente'),
+      ),
+      body: !_cargado
+          ? const Center(child: CircularProgressIndicator())
+          : _items.isEmpty
+              ? EstadoVacio(
+                  ilustracion: const IlustracionPizarra(),
+                  titulo: 'Aún no hay clientes',
+                  texto: 'Agrega a tus clientes para venderles fiado, ver quién '
+                      'te debe y cobrarles por WhatsApp.',
+                  accion: FilledButton.icon(
+                    onPressed: () => mostrarFormCliente(context),
+                    icon: const Icon(Icons.person_add_alt),
+                    label: const Text('Agregar el primero'),
                   ),
-      );
+                )
+              : ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: [
+                  TextField(
+                    onChanged: (v) => setState(() => _filtro = v),
+                    textInputAction: TextInputAction.search,
+                    decoration: const InputDecoration(
+                      hintText: 'Buscar por nombre o celular',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                    child: Text(
+                      '${_items.length == 1 ? '1 cliente' : '${_items.length} clientes'}'
+                      '${deudores > 0 ? ' · $deudores con saldo pendiente' : ''}',
+                      style: t.labelLarge?.copyWith(color: esquema.onSurfaceVariant),
+                    ),
+                  ),
+                  if (lista.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text('Ningún cliente coincide con «${_filtro.trim()}».',
+                          textAlign: TextAlign.center, style: t.bodyLarge),
+                    )
+                  else
+                    Card(
+                      child: Column(children: [
+                        for (final (i, c) in lista.indexed) ...[
+                          if (i > 0) const Divider(indent: 72),
+                          _FilaCliente(c: c, p: p),
+                        ],
+                      ]),
+                    ),
+                ]),
+    );
+  }
+}
+
+class _FilaCliente extends StatelessWidget {
+  final Map<String, Object?> c;
+  final Paleta p;
+  const _FilaCliente({required this.c, required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final tel = (c['telefono'] as String?) ?? '';
+    final saldo = (c['saldo'] as num?)?.toDouble() ?? 0;
+    final nombre = c['nombre'] as String;
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      leading: AvatarCliente(nombre: nombre, clave: nombre),
+      title: Text(nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(tel.isEmpty ? 'Sin celular' : mostrarTelefono(tel)),
+      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        if (saldo > 0)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+                color: p.fiadoFondo, borderRadius: BorderRadius.circular(10)),
+            child: Text('Debe ${cop(saldo)}',
+                style: cifras(t.labelLarge?.copyWith(color: p.fiado))),
+          ),
+        const SizedBox(width: 6),
+        iconoSync(c['sync']),
+      ]),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ClienteDetallePage(clienteId: c['id'] as String))),
+    );
+  }
 }
 
 /// Crear (cliente == null) o editar un cliente. Devuelve el id guardado.
 Future<String?> mostrarFormCliente(BuildContext context,
     {Map<String, Object?>? cliente}) async {
-  final r = await showDialog<(String, String)>(
+  final r = await showModalBottomSheet<(String, String)>(
     context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
     builder: (_) => _FormCliente(cliente: cliente),
   );
   if (r == null) return null;
@@ -116,6 +189,12 @@ class _FormClienteState extends State<_FormCliente> {
       text: mostrarTelefono(widget.cliente?['telefono'] as String? ?? ''));
 
   @override
+  void initState() {
+    super.initState();
+    _nombre.addListener(() => setState(() {}));
+  }
+
+  @override
   void dispose() {
     _nombre.dispose();
     _tel.dispose();
@@ -130,17 +209,38 @@ class _FormClienteState extends State<_FormCliente> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-        title: Text(widget.cliente == null ? 'Nuevo cliente' : 'Editar cliente'),
-        content: Form(
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final esquema = Theme.of(context).colorScheme;
+    final nombre = _nombre.text.trim();
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Form(
           key: _form,
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(children: [
+              AvatarCliente(
+                  nombre: nombre.isEmpty ? '?' : nombre,
+                  clave: nombre.replaceAll(RegExp(r'\s+'), ' '),
+                  tam: 52),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                    widget.cliente == null ? 'Nuevo cliente' : 'Editar cliente',
+                    style: t.headlineSmall),
+              ),
+            ]),
+            const SizedBox(height: 20),
             TextFormField(
               controller: _nombre,
               autofocus: widget.cliente == null,
               textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
               maxLength: 60,
-              decoration: const InputDecoration(labelText: 'Nombre *'),
+              decoration: const InputDecoration(
+                  labelText: 'Nombre', prefixIcon: Icon(Icons.person_outline)),
               validator: (v) {
                 final t = (v ?? '').trim();
                 if (t.length < 2) return 'Escribe el nombre del cliente';
@@ -150,26 +250,36 @@ class _FormClienteState extends State<_FormCliente> {
                 return null;
               },
             ),
+            const SizedBox(height: 4),
             TextFormField(
               controller: _tel,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(
-                  labelText: 'Celular (WhatsApp)', hintText: '300 123 4567'),
+                  labelText: 'Celular para WhatsApp (opcional)',
+                  hintText: '300 123 4567',
+                  prefixIcon: Icon(Icons.phone_android)),
               validator: (v) => normalizarTelefono(v ?? '') == null
                   ? 'Celular colombiano de 10 dígitos que empiece por 3'
                   : null,
               onFieldSubmitted: (_) => _guardar(),
             ),
-            const SizedBox(height: 8),
-            Text('Pide autorización al cliente para guardar sus datos.',
-                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 12),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.info_outline, size: 18, color: esquema.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Pide autorización al cliente para guardar sus datos.',
+                    style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
+              ),
+            ]),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: _guardar,
+              child: Text(widget.cliente == null ? 'Guardar cliente' : 'Guardar cambios'),
+            ),
           ]),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar')),
-          FilledButton(onPressed: _guardar, child: const Text('Guardar')),
-        ],
-      );
+      ),
+    );
+  }
 }

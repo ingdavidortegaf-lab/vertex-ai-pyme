@@ -9,6 +9,7 @@ import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'clientes_page.dart';
 import 'comun.dart';
+import 'tema.dart';
 import 'ventas_page.dart';
 
 /// Ficha del cliente: saldo, historial y mensaje sugerido para WhatsApp.
@@ -116,9 +117,14 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final fmt = DateFormat('d MMM y, h:mm a', 'es_CO');
+    final p = Paleta.of(context);
+    final t = Theme.of(context).textTheme;
+    final esquema = Theme.of(context).colorScheme;
+    final nombre = c['nombre'] as String;
+    final debe = _saldo > 0;
     return Scaffold(
       appBar: AppBar(
-        title: Text(c['nombre'] as String),
+        title: const Text('Cliente'),
         actions: [
           IconButton(
               tooltip: 'Editar',
@@ -130,62 +136,109 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
               onPressed: _eliminar),
         ],
       ),
-      body: ListView(padding: const EdgeInsets.all(12), children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                const Icon(Icons.phone_android, size: 18),
-                const SizedBox(width: 6),
-                Text(_tel.isEmpty ? 'Sin celular' : mostrarTelefono(_tel)),
-                const Spacer(),
-                iconoSync(c['sync']),
-              ]),
-              const SizedBox(height: 12),
-              Text(_saldo > 0 ? 'Saldo pendiente' : 'Está al día',
-                  style: Theme.of(context).textTheme.labelLarge),
-              Text(cop(_saldo > 0 ? _saldo : 0),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: _saldo > 0 ? Colors.red : Colors.green,
-                      fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                FilledButton.icon(
-                  onPressed: _tel.isEmpty || _generando ? null : _mensaje,
-                  icon: _generando
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.chat_outlined),
-                  label: Text(_saldo > 0 ? 'Mensaje de cobro' : 'Mensaje WhatsApp'),
-                ),
-                OutlinedButton.icon(
+      body: ListView(padding: EdgeInsets.zero, children: [
+        Container(
+          decoration: BoxDecoration(
+            color: p.pizarra,
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              AvatarCliente(nombre: nombre, clave: nombre, tam: 56),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(nombre,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: t.titleLarge?.copyWith(color: p.tizaBlanca)),
+                  const SizedBox(height: 2),
+                  Row(children: [
+                    Icon(Icons.phone_android, size: 16, color: p.tizaSuave),
+                    const SizedBox(width: 4),
+                    Text(_tel.isEmpty ? 'Sin celular' : mostrarTelefono(_tel),
+                        style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
+                  ]),
+                ]),
+              ),
+              iconoSync(c['sync']),
+            ]),
+            const SizedBox(height: 22),
+            Text(debe ? 'Te debe' : 'Está al día',
+                style: t.titleSmall?.copyWith(color: p.tizaSuave)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(cop(debe ? _saldo : 0),
+                  style: cifras(t.displaySmall?.copyWith(
+                      color: debe ? p.fiadoTiza : p.ventasTiza, fontSize: 40))),
+            ),
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF1C7A43),
+                  foregroundColor: Colors.white),
+              onPressed: _tel.isEmpty || _generando ? null : _mensaje,
+              icon: _generando
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.chat_outlined),
+              label: Text(_tel.isEmpty
+                  ? 'Agrega su celular para escribirle'
+                  : debe
+                      ? 'Cobrar por WhatsApp'
+                      : 'Escribir por WhatsApp'),
+            ),
+            const SizedBox(height: 10),
+            Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
                   onPressed: () =>
                       mostrarFormMovimiento(context, clienteId: widget.clienteId),
-                  icon: const Icon(Icons.add_shopping_cart),
+                  icon: const Icon(Icons.add),
                   label: const Text('Venta'),
                 ),
-                if (_saldo > 0)
-                  OutlinedButton.icon(
+              ),
+              if (debe) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: p.fiado, side: BorderSide(color: p.fiado)),
                     onPressed: () => mostrarFormMovimiento(context,
                         clienteId: widget.clienteId, tipoInicial: 'abono'),
                     icon: const Icon(Icons.payments_outlined),
-                    label: const Text('Registrar abono'),
+                    label: const Text('Abono'),
                   ),
-              ]),
+                ),
+              ],
             ]),
-          ),
+            const TituloSeccion('Historial'),
+            if (_movs.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+                child: Text('Todavía no hay movimientos con este cliente.',
+                    style: t.bodyLarge?.copyWith(color: esquema.onSurfaceVariant)),
+              )
+            else
+              Card(
+                child: Column(children: [
+                  for (final (i, m) in _movs.indexed) ...[
+                    if (i > 0) const Divider(indent: 72),
+                    filaMovimiento(m, fmt, mostrarCliente: false),
+                  ],
+                ]),
+              ),
+            const SizedBox(height: 28),
+          ]),
         ),
-        const SizedBox(height: 8),
-        Text('Historial', style: Theme.of(context).textTheme.titleMedium),
-        if (_movs.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text('Todavía no hay movimientos con este cliente.'),
-          ),
-        for (final m in _movs) filaMovimiento(m, fmt, mostrarCliente: false),
       ]),
     );
   }

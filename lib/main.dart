@@ -11,6 +11,7 @@ import 'ui/comun.dart';
 import 'ui/consent_gate.dart';
 import 'ui/home_page.dart';
 import 'ui/inactividad.dart';
+import 'ui/tema.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,8 +53,9 @@ class VertexApp extends StatelessWidget {
         locale: const Locale('es', 'CO'),
         supportedLocales: const [Locale('es', 'CO'), Locale('es')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        theme: ThemeData(
-            colorSchemeSeed: const Color(0xFF1D4ED8), useMaterial3: true),
+        theme: temaVertex(Brightness.light),
+        darkTheme: temaVertex(Brightness.dark),
+        themeMode: ThemeMode.system,
         home: const ConsentGate(child: InactividadGuard(child: HomePage())),
       );
 }

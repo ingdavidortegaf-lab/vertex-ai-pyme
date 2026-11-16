@@ -5,8 +5,10 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
+import 'ilustraciones.dart';
+import 'tema.dart';
 
-/// Movimientos: ventas (de contado o fiadas), gastos y abonos.
+/// Movimientos: ventas (de contado o fiadas), gastos y abonos, por día.
 class VentasPage extends StatefulWidget {
   const VentasPage({super.key});
   @override
@@ -40,9 +42,37 @@ class _VentasPageState extends State<VentasPage> {
     }
   }
 
+  static String _dia(DateTime d) {
+    final hoy = DateTime.now();
+    final h = DateTime(hoy.year, hoy.month, hoy.day);
+    final x = DateTime(d.year, d.month, d.day);
+    final dif = h.difference(x).inDays;
+    if (dif == 0) return 'Hoy';
+    if (dif == 1) return 'Ayer';
+    final s = DateFormat("EEEE d 'de' MMMM", 'es_CO').format(d);
+    return '${s[0].toUpperCase()}${s.substring(1)}';
+  }
+
+  /// Movimientos agrupados por día, con lo vendido ese día.
+  List<(String, double, List<Map<String, Object?>>)> _dias() {
+    final out = <(String, double, List<Map<String, Object?>>)>[];
+    for (final v in _items) {
+      final dia = _dia(DateTime.parse(v['fecha'] as String).toLocal());
+      if (out.isEmpty || out.last.$1 != dia) out.add((dia, 0, []));
+      final (d, vendido, lista) = out.removeLast();
+      lista.add(v);
+      final suma = v['tipo'] == 'ingreso' ? (v['monto'] as num).toDouble() : 0.0;
+      out.add((d, vendido + suma, lista));
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat('d MMM y, h:mm a', 'es_CO');
+    final hora = DateFormat('h:mm a', 'es_CO');
+    final t = Theme.of(context).textTheme;
+    final p = Paleta.of(context);
+    final dias = _cargado ? _dias() : const <(String, double, List<Map<String, Object?>>)>[];
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => mostrarFormMovimiento(context),
@@ -52,60 +82,100 @@ class _VentasPageState extends State<VentasPage> {
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
-              ? const Center(
-                  child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text(
-                      'Aún no hay movimientos. Toca «Registrar» para anotar una '
-                      'venta, un gasto o un abono.',
-                      textAlign: TextAlign.center),
-                ))
-              : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: 88),
-                  itemCount: _items.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (_, i) => filaMovimiento(_items[i], fmt),
+              ? const EstadoVacio(
+                  ilustracion: IlustracionPizarra(),
+                  titulo: 'Aún no hay movimientos',
+                  texto: 'Toca «Registrar» para anotar una venta, un gasto o '
+                      'un abono. Funciona aunque no haya señal.',
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 96),
+                  itemCount: dias.length,
+                  itemBuilder: (_, i) {
+                    final (dia, vendido, lista) = dias[i];
+                    return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+                            child: Row(children: [
+                              Expanded(child: Text(dia, style: t.titleSmall)),
+                              if (vendido > 0)
+                                Text('Vendido ${cop(vendido)}',
+                                    style: cifras(
+                                        t.labelLarge?.copyWith(color: p.ventas))),
+                            ]),
+                          ),
+                          Card(
+                            child: Column(children: [
+                              for (final (j, v) in lista.indexed) ...[
+                                if (j > 0) const Divider(indent: 72),
+                                FilaMovimiento(v: v, fmt: hora),
+                              ],
+                            ]),
+                          ),
+                        ]);
+                  },
                 ),
     );
   }
 }
 
+/// Compatibilidad: fila de un movimiento.
 Widget filaMovimiento(Map<String, Object?> v, DateFormat fmt,
-    {bool mostrarCliente = true}) {
-  final tipo = v['tipo'];
-  final fiado = v['credito'] == 1;
-  final (IconData icono, Color color, String etiqueta) = switch (tipo) {
-    'egreso' => (Icons.arrow_upward, Colors.red, 'Gasto'),
-    'abono' => (Icons.payments_outlined, Colors.teal, 'Abono'),
-    _ => (Icons.arrow_downward, Colors.green, fiado ? 'Venta fiada' : 'Venta'),
-  };
-  final cliente = v['cliente_nombre'] as String?;
-  final fecha = fmt.format(DateTime.parse(v['fecha'] as String).toLocal());
-  final partes = [
-    etiqueta,
-    if (mostrarCliente && cliente != null) cliente,
-    fecha,
-  ];
-  return ListTile(
-    leading: Icon(icono, color: color),
-    title: Text(v['concepto'] as String),
-    subtitle: Text(partes.join(' · ')),
-    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-      Text(cop((v['monto'] as num).toDouble()),
-          style: TextStyle(color: color, fontWeight: FontWeight.w600)),
-      const SizedBox(width: 6),
-      iconoSync(v['sync']),
-    ]),
-  );
+        {bool mostrarCliente = true}) =>
+    FilaMovimiento(v: v, fmt: fmt, mostrarCliente: mostrarCliente);
+
+class FilaMovimiento extends StatelessWidget {
+  final Map<String, Object?> v;
+  final DateFormat fmt;
+  final bool mostrarCliente;
+  const FilaMovimiento(
+      {super.key, required this.v, required this.fmt, this.mostrarCliente = true});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = Paleta.of(context);
+    final t = Theme.of(context).textTheme;
+    final tipo = v['tipo'] as String? ?? 'ingreso';
+    final fiado = v['credito'] == 1;
+    final (Color color, String etiqueta, String signo) = switch (tipo) {
+      'egreso' => (p.gastos, 'Gasto', '−'),
+      'abono' => (p.fiado, 'Abono', '+'),
+      _ => fiado ? (p.fiado, 'Venta fiada', '+') : (p.ventas, 'Venta', '+'),
+    };
+    final cliente = v['cliente_nombre'] as String?;
+    final fecha = fmt.format(DateTime.parse(v['fecha'] as String).toLocal());
+    final partes = [
+      etiqueta,
+      if (mostrarCliente && cliente != null) cliente,
+      fecha,
+    ];
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      leading: IconoTipo(tipo: tipo, fiado: fiado),
+      title: Text(v['concepto'] as String,
+          maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(partes.join(' · '), maxLines: 1, overflow: TextOverflow.ellipsis),
+      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        Text('$signo${cop((v['monto'] as num).toDouble())}',
+            style: cifras(t.titleSmall?.copyWith(color: color))),
+        const SizedBox(width: 6),
+        iconoSync(v['sync']),
+      ]),
+    );
+  }
 }
 
-/// Registrar venta, venta fiada, gasto o abono.
+/// Registrar venta, venta fiada, gasto o abono (hoja inferior).
 Future<void> mostrarFormMovimiento(BuildContext context,
     {String? clienteId, String tipoInicial = 'ingreso'}) async {
   final clientes = await LocalDb.instance.clientesConSaldo();
   if (!context.mounted) return;
-  final r = await showDialog<_Movimiento>(
+  final r = await showModalBottomSheet<_Movimiento>(
     context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
     builder: (_) => _FormMovimiento(
         clientes: clientes, clienteId: clienteId, tipoInicial: tipoInicial),
   );
@@ -168,31 +238,49 @@ class _FormMovimientoState extends State<_FormMovimiento> {
     final lista = _tipo == 'abono'
         ? widget.clientes.where((c) => c.saldo > 0).toList()
         : widget.clientes;
-    final elegido = await showDialog<String>(
+    final p = Paleta.of(context);
+    final elegido = await showModalBottomSheet<String>(
       context: context,
-      builder: (c) => SimpleDialog(
-        title: const Text('Elegir cliente'),
-        children: [
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (c) => ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(c).height * 0.7),
+        child: ListView(shrinkWrap: true, padding: const EdgeInsets.only(bottom: 16), children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(_tipo == 'abono' ? '¿Quién abona?' : 'Elegir cliente',
+                style: Theme.of(c).textTheme.titleLarge),
+          ),
           if (lista.isEmpty)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Text(_tipo == 'abono'
                   ? 'Ningún cliente tiene saldo pendiente.'
                   : 'Aún no hay clientes. Agrégalos en la pestaña Clientes.'),
             ),
           if (!_requiereCliente)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(c, ''),
-              child: const Text('Sin cliente'),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              leading: const Icon(Icons.person_off_outlined),
+              title: const Text('Sin cliente'),
+              onTap: () => Navigator.pop(c, ''),
             ),
           for (final cl in lista)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(c, cl.id),
-              child: Text(cl.saldo > 0
-                  ? '${cl.nombre} (debe ${cop(cl.saldo)})'
-                  : cl.nombre),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              leading: AvatarCliente(nombre: cl.nombre, clave: cl.nombre),
+              title: Text(cl.nombre),
+              trailing: cl.saldo > 0
+                  ? Text('Debe ${cop(cl.saldo)}',
+                      style: cifras(Theme.of(c)
+                          .textTheme
+                          .labelLarge
+                          ?.copyWith(color: p.fiado)))
+                  : null,
+              selected: cl.id == _clienteId,
+              onTap: () => Navigator.pop(c, cl.id),
             ),
-        ],
+        ]),
       ),
     );
     if (elegido == null) return;
@@ -229,84 +317,144 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   @override
   Widget build(BuildContext context) {
     final cliente = _cliente;
-    return AlertDialog(
-      title: const Text('Registrar movimiento'),
-      scrollable: true,
-      content: Form(
-        key: _form,
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SegmentedButton<String>(
-            showSelectedIcon: false,
-            segments: const [
-              ButtonSegment(value: 'ingreso', label: Text('Venta')),
-              ButtonSegment(value: 'egreso', label: Text('Gasto')),
-              ButtonSegment(value: 'abono', label: Text('Abono')),
+    final p = Paleta.of(context);
+    final t = Theme.of(context).textTheme;
+    final esquema = Theme.of(context).colorScheme;
+    final (Color tinta, Color fondo) = switch (_tipo) {
+      'egreso' => (p.gastos, p.gastosFondo),
+      'abono' => (p.fiado, p.fiadoFondo),
+      _ => _fiado ? (p.fiado, p.fiadoFondo) : (p.ventas, p.ventasFondo),
+    };
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Form(
+          key: _form,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text('Registrar', style: t.headlineSmall),
+            const SizedBox(height: 16),
+            SegmentedButton<String>(
+              showSelectedIcon: false,
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith(
+                    (s) => s.contains(WidgetState.selected) ? fondo : null),
+                foregroundColor: WidgetStateProperty.resolveWith(
+                    (s) => s.contains(WidgetState.selected) ? tinta : null),
+              ),
+              segments: const [
+                ButtonSegment(
+                    value: 'ingreso',
+                    icon: Icon(Icons.south_west_rounded),
+                    label: Text('Venta')),
+                ButtonSegment(
+                    value: 'egreso',
+                    icon: Icon(Icons.north_east_rounded),
+                    label: Text('Gasto')),
+                ButtonSegment(
+                    value: 'abono',
+                    icon: Icon(Icons.payments_outlined),
+                    label: Text('Abono')),
+              ],
+              selected: {_tipo},
+              onSelectionChanged: (s) => setState(() {
+                _tipo = s.first;
+                _errorCliente = null;
+                if (_tipo == 'abono' && (cliente == null || cliente.saldo <= 0)) {
+                  _clienteId = null;
+                }
+              }),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _monto,
+              autofocus: true,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              style: cifras(t.headlineMedium?.copyWith(color: tinta)),
+              decoration: InputDecoration(
+                labelText: 'Monto en pesos',
+                hintText: '25.000',
+                prefixText: r'$ ',
+                prefixStyle: t.headlineMedium?.copyWith(color: tinta),
+              ),
+              validator: (v) =>
+                  parseMonto(v ?? '') == null ? 'Escribe un monto mayor a cero' : null,
+            ),
+            if (_tipo == 'ingreso') ...[
+              const SizedBox(height: 8),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                value: _fiado,
+                activeTrackColor: p.fiado,
+                onChanged: (v) => setState(() => _fiado = v),
+                title: const Text('Venta fiada'),
+                subtitle: const Text('Queda por cobrar a un cliente'),
+              ),
             ],
-            selected: {_tipo},
-            onSelectionChanged: (s) => setState(() {
-              _tipo = s.first;
-              _errorCliente = null;
-              if (_tipo == 'abono' && (cliente == null || cliente.saldo <= 0)) {
-                _clienteId = null;
-              }
-            }),
-          ),
-          if (_tipo == 'ingreso')
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: _fiado,
-              onChanged: (v) => setState(() => _fiado = v),
-              title: const Text('Fiado (queda por cobrar)'),
+            if (_tipo != 'egreso') ...[
+              const SizedBox(height: 8),
+              Material(
+                color: esquema.surfaceContainerLow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(
+                      color: _errorCliente != null
+                          ? esquema.error
+                          : esquema.outlineVariant),
+                ),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  leading: cliente == null
+                      ? const Icon(Icons.person_outline)
+                      : AvatarCliente(nombre: cliente.nombre, clave: cliente.nombre, tam: 36),
+                  title: Text(cliente?.nombre ??
+                      (_requiereCliente ? 'Elegir cliente' : 'Cliente (opcional)')),
+                  subtitle: _errorCliente != null
+                      ? Text(_errorCliente!, style: TextStyle(color: esquema.error))
+                      : (cliente != null && cliente.saldo > 0
+                          ? Text('Debe ${cop(cliente.saldo)}')
+                          : null),
+                  trailing: const Icon(Icons.expand_more),
+                  onTap: _elegirCliente,
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _concepto,
+              textCapitalization: TextCapitalization.sentences,
+              maxLength: 80,
+              decoration: InputDecoration(
+                labelText: _tipo == 'egreso' ? 'En qué fue el gasto' : 'Concepto (opcional)',
+                hintText: switch (_tipo) {
+                  'egreso' => 'Ej.: arriendo, mercancía',
+                  'abono' => 'Abono',
+                  _ => 'Ej.: 2 bultos de concentrado',
+                },
+              ),
+              validator: (v) => _tipo == 'egreso' && (v ?? '').trim().isEmpty
+                  ? 'Escribe en qué fue el gasto'
+                  : null,
+              onFieldSubmitted: (_) => _guardar(),
             ),
-          TextFormField(
-            controller: _concepto,
-            textCapitalization: TextCapitalization.sentences,
-            maxLength: 80,
-            decoration: InputDecoration(
-              labelText: _tipo == 'egreso' ? 'Concepto *' : 'Concepto',
-              hintText: switch (_tipo) {
-                'egreso' => 'Ej.: arriendo, mercancía',
-                'abono' => 'Abono',
-                _ => 'Ej.: 2 bultos de concentrado',
-              },
-            ),
-            validator: (v) => _tipo == 'egreso' && (v ?? '').trim().isEmpty
-                ? 'Escribe en qué fue el gasto'
-                : null,
-          ),
-          TextFormField(
-            controller: _monto,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-                labelText: 'Monto (COP) *', hintText: '25.000'),
-            validator: (v) =>
-                parseMonto(v ?? '') == null ? 'Escribe un monto mayor a cero' : null,
-          ),
-          if (_tipo != 'egreso') ...[
             const SizedBox(height: 8),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.person_outline),
-              title: Text(cliente?.nombre ??
-                  (_requiereCliente ? 'Elegir cliente *' : 'Sin cliente (opcional)')),
-              subtitle: _errorCliente != null
-                  ? Text(_errorCliente!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error))
-                  : (cliente != null && cliente.saldo > 0
-                      ? Text('Debe ${cop(cliente.saldo)}')
-                      : null),
-              trailing: const Icon(Icons.arrow_drop_down),
-              onTap: _elegirCliente,
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: tinta,
+                foregroundColor: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : const Color(0xFF0B2018),
+              ),
+              onPressed: _guardar,
+              child: Text(switch (_tipo) {
+                'egreso' => 'Guardar gasto',
+                'abono' => 'Guardar abono',
+                _ => _fiado ? 'Guardar venta fiada' : 'Guardar venta',
+              }),
             ),
-          ],
-        ]),
+          ]),
+        ),
       ),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar')),
-        FilledButton(onPressed: _guardar, child: const Text('Guardar')),
-      ],
     );
   }
 }
