@@ -6,8 +6,10 @@
   a favor del paquete `material_ui`. Funciona igual; la migración queda para
   después del evento.
 - `flutter test`: **55 de 55 pruebas pasan**.
-- Pendiente: la prueba en celular y el APK, que necesitan el SDK de Android
-  (Android Studio se está instalando).
+- `flutter build apk --release --obfuscate --split-debug-info=build\debug-info`:
+  **compila** (64,1 MB, modo solo local, sin claves).
+- Pendiente: probarla en un celular real. El emulador no arranca en este PC
+  porque falta el controlador de virtualización.
 
 ## 1. Segunda revisión: cambios hechos
 | # | Problema | Riesgo | Solución |

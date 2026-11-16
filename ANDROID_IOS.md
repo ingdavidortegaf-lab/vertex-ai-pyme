@@ -29,3 +29,29 @@ documenta qué hace, por si hay que revisarlo a mano.
 ```
 flutter build apk --release --obfuscate --split-debug-info=build\debug-info --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
 ```
+Sin los `--dart-define` el APK funciona en modo solo local (sin nube).
+Resultado: `build\app\outputs\flutter-apk\app-release.apk`.
+
+## Problemas del PC de desarrollo (Windows) y su solución
+- **El SDK de Android no puede estar en una ruta con espacios** (por ejemplo
+  `C:\Users\NOMBRE APELLIDO\...`). Se copió a `C:\Android\sdk` y se
+  configuró con `flutter config --android-sdk C:\Android\sdk` y la variable
+  `ANDROID_HOME`.
+- **`flutter doctor --android-licenses`**: en las herramientas de línea de
+  comandos recientes ya no hace falta; solo muestra un aviso.
+- **Antivirus con revisión HTTPS (Avast)**: Gradle falla con
+  `PKIX path building failed` porque el Java de Android Studio no confía en el
+  certificado del antivirus. Sin desactivar el antivirus: se crea un almacén
+  propio con la raíz pública de Avast y se compila con esa variable en la
+  misma ventana:
+  ```
+  $env:JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=C:\Android\java-truststore\cacerts-avast.jks -Djavax.net.ssl.trustStorePassword=changeit"
+  ```
+- **NDK**: si el build dice que no pudo instalar el NDK, se instala a mano
+  (la herramienta nueva usa `/` en el nombre del paquete):
+  ```
+  C:\Android\sdk\cmdline-tools\latest\bin\android.exe --sdk=C:\Android\sdk sdk install ndk/28.2.13676358
+  ```
+- **Emulador**: necesita el controlador de virtualización (Android Emulator
+  hypervisor driver), que se instala con permisos de administrador desde el
+  SDK Manager de Android Studio. Para la demo se usa el celular real.
