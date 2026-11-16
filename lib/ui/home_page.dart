@@ -3,7 +3,9 @@ import '../data/sync_service.dart';
 import 'asistente_page.dart';
 import 'clientes_page.dart';
 import 'ilustraciones.dart';
+import 'inventario_page.dart';
 import 'login_page.dart';
+import 'negocio_page.dart';
 import 'privacidad_page.dart';
 import 'tablero_page.dart';
 import 'tema.dart';
@@ -23,7 +25,8 @@ class _HomePageState extends State<HomePage> {
   Widget _page() => switch (_i) {
         0 => TableroPage(key: const ValueKey('t'), onIr: _ir),
         1 => const VentasPage(key: ValueKey('v')),
-        2 => const ClientesPage(key: ValueKey('c')),
+        2 => const InventarioPage(key: ValueKey('i')),
+        3 => const ClientesPage(key: ValueKey('c')),
         _ => const AsistentePage(key: ValueKey('a')),
       };
 
@@ -32,7 +35,13 @@ class _HomePageState extends State<HomePage> {
     final p = Paleta.of(context);
     final t = Theme.of(context).textTheme;
     // Cada sección tiene su tiza: el indicador de la barra toma ese color.
-    final indicador = [p.ventasFondo, p.ventasFondo, p.fiadoFondo, p.asistenteFondo][_i];
+    final indicador = [
+      p.ventasFondo,
+      p.ventasFondo,
+      p.ventasFondo,
+      p.fiadoFondo,
+      p.asistenteFondo
+    ][_i];
     final quieto = MediaQuery.disableAnimationsOf(context);
     return Scaffold(
       appBar: AppBar(
@@ -62,11 +71,20 @@ class _HomePageState extends State<HomePage> {
               if (v == 'privacidad') {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => const PrivacidadPage()));
+              } else if (v == 'negocio') {
+                mostrarMiNegocio(context);
               } else if (v == 'sync') {
                 SyncService.instance.reintentarErrores();
               }
             },
             itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'negocio',
+                child: ListTile(
+                    leading: Icon(Icons.storefront_outlined),
+                    title: Text('Mi negocio'),
+                    contentPadding: EdgeInsets.zero),
+              ),
               PopupMenuItem(
                 value: 'sync',
                 child: ListTile(
@@ -111,7 +129,11 @@ class _HomePageState extends State<HomePage> {
           NavigationDestination(
               icon: const Icon(Icons.receipt_long_outlined),
               selectedIcon: Icon(Icons.receipt_long, color: p.ventas),
-              label: 'Movimientos'),
+              label: 'Caja'),
+          NavigationDestination(
+              icon: const Icon(Icons.inventory_2_outlined),
+              selectedIcon: Icon(Icons.inventory_2, color: p.ventas),
+              label: 'Inventario'),
           NavigationDestination(
               icon: const Icon(Icons.people_outline),
               selectedIcon: Icon(Icons.people, color: p.fiado),

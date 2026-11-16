@@ -56,6 +56,9 @@
 | 25 | `mi_empresa()` (SECURITY DEFINER) se podía llamar por `/rest/v1/rpc` | Superficie de API innecesaria (linter de Supabase) | Movida al esquema `privado`, que la API no expone; 0 avisos de seguridad |
 | 26 | Políticas RLS evaluaban `auth.uid()` por cada fila | Lentitud con muchos datos | `(select auth.uid())` y `(select privado.mi_empresa())`: una vez por consulta |
 | 27 | La Edge Function confiaba solo en el gateway | Si se desactivaba `verify_jwt`, cualquiera gastaría la cuota de IA | La función valida el token contra Supabase Auth antes de llamar al modelo (probado: sin sesión responde 401) |
+| 29 | No había inventario | El tendero no sabía qué se agotaba ni cuánto ganaba por producto | Productos (unión por campo) + movimientos de inventario que solo se agregan: el stock es su suma, así dos celulares sin señal no se pisan. Venta con productos en una transacción. Tablas `productos` e `inventario` en Supabase con RLS por empresa (verificado: RLS activo, anon sin acceso) |
+| 30 | El tablero solo mostraba el mes | Sin comparación ni tendencia | Reportes por periodo (hoy, 7 días, mes, mes anterior) con variación frente al periodo anterior, barras de ventas y gastos por día o semana, contado frente a fiado y lo más vendido. Colores verificados para daltonismo; gastos con rayado además del color |
+| 31 | El asistente no conocía el negocio | Respuestas genéricas | «Mi negocio» (nombre, tipo, meta del mes) y nuevas preguntas sin señal: qué se está agotando, producto más vendido, cómo voy con la meta, ganancia en productos |
 | 28 | Las cuentas solo se creaban desde el panel | El negocio no podía empezar solo | Pantalla «Tu cuenta»: entrar, crear cuenta (clave ≥ 8), perfil, cerrar sesión avisando lo pendiente; errores en español; bloqueo tras 5 intentos |
 
 ## 2. Hallazgos de la primera revisión (se mantienen)

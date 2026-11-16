@@ -1,0 +1,500 @@
+import 'package:flutter/material.dart';
+import '../data/local_db.dart';
+import '../data/sync_service.dart';
+import '../domain/formato.dart';
+import '../domain/resumen.dart';
+import 'comun.dart';
+import 'ilustraciones.dart';
+import 'tema.dart';
+
+String cantidadTexto(double c) =>
+    c == c.roundToDouble() ? c.toInt().toString() : c.toStringAsFixed(1);
+
+/// Inventario: productos, cuántos quedan y qué hay que reponer.
+class InventarioPage extends StatefulWidget {
+  const InventarioPage({super.key});
+  @override
+  State<InventarioPage> createState() => _InventarioPageState();
+}
+
+class _InventarioPageState extends State<InventarioPage> {
+  List<ProductoStock> _items = [];
+  bool _cargado = false;
+  String _filtro = '';
+  bool _soloReponer = false;
+
+  @override
+  void initState() {
+    super.initState();
+    LocalDb.instance.cambios.addListener(_load);
+    _load();
+  }
+
+  @override
+  void dispose() {
+    LocalDb.instance.cambios.removeListener(_load);
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final r = await LocalDb.instance.productos();
+    if (mounted) {
+      setState(() {
+        _items = r;
+        _cargado = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final p = Paleta.of(context);
+    final esquema = Theme.of(context).colorScheme;
+    final reponer = _items.where((x) => x.agotado || x.bajo).length;
+    final valor = _items.fold(0.0, (s, x) => s + (x.stock > 0 ? x.stock * x.costo : 0));
+    final f = _filtro.trim().toLowerCase();
+    final lista = _items
+        .where((x) => !_soloReponer || x.agotado || x.bajo)
+        .where((x) => f.isEmpty || x.nombre.toLowerCase().contains(f))
+        .toList();
+
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => mostrarFormProducto(context),
+        icon: const Icon(Icons.add_box_outlined),
+        label: const Text('Producto'),
+      ),
+      body: !_cargado
+          ? const Center(child: CircularProgressIndicator())
+          : _items.isEmpty
+              ? EstadoVacio(
+                  ilustracion: const IlustracionPizarra(),
+                  titulo: 'Aún no hay productos',
+                  texto: 'Agrega lo que vendes con su precio, su costo y '
+                      'cuántos tienes. Al vender, el stock baja solo.',
+                  accion: FilledButton.icon(
+                    onPressed: () => mostrarFormProducto(context),
+                    icon: const Icon(Icons.add_box_outlined),
+                    label: const Text('Agregar el primero'),
+                  ),
+                )
+              : ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: [
+                  Row(children: [
+                    Expanded(
+                      child: _Dato(
+                          titulo: 'Valor a costo',
+                          valor: cop(valor),
+                          color: esquema.onSurface),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _Dato(
+                          titulo: 'Por reponer',
+                          valor: reponer == 1 ? '1 producto' : '$reponer productos',
+                          color: reponer > 0 ? p.gastos : p.ventas,
+                          icono: reponer > 0
+                              ? Icons.warning_amber_rounded
+                              : Icons.check_circle_outline),
+                    ),
+                  ]),
+                  const SizedBox(height: 12),
+                  TextField(
+                    onChanged: (v) => setState(() => _filtro = v),
+                    decoration: const InputDecoration(
+                        hintText: 'Buscar producto', prefixIcon: Icon(Icons.search)),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(children: [
+                    ChoiceChip(
+                      label: Text('Todos (${_items.length})'),
+                      selected: !_soloReponer,
+                      onSelected: (_) => setState(() => _soloReponer = false),
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: Text('Por reponer ($reponer)'),
+                      selected: _soloReponer,
+                      onSelected: (_) => setState(() => _soloReponer = true),
+                    ),
+                  ]),
+                  const SizedBox(height: 12),
+                  if (lista.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                          _soloReponer
+                              ? 'Nada por reponer. ¡Todo está surtido!'
+                              : 'Ningún producto coincide.',
+                          textAlign: TextAlign.center,
+                          style: t.bodyLarge),
+                    )
+                  else
+                    Card(
+                      child: Column(children: [
+                        for (final (i, x) in lista.indexed) ...[
+                          if (i > 0) const Divider(indent: 72),
+                          _FilaProducto(x: x),
+                        ],
+                      ]),
+                    ),
+                ]),
+    );
+  }
+}
+
+class _Dato extends StatelessWidget {
+  final String titulo, valor;
+  final Color color;
+  final IconData? icono;
+  const _Dato(
+      {required this.titulo, required this.valor, required this.color, this.icono});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(titulo,
+              style: t.bodyMedium
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          const SizedBox(height: 4),
+          Row(children: [
+            if (icono != null) ...[
+              Icon(icono, size: 20, color: color),
+              const SizedBox(width: 6),
+            ],
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(valor, style: cifras(t.titleLarge?.copyWith(color: color))),
+              ),
+            ),
+          ]),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Etiqueta del stock: verde normal, ámbar bajo, coral agotado (con texto).
+class EtiquetaStock extends StatelessWidget {
+  final ProductoStock x;
+  const EtiquetaStock({super.key, required this.x});
+  @override
+  Widget build(BuildContext context) {
+    final p = Paleta.of(context);
+    final t = Theme.of(context).textTheme;
+    final (Color fondo, Color tinta, String texto) = x.agotado
+        ? (p.gastosFondo, p.gastos, 'Agotado')
+        : x.bajo
+            ? (p.fiadoFondo, p.fiado, 'Quedan ${cantidadTexto(x.stock)}')
+            : (p.ventasFondo, p.ventas, '${cantidadTexto(x.stock)} und.');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(10)),
+      child: Text(texto, style: cifras(t.labelLarge?.copyWith(color: tinta))),
+    );
+  }
+}
+
+class _FilaProducto extends StatelessWidget {
+  final ProductoStock x;
+  const _FilaProducto({required this.x});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = Paleta.of(context);
+    final (Color fondo, Color tinta) = x.agotado
+        ? (p.gastosFondo, p.gastos)
+        : x.bajo
+            ? (p.fiadoFondo, p.fiado)
+            : (p.ventasFondo, p.ventas);
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      leading: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(14)),
+        child: Icon(Icons.inventory_2_outlined, color: tinta),
+      ),
+      title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+          '${cop(x.precio)}${x.costo > 0 ? ' · gana ${(x.margen * 100).round()} %' : ''}'),
+      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        EtiquetaStock(x: x),
+        const SizedBox(width: 6),
+        iconoSync(x.sync),
+      ]),
+      onTap: () => _acciones(context, x),
+    );
+  }
+}
+
+Future<void> _acciones(BuildContext context, ProductoStock x) async {
+  final accion = await showModalBottomSheet<String>(
+    context: context,
+    builder: (c) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          title: Text(x.nombre, style: Theme.of(c).textTheme.titleLarge),
+          subtitle: Text('Hay ${cantidadTexto(x.stock)} · mínimo ${cantidadTexto(x.minimo)}'),
+          trailing: EtiquetaStock(x: x),
+        ),
+        const Divider(),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: const Icon(Icons.add_circle_outline),
+          title: const Text('Llegó mercancía'),
+          subtitle: const Text('Suma unidades al stock'),
+          onTap: () => Navigator.pop(c, 'entrada'),
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: const Icon(Icons.fact_check_outlined),
+          title: const Text('Corregir por conteo'),
+          subtitle: const Text('Ajusta a lo que hay de verdad'),
+          onTap: () => Navigator.pop(c, 'ajuste'),
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: const Icon(Icons.edit_outlined),
+          title: const Text('Editar precio, costo o mínimo'),
+          onTap: () => Navigator.pop(c, 'editar'),
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: Icon(Icons.delete_outline, color: Theme.of(c).colorScheme.error),
+          title: Text('Eliminar producto',
+              style: TextStyle(color: Theme.of(c).colorScheme.error)),
+          onTap: () => Navigator.pop(c, 'eliminar'),
+        ),
+        const SizedBox(height: 8),
+      ]),
+    ),
+  );
+  if (accion == null || !context.mounted) return;
+  switch (accion) {
+    case 'editar':
+      await mostrarFormProducto(context, producto: x);
+    case 'eliminar':
+      final ok = await confirmar(context, 'Eliminar producto',
+          '¿Eliminar ${x.nombre}? Sus ventas se conservan en el historial.',
+          si: 'Eliminar');
+      if (!ok) return;
+      await LocalDb.instance.deleteProducto(x.id);
+      SyncService.instance.sync();
+      avisar('Producto eliminado');
+    default:
+      final entrada = accion == 'entrada';
+      final n = await _pedirCantidad(context,
+          titulo: entrada ? 'Llegó mercancía' : 'Corregir por conteo',
+          etiqueta: entrada ? '¿Cuántas unidades llegaron?' : '¿Cuántas hay de verdad?',
+          inicial: entrada ? null : cantidadTexto(x.stock < 0 ? 0 : x.stock));
+      if (n == null) return;
+      final cambio = entrada ? n : n - x.stock;
+      if (cambio == 0) {
+        avisar('El stock ya estaba en ${cantidadTexto(n)}');
+        return;
+      }
+      await LocalDb.instance.moverStock(x.id, cambio,
+          motivo: entrada ? 'entrada' : 'ajuste', costo: x.costo);
+      SyncService.instance.sync();
+      avisar(entrada
+          ? 'Se sumaron ${cantidadTexto(n)} a ${x.nombre}'
+          : 'Stock de ${x.nombre} corregido a ${cantidadTexto(n)}');
+  }
+}
+
+double? _numero(String s) {
+  final t = s.trim().replaceAll(',', '.');
+  if (t.isEmpty) return null;
+  return double.tryParse(t);
+}
+
+Future<double?> _pedirCantidad(BuildContext context,
+    {required String titulo, required String etiqueta, String? inicial}) async {
+  final ctrl = TextEditingController(text: inicial ?? '');
+  final r = await showDialog<double>(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: Text(titulo),
+      content: TextField(
+        controller: ctrl,
+        autofocus: true,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: InputDecoration(labelText: etiqueta),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
+        FilledButton(
+          onPressed: () {
+            final n = _numero(ctrl.text);
+            if (n == null || n < 0) return;
+            Navigator.pop(c, n);
+          },
+          child: const Text('Guardar'),
+        ),
+      ],
+    ),
+  );
+  ctrl.dispose();
+  return r;
+}
+
+/// Crear (producto == null) o editar un producto.
+Future<void> mostrarFormProducto(BuildContext context, {ProductoStock? producto}) async {
+  final r = await showModalBottomSheet<_DatosProducto>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (_) => _FormProducto(producto: producto),
+  );
+  if (r == null) return;
+  await LocalDb.instance.saveProducto(r.nombre,
+      precio: r.precio,
+      costo: r.costo,
+      minimo: r.minimo,
+      stockInicial: r.stock,
+      id: producto?.id);
+  SyncService.instance.sync();
+  avisar(producto == null ? 'Producto guardado' : 'Producto actualizado');
+}
+
+class _DatosProducto {
+  final String nombre;
+  final double precio, costo, minimo, stock;
+  const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo, this.stock);
+}
+
+class _FormProducto extends StatefulWidget {
+  final ProductoStock? producto;
+  const _FormProducto({this.producto});
+  @override
+  State<_FormProducto> createState() => _FormProductoState();
+}
+
+class _FormProductoState extends State<_FormProducto> {
+  final _form = GlobalKey<FormState>();
+  late final _nombre = TextEditingController(text: widget.producto?.nombre ?? '');
+  late final _precio = TextEditingController(
+      text: widget.producto == null ? '' : cop(widget.producto!.precio).substring(1));
+  late final _costo = TextEditingController(
+      text: (widget.producto?.costo ?? 0) > 0 ? cop(widget.producto!.costo).substring(1) : '');
+  late final _minimo = TextEditingController(
+      text: (widget.producto?.minimo ?? 0) > 0 ? cantidadTexto(widget.producto!.minimo) : '');
+  final _stock = TextEditingController();
+
+  @override
+  void dispose() {
+    for (final c in [_nombre, _precio, _costo, _minimo, _stock]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _guardar() {
+    if (!_form.currentState!.validate()) return;
+    Navigator.pop(
+        context,
+        _DatosProducto(
+          _nombre.text.trim().replaceAll(RegExp(r'\s+'), ' '),
+          parseMonto(_precio.text) ?? 0,
+          _costo.text.trim().isEmpty ? 0 : (parseMonto(_costo.text) ?? 0),
+          _numero(_minimo.text) ?? 0,
+          _numero(_stock.text) ?? 0,
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final nuevo = widget.producto == null;
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Form(
+          key: _form,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(nuevo ? 'Nuevo producto' : 'Editar producto', style: t.headlineSmall),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _nombre,
+              autofocus: nuevo,
+              textCapitalization: TextCapitalization.sentences,
+              maxLength: 80,
+              decoration: const InputDecoration(
+                  labelText: 'Nombre', hintText: 'Ej.: Arroz 500 g', counterText: ''),
+              validator: (v) =>
+                  (v ?? '').trim().length < 2 ? 'Escribe el nombre del producto' : null,
+            ),
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(
+                child: TextFormField(
+                  controller: _precio,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Precio de venta', prefixText: r'$ '),
+                  validator: (v) =>
+                      parseMonto(v ?? '') == null ? 'Precio mayor a cero' : null,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextFormField(
+                  controller: _costo,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Costo (opcional)', prefixText: r'$ '),
+                  validator: (v) => (v ?? '').trim().isNotEmpty &&
+                          parseMonto(v!) == null
+                      ? 'Costo no válido'
+                      : null,
+                ),
+              ),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: [
+              if (nuevo) ...[
+                Expanded(
+                  child: TextFormField(
+                    controller: _stock,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(labelText: '¿Cuántos tienes?'),
+                    validator: (v) => (v ?? '').trim().isNotEmpty &&
+                            ((_numero(v!) ?? -1) < 0)
+                        ? 'Cantidad no válida'
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: TextFormField(
+                  controller: _minimo,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                      labelText: 'Avisar cuando queden', hintText: 'Ej.: 5'),
+                  validator: (v) => (v ?? '').trim().isNotEmpty &&
+                          ((_numero(v!) ?? -1) < 0)
+                      ? 'Cantidad no válida'
+                      : null,
+                ),
+              ),
+            ]),
+            const SizedBox(height: 20),
+            FilledButton(
+                onPressed: _guardar,
+                child: Text(nuevo ? 'Guardar producto' : 'Guardar cambios')),
+          ]),
+        ),
+      ),
+    );
+  }
+}

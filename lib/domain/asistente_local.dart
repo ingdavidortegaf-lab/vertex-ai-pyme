@@ -16,6 +16,9 @@ enum Intencion {
   mejoresClientes,
   gastosMes,
   mensajeCliente,
+  masVendido,
+  inventario,
+  meta,
   resumen,
   general,
 }
@@ -43,6 +46,15 @@ Intencion detectarIntencion(String pregunta) {
       _alguna(t, ['mas me compra', 'mas me compran'])) {
     return Intencion.mejoresClientes;
   }
+  if (_alguna(t, ['mas vendido', 'mas se vende', 'se vende mas', 'mas vendo', 'producto estrella']) ||
+      (t.contains('producto') && _alguna(t, ['vend', 'sale', 'mejor', 'top']))) {
+    return Intencion.masVendido;
+  }
+  if (_alguna(t, ['inventario', 'agot', 'reponer', 'surtir', 'stock', 'mercancia',
+    'por pedir', 'hay que pedir', 'se acab', 'me falta'])) {
+    return Intencion.inventario;
+  }
+  if (t.contains('meta')) return Intencion.meta;
   if (_alguna(t, ['gast', 'egreso', 'compre'])) return Intencion.gastosMes;
   if (_alguna(t, ['vend', 'venta', 'ingres', 'factur'])) {
     if (t.contains('hoy')) return Intencion.ventasHoy;
@@ -154,14 +166,69 @@ RespuestaLocal responderLocal(String pregunta, DatosAsistente d) {
       }
       return RespuestaLocal('Mensaje sugerido para ${c.nombre}:\n\n$msg',
           telefono: c.telefono, mensajeWhatsApp: msg);
+    case Intencion.masVendido:
+      if (d.topProductos.isEmpty) {
+        return const RespuestaLocal('Este mes aún no hay ventas hechas con '
+            'productos del inventario. Al registrar una venta, agrega los '
+            'productos y aquí verás cuál se vende más.');
+      }
+      final l = d.topProductos.take(3).toList();
+      final lineas = [
+        for (final (i, p) in l.indexed)
+          '${i + 1}. ${p.nombre}: ${_cant(p.cantidad)} vendidos, ${cop(p.total)}'
+      ].join('\n');
+      return RespuestaLocal('Lo que más vendes este mes:\n$lineas\n\n'
+          'Cuida que no se te agote ${l.first.nombre}.');
+    case Intencion.inventario:
+      if (d.productos.isEmpty) {
+        return const RespuestaLocal('Aún no tienes productos. Agrégalos en la '
+            'pestaña Inventario con su precio, costo y cuántos tienes.');
+      }
+      final reponer = d.porReponer;
+      final base = 'Tienes ${_n(d.productos.length, 'producto', 'productos')}; '
+          'tu mercancía vale ${cop(d.valorInventario)} a precio de costo.';
+      if (reponer.isEmpty) {
+        return RespuestaLocal('$base\nNada por reponer: todo está por encima '
+            'del mínimo.');
+      }
+      final lineas = [
+        for (final p in reponer.take(6))
+          p.agotado
+              ? '• ${p.nombre}: agotado'
+              : '• ${p.nombre}: quedan ${_cant(p.stock)} (mínimo ${_cant(p.minimo)})'
+      ].join('\n');
+      return RespuestaLocal('$base\nPor reponer:\n$lineas');
+    case Intencion.meta:
+      if (d.metaMensual <= 0) {
+        return const RespuestaLocal('Aún no tienes una meta de ventas. '
+            'Ponla en el menú ⋮ → «Mi negocio» y te diré cuánto te falta.');
+      }
+      final pct = (r.ingresos / d.metaMensual * 100).round();
+      final falta = d.metaMensual - r.ingresos;
+      if (falta <= 0) {
+        return RespuestaLocal('¡Cumpliste la meta! Llevas ${cop(r.ingresos)} de '
+            '${cop(d.metaMensual)} ($pct %).');
+      }
+      final hoy = DateTime.now();
+      final dias = DateTime(hoy.year, hoy.month + 1, 0).day - hoy.day + 1;
+      return RespuestaLocal('Llevas ${cop(r.ingresos)} de tu meta de '
+          '${cop(d.metaMensual)} ($pct %). Te faltan ${cop(falta)}: unos '
+          '${cop(falta / dias)} por día en los $dias días que quedan del mes.');
     case Intencion.resumen:
     case Intencion.general:
       final cobrar = r.porCobrar > 0
           ? ' Tienes ${cop(r.porCobrar)} por cobrar.'
           : '';
-      return RespuestaLocal('${resumenLocal(r)}$cobrar');
+      final ganancia = d.gananciaProductosMes > 0
+          ? ' Lo vendido de tu inventario te dejó ${cop(d.gananciaProductosMes)} '
+              'de ganancia sobre el costo.'
+          : '';
+      return RespuestaLocal('${resumenLocal(r)}$cobrar$ganancia');
   }
 }
+
+String _cant(double c) =>
+    c == c.roundToDouble() ? c.toInt().toString() : c.toStringAsFixed(1);
 
 /// Resumen del mes con un consejo según el margen.
 String resumenLocal(Resumen r) {

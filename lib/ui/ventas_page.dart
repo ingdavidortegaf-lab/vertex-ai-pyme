@@ -6,6 +6,7 @@ import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
 import 'ilustraciones.dart';
+import 'inventario_page.dart';
 import 'tema.dart';
 
 /// Movimientos: ventas (de contado o fiadas), gastos y abonos, por día.
@@ -171,17 +172,28 @@ class FilaMovimiento extends StatelessWidget {
 Future<void> mostrarFormMovimiento(BuildContext context,
     {String? clienteId, String tipoInicial = 'ingreso'}) async {
   final clientes = await LocalDb.instance.clientesConSaldo();
+  final productos = await LocalDb.instance.productos();
   if (!context.mounted) return;
   final r = await showModalBottomSheet<_Movimiento>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
     builder: (_) => _FormMovimiento(
-        clientes: clientes, clienteId: clienteId, tipoInicial: tipoInicial),
+        clientes: clientes,
+        productos: productos,
+        clienteId: clienteId,
+        tipoInicial: tipoInicial),
   );
   if (r == null) return;
-  await LocalDb.instance.saveMovimiento(r.concepto, r.monto,
-      tipo: r.tipo, credito: r.fiado, clienteId: r.clienteId);
+  if (r.items.isNotEmpty) {
+    await LocalDb.instance.saveVentaProductos(r.items,
+        fiado: r.fiado, clienteId: r.clienteId, concepto: r.concepto);
+  } else {
+    var concepto = r.concepto.trim();
+    if (concepto.isEmpty) concepto = r.tipo == 'abono' ? 'Abono' : 'Venta';
+    await LocalDb.instance.saveMovimiento(concepto, r.monto,
+        tipo: r.tipo, credito: r.fiado, clienteId: r.clienteId);
+  }
   SyncService.instance.sync();
   avisar(switch (r.tipo) {
     'egreso' => 'Gasto guardado',
@@ -196,15 +208,21 @@ class _Movimiento {
   final String tipo;
   final bool fiado;
   final String? clienteId;
-  const _Movimiento(this.concepto, this.monto, this.tipo, this.fiado, this.clienteId);
+  final List<ItemVenta> items;
+  const _Movimiento(this.concepto, this.monto, this.tipo, this.fiado, this.clienteId,
+      [this.items = const []]);
 }
 
 class _FormMovimiento extends StatefulWidget {
   final List<ClienteSaldo> clientes;
+  final List<ProductoStock> productos;
   final String? clienteId;
   final String tipoInicial;
   const _FormMovimiento(
-      {required this.clientes, this.clienteId, required this.tipoInicial});
+      {required this.clientes,
+      this.productos = const [],
+      this.clienteId,
+      required this.tipoInicial});
   @override
   State<_FormMovimiento> createState() => _FormMovimientoState();
 }
@@ -217,6 +235,49 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   bool _fiado = false;
   late String? _clienteId = widget.clienteId;
   String? _errorCliente;
+
+  /// Productos de la venta: id -> cantidad (en el orden en que se agregaron).
+  final _carrito = <String, double>{};
+
+  ProductoStock? _producto(String id) {
+    for (final p in widget.productos) {
+      if (p.id == id) return p;
+    }
+    return null;
+  }
+
+  List<ItemVenta> get _items => [
+        for (final e in _carrito.entries)
+          if (_producto(e.key) case final p?)
+            ItemVenta(
+                productoId: p.id,
+                nombre: p.nombre,
+                cantidad: e.value,
+                precio: p.precio,
+                costo: p.costo),
+      ];
+
+  double get _totalCarrito => _items.fold(0.0, (s, i) => s + i.total);
+
+  Future<void> _agregarProducto() async {
+    final p = await showModalBottomSheet<ProductoStock>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => _ElegirProducto(productos: widget.productos),
+    );
+    if (p == null) return;
+    setState(() => _carrito[p.id] = (_carrito[p.id] ?? 0) + 1);
+  }
+
+  void _cambiarCantidad(String id, double delta) => setState(() {
+        final n = (_carrito[id] ?? 0) + delta;
+        if (n <= 0) {
+          _carrito.remove(id);
+        } else {
+          _carrito[id] = n;
+        }
+      });
 
   @override
   void dispose() {
@@ -299,19 +360,18 @@ class _FormMovimientoState extends State<_FormMovimiento> {
           ? 'Elige el cliente que abona'
           : 'Para fiar, elige el cliente';
     }
-    final monto = parseMonto(_monto.text);
+    final conProductos = _tipo == 'ingreso' && _carrito.isNotEmpty;
+    final monto = conProductos ? _totalCarrito : parseMonto(_monto.text);
     if (_tipo == 'abono' && cliente != null && monto != null &&
         monto > cliente.saldo + 0.5) {
       errCliente = 'El abono supera lo que debe (${cop(cliente.saldo)})';
     }
     setState(() => _errorCliente = errCliente);
-    if (!okForm || errCliente != null || monto == null) return;
-    var concepto = _concepto.text.trim();
-    if (concepto.isEmpty) concepto = _tipo == 'abono' ? 'Abono' : 'Venta';
+    if (!okForm || errCliente != null || monto == null || monto <= 0) return;
     Navigator.pop(
         context,
-        _Movimiento(concepto, monto, _tipo, _tipo == 'ingreso' && _fiado,
-            _tipo == 'egreso' ? null : _clienteId));
+        _Movimiento(_concepto.text.trim(), monto, _tipo, _tipo == 'ingreso' && _fiado,
+            _tipo == 'egreso' ? null : _clienteId, conProductos ? _items : const []));
   }
 
   @override
@@ -365,10 +425,72 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 }
               }),
             ),
+            if (_tipo == 'ingreso' && widget.productos.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              for (final i in _items)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(i.nombre,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: t.titleSmall),
+                        Text(
+                            '${cop(i.precio)} c/u'
+                            '${(_producto(i.productoId)?.stock ?? 0) < i.cantidad ? ' · solo hay ${(_producto(i.productoId)?.stock ?? 0).toStringAsFixed(0)}' : ''}',
+                            style: t.bodySmall?.copyWith(
+                                color: (_producto(i.productoId)?.stock ?? 0) < i.cantidad
+                                    ? p.gastos
+                                    : esquema.onSurfaceVariant)),
+                      ]),
+                    ),
+                    IconButton(
+                      tooltip: 'Quitar uno',
+                      onPressed: () => _cambiarCantidad(i.productoId, -1),
+                      icon: const Icon(Icons.remove_circle_outline),
+                    ),
+                    Text(i.cantidad.toStringAsFixed(0), style: cifras(t.titleMedium)),
+                    IconButton(
+                      tooltip: 'Agregar uno',
+                      onPressed: () => _cambiarCantidad(i.productoId, 1),
+                      icon: const Icon(Icons.add_circle_outline),
+                    ),
+                    SizedBox(
+                      width: 84,
+                      child: Text(cop(i.total),
+                          textAlign: TextAlign.right,
+                          style: cifras(t.titleSmall?.copyWith(color: tinta))),
+                    ),
+                  ]),
+                ),
+              OutlinedButton.icon(
+                onPressed: _agregarProducto,
+                icon: const Icon(Icons.add_shopping_cart),
+                label: Text(_carrito.isEmpty
+                    ? 'Elegir productos del inventario'
+                    : 'Agregar otro producto'),
+              ),
+            ],
+            if (_tipo == 'ingreso' && _carrito.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                    color: fondo, borderRadius: BorderRadius.circular(14)),
+                child: Row(children: [
+                  Text('Total', style: t.titleMedium?.copyWith(color: tinta)),
+                  const Spacer(),
+                  Text(cop(_totalCarrito),
+                      style: cifras(t.headlineMedium?.copyWith(color: tinta))),
+                ]),
+              ),
+            ] else ...[
             const SizedBox(height: 16),
             TextFormField(
               controller: _monto,
-              autofocus: true,
+              autofocus: _tipo != 'ingreso' || widget.productos.isEmpty,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               style: cifras(t.headlineMedium?.copyWith(color: tinta)),
               decoration: InputDecoration(
@@ -380,6 +502,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               validator: (v) =>
                   parseMonto(v ?? '') == null ? 'Escribe un monto mayor a cero' : null,
             ),
+            ],
             if (_tipo == 'ingreso') ...[
               const SizedBox(height: 8),
               SwitchListTile(
@@ -455,6 +578,64 @@ class _FormMovimientoState extends State<_FormMovimiento> {
             ),
           ]),
         ),
+      ),
+    );
+  }
+}
+
+/// Lista de productos para agregar a una venta (con buscador).
+class _ElegirProducto extends StatefulWidget {
+  final List<ProductoStock> productos;
+  const _ElegirProducto({required this.productos});
+  @override
+  State<_ElegirProducto> createState() => _ElegirProductoState();
+}
+
+class _ElegirProductoState extends State<_ElegirProducto> {
+  String _f = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final f = _f.trim().toLowerCase();
+    final lista = widget.productos
+        .where((x) => f.isEmpty || x.nombre.toLowerCase().contains(f))
+        .toList();
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.75),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text('Elegir producto', style: t.titleLarge),
+              const SizedBox(height: 12),
+              TextField(
+                onChanged: (v) => setState(() => _f = v),
+                decoration: const InputDecoration(
+                    hintText: 'Buscar producto', prefixIcon: Icon(Icons.search)),
+              ),
+            ]),
+          ),
+          Flexible(
+            child: ListView(shrinkWrap: true, padding: const EdgeInsets.only(bottom: 16), children: [
+              if (lista.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('Ningún producto coincide.', textAlign: TextAlign.center),
+                ),
+              for (final x in lista)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  subtitle: Text(cop(x.precio)),
+                  trailing: EtiquetaStock(x: x),
+                  onTap: () => Navigator.pop(context, x),
+                ),
+            ]),
+          ),
+        ]),
       ),
     );
   }

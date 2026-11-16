@@ -12,6 +12,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:vertex_ai_pyme/data/local_db.dart';
 import 'package:vertex_ai_pyme/data/sync_service.dart';
+import 'package:vertex_ai_pyme/domain/resumen.dart';
 import 'package:vertex_ai_pyme/ui/cliente_detalle_page.dart';
 import 'package:vertex_ai_pyme/ui/comun.dart';
 import 'package:vertex_ai_pyme/ui/consent_gate.dart';
@@ -82,7 +83,41 @@ Future<String> _sembrar(LocalDb db) async {
   await mov(0, 140, 'Insumos de ordeño', 40000, fiado: true, cliente: carlos);
   await mov(0, 200, 'Fletes', 32000, tipo: 'egreso');
   await mov(0, 260, 'Abono', 20000, tipo: 'abono', cliente: ana);
+  // Mes pasado y días anteriores de este mes (para comparar en reportes).
+  for (var dd = 3; dd <= 12; dd++) {
+    await mov(dd, 60, 'Venta mostrador', 60000.0 + dd * 7000);
+    if (dd % 4 == 0) await mov(dd, 90, 'Servicios', 45000, tipo: 'egreso');
+  }
+  for (var dd = 20; dd <= 45; dd += 2) {
+    await mov(dd, 60, 'Venta mostrador', 90000.0 + dd * 1000);
+  }
+  // Inventario.
+  db.reloj = () => t(5, 0);
+  Future<String> prod(String n, double precio, double costo, double min, double stock) =>
+      db.saveProducto(n, precio: precio, costo: costo, minimo: min, stockInicial: stock);
+  final purina = await prod('Purina 40 kg', 118000, 96000, 3, 12);
+  final sal = await prod('Sal mineralizada 25 kg', 48000, 36000, 4, 10);
+  final arroz = await prod('Arroz 500 g', 2500, 1800, 10, 60);
+  final aceite = await prod('Aceite 1 L', 9500, 7600, 6, 8);
+  await prod('Huevos AA (unidad)', 600, 450, 30, 0);
+  await prod('Jabón en barra', 3200, 2300, 5, 24);
+  Future<void> vp(int dias, int min, List<(String, String, double, double, double)> l) async {
+    db.reloj = () => t(dias, min);
+    await db.saveVentaProductos([
+      for (final (id, n, c, p, co) in l)
+        ItemVenta(productoId: id, nombre: n, cantidad: c, precio: p, costo: co)
+    ]);
+  }
+  await vp(2, 30, [(purina, 'Purina 40 kg', 3, 118000, 96000)]);
+  await vp(1, 40, [(sal, 'Sal mineralizada 25 kg', 4, 48000, 36000)]);
+  await vp(0, 15, [
+    (arroz, 'Arroz 500 g', 12, 2500, 1800),
+    (aceite, 'Aceite 1 L', 4, 9500, 7600)
+  ]);
+  await vp(0, 300, [(purina, 'Purina 40 kg', 2, 118000, 96000)]);
   db.reloj = DateTime.now;
+  await db.setAjuste('negocio_nombre', 'Agrotienda La Esperanza');
+  await db.setAjuste('negocio_meta', '6000000');
   return ana;
 }
 
@@ -147,7 +182,7 @@ void main() {
   });
 
   testWidgets('inicio completo', (tester) async {
-    await tam(tester, 1900);
+    await tam(tester, 3000);
     await tester.runAsync(() async {
       await tester.pumpWidget(_app(const HomePage()));
     });
@@ -170,7 +205,7 @@ void main() {
       await tester.pumpWidget(_app(const HomePage()));
     });
     await _esperar(tester);
-    await tester.tap(find.text('Movimientos'));
+    await tester.tap(find.text('Caja'));
     await _esperar(tester);
     await captura(tester, 'phone-movimientos');
   });
@@ -227,5 +262,33 @@ void main() {
     });
     await _esperar(tester);
     await captura(tester, 'phone-bienvenida');
+  });
+  testWidgets('inventario', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const HomePage()));
+    });
+    await _esperar(tester);
+    await tester.tap(find.text('Inventario'));
+    await _esperar(tester);
+    await captura(tester, 'phone-inventario');
+  });
+
+  testWidgets('venta con productos', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const HomePage()));
+    });
+    await _esperar(tester);
+    await tester.tap(find.text('Venta').first);
+    await _esperar(tester);
+    await tester.tap(find.text('Elegir productos del inventario'));
+    await _esperar(tester);
+    await tester.tap(find.text('Arroz 500 g').last);
+    await _esperar(tester);
+    await tester.tap(find.byTooltip('Agregar uno').first);
+    await tester.tap(find.byTooltip('Agregar uno').first);
+    await _esperar(tester);
+    await captura(tester, 'phone-venta-productos');
   });
 }

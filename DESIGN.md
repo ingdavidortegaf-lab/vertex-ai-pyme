@@ -60,6 +60,22 @@ táctiles ≥ 48 dp.
 animar. Otros movimientos: cambio de pestaña por fundido (220 ms) y barras del
 mes que crecen hasta su monto exacto (500 ms).
 
+## Gráficas (`lib/ui/graficas.dart`)
+Colores de serie validados con el verificador de paletas (daltonismo y
+contraste), distintos de los colores de texto:
+| Serie | Claro | Oscuro | Ayuda extra |
+|---|---|---|---|
+| Ventas | #1B7F45 | #3FA56C | barra llena |
+| Gastos | #C2412D | #E0614B | barra rayada (textura), leyenda |
+| Contado | #1F6FB2 | #4C93D6 | etiqueta directa con monto y % |
+| Fiado | #A35F00 | #BF8420 | etiqueta directa con monto y % |
+
+Rejilla recesiva (0, mitad, máximo) con montos cortos ($420 mil, $1,2 M).
+Barras con 2 px de aire y puntas redondeadas de 4 px; al tocar un grupo se
+resalta y su detalle sale arriba. Los indicadores muestran la variación con
+flecha y texto, nunca solo color. Navegación: Inicio, Caja, Inventario,
+Clientes, Asistente.
+
 ## Reglas
 - Largo de barra = monto exacto (sin escalas engañosas).
 - Lo recién sincronizado queda resaltado en la píldora hasta que se toca.
