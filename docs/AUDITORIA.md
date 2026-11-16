@@ -7,14 +7,22 @@
   después del evento.
 - `flutter test`: **55 de 55 pruebas pasan**.
 - `flutter build apk --release --obfuscate --split-debug-info=build\debug-info`:
-  **compila** (64,1 MB, modo solo local, sin claves).
+  **compila** (64,1 MB), tanto en modo solo local como con la nube
+  (`--dart-define-from-file=dart_defines.json`, archivo ignorado por git).
 - Celular real (Xiaomi 14T, HyperOS): el APK se instala y **la app abre bien**
   (16 nov. 2026), así que la base cifrada con SQLCipher y la clave en el Keystore
   funcionan en el dispositivo. **Flujo en modo avión verificado** por el
   usuario: clientes, venta, gasto y venta fiada, tablero actualizado,
   asistente («¿cuánto vendí esta semana?», «¿quién me debe?»), mensaje de
   WhatsApp y datos que siguen ahí al reabrir la app.
-- Falta probar la sincronización con Supabase (requiere URL y clave anon).
+- **Sincronización con Supabase verificada** en el celular real (16 nov.
+  2026): el APK con nube se instaló encima del anterior sin perder datos; al
+  quitar el modo avión e iniciar sesión subieron los 4 clientes y los 7
+  movimientos (3 ventas de contado, 2 fiadas, 2 gastos) registrados sin
+  señal. En el servidor: un envío por registro (11 POST con respuesta 201,
+  ningún rechazo), 0 duplicados, todo en la empresa del usuario y ninguna
+  venta apunta a un cliente inexistente. Los dos intentos con clave errada
+  devolvieron 400 y la app los contó como fallidos.
 - El emulador no arranca en este PC porque falta el controlador de
   virtualización; se prueba en el celular real.
 
@@ -88,9 +96,10 @@ lógico, validación de montos colombianos, reintento por cambio de red,
   celular, preguntas a la IA en cola.
 
 ## 6. Pendiente / riesgos conocidos
-- Falta probar en un celular real: el cifrado con SQLCipher, el Keystore,
-  WhatsApp y el modo avión solo se pueden comprobar en el dispositivo. Las
-  pruebas automáticas usan SQLite sin cifrar sobre Windows.
+- Probado en un solo celular (Xiaomi 14T, Android). Sin probar todavía:
+  la sincronización entre dos celulares de la misma empresa, el asistente
+  con IA en el servidor (Edge Function sin desplegar) e iOS. Las pruebas
+  automáticas usan SQLite sin cifrar sobre Windows.
 - Se cambió `anonKey` por `publishableKey` en `Supabase.initialize`
   (supabase_flutter 2.18 marcó `anonKey` como obsoleto); se le pasa la misma clave anon.
 - Roles: existe la columna `rol` (admin/vendedor) pero el prototipo usa solo admin.
