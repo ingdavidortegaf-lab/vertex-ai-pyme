@@ -63,6 +63,9 @@
 | 33 | Clave de 8 caracteres sin más reglas | Bases 4.4.3: política de contraseñas robustas | Mínimo 8 caracteres con letras y números, sin espacios al inicio o final |
 | 34 | El tendero hacía a mano comprobantes, cotizaciones y pedidos | Pertinencia (procesos de la cadena de valor) | Comprobante de venta, cotizaciones que se vuelven venta, pedido sugerido al proveedor con ingreso de mercancía en bloque y promociones, todo por WhatsApp. Base local v3 (cotizaciones y proveedores, solo en el celular). El comprobante no es factura electrónica DIAN: trae los datos para conectarlo con un proveedor autorizado |
 | 35 | Sin manual de usuario | Entregable 9.2 (4) | `docs/MANUAL_USUARIO.md` |
+| 36 | Sin código de barras ni venta por peso | Tiendas que venden a granel (queso, carne, granos) y con lector | Código de barras y unidad (und/kg/lb) por producto, sincronizados por campo (base local v4 y columnas en Supabase); escáner con cámara (mobile_scanner, BSD-3) o lector USB/teclado; etiquetas de gramera EAN-13 (20–29 + PLU + gramos) con dígito de control. La gramera no se conecta por cable: se usa su etiqueta o se escribe el peso |
+| 37 | Comprobantes solo como texto | El tendero necesita imprimir y entregar | PDF con logo del negocio en tirilla de 80 mm o carta (pdf y printing, Apache-2.0), impresión con el diálogo del sistema y compartir PDF. Sigue sin ser factura electrónica |
+| 38 | Versión para PC | Pedida por el usuario | Pendiente para después del pitch: requiere Visual Studio Build Tools (no instalado) y ajustar la base cifrada en Windows |
 | 28 | Las cuentas solo se creaban desde el panel | El negocio no podía empezar solo | Pantalla «Tu cuenta»: entrar, crear cuenta (clave ≥ 8), perfil, cerrar sesión avisando lo pendiente; errores en español; bloqueo tras 5 intentos |
 
 ## 2. Hallazgos de la primera revisión (se mantienen)

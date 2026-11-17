@@ -102,6 +102,8 @@ Future<String> _sembrar(LocalDb db) async {
   final aceite = await prod('Aceite 1 L', 9500, 7600, 6, 8);
   await prod('Huevos AA (unidad)', 600, 450, 30, 0);
   await prod('Jabón en barra', 3200, 2300, 5, 24);
+  await db.saveProducto('Queso campesino',
+      precio: 24000, costo: 18000, minimo: 2, stockInicial: 6, codigo: '00123', unidad: 'kg');
   Future<void> vp(int dias, int min, List<(String, String, double, double, double)> l) async {
     db.reloj = () => t(dias, min);
     await db.saveVentaProductos([
@@ -264,6 +266,21 @@ void main() {
     await _esperar(tester);
     await captura(tester, 'phone-bienvenida');
   });
+  testWidgets('nuevo producto por peso', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const HomePage()));
+    });
+    await _esperar(tester);
+    await tester.tap(find.text('Inventario'));
+    await _esperar(tester);
+    await tester.tap(find.text('Producto'));
+    await _esperar(tester);
+    await tester.tap(find.text('Kilo'));
+    await _esperar(tester);
+    await captura(tester, 'phone-producto-peso');
+  });
+
   testWidgets('pedido a proveedor', (tester) async {
     await tam(tester, 890);
     await tester.runAsync(() async {
@@ -307,8 +324,8 @@ void main() {
     await _esperar(tester);
     await tester.tap(find.text('Arroz 500 g').last);
     await _esperar(tester);
-    await tester.tap(find.byTooltip('Agregar uno').first);
-    await tester.tap(find.byTooltip('Agregar uno').first);
+    await tester.tap(find.byTooltip('Agregar').first);
+    await tester.tap(find.byTooltip('Agregar').first);
     await _esperar(tester);
     await captura(tester, 'phone-venta-productos');
   });
