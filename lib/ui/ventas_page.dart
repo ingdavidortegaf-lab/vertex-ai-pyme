@@ -5,6 +5,7 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
+import 'herramientas_page.dart';
 import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'tema.dart';
@@ -164,6 +165,10 @@ class FilaMovimiento extends StatelessWidget {
         const SizedBox(width: 6),
         iconoSync(v['sync']),
       ]),
+      // Tocar una venta abre su comprobante para enviarlo por WhatsApp.
+      onTap: tipo == 'ingreso'
+          ? () => enviarComprobante(context, v['id'] as String)
+          : null,
     );
   }
 }
@@ -185,21 +190,26 @@ Future<void> mostrarFormMovimiento(BuildContext context,
         tipoInicial: tipoInicial),
   );
   if (r == null) return;
+  final String id;
   if (r.items.isNotEmpty) {
-    await LocalDb.instance.saveVentaProductos(r.items,
+    id = await LocalDb.instance.saveVentaProductos(r.items,
         fiado: r.fiado, clienteId: r.clienteId, concepto: r.concepto);
   } else {
     var concepto = r.concepto.trim();
     if (concepto.isEmpty) concepto = r.tipo == 'abono' ? 'Abono' : 'Venta';
-    await LocalDb.instance.saveMovimiento(concepto, r.monto,
+    id = await LocalDb.instance.saveMovimiento(concepto, r.monto,
         tipo: r.tipo, credito: r.fiado, clienteId: r.clienteId);
   }
   SyncService.instance.sync();
-  avisar(switch (r.tipo) {
-    'egreso' => 'Gasto guardado',
-    'abono' => 'Abono guardado',
-    _ => r.fiado ? 'Venta fiada guardada' : 'Venta guardada',
-  });
+  if (r.tipo == 'ingreso') {
+    // Ofrece enviar el comprobante por WhatsApp enseguida.
+    avisarConAccion(r.fiado ? 'Venta fiada guardada' : 'Venta guardada',
+        'Enviar comprobante', () {
+      if (context.mounted) enviarComprobante(context, id);
+    });
+  } else {
+    avisar(r.tipo == 'egreso' ? 'Gasto guardado' : 'Abono guardado');
+  }
 }
 
 class _Movimiento {
@@ -264,7 +274,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => _ElegirProducto(productos: widget.productos),
+      builder: (_) => ElegirProducto(productos: widget.productos),
     );
     if (p == null) return;
     setState(() => _carrito[p.id] = (_carrito[p.id] ?? 0) + 1);
@@ -584,14 +594,14 @@ class _FormMovimientoState extends State<_FormMovimiento> {
 }
 
 /// Lista de productos para agregar a una venta (con buscador).
-class _ElegirProducto extends StatefulWidget {
+class ElegirProducto extends StatefulWidget {
   final List<ProductoStock> productos;
-  const _ElegirProducto({required this.productos});
+  const ElegirProducto({super.key, required this.productos});
   @override
-  State<_ElegirProducto> createState() => _ElegirProductoState();
+  State<ElegirProducto> createState() => _ElegirProductoState();
 }
 
-class _ElegirProductoState extends State<_ElegirProducto> {
+class _ElegirProductoState extends State<ElegirProducto> {
   String _f = '';
 
   @override

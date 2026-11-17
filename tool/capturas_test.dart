@@ -16,6 +16,7 @@ import 'package:vertex_ai_pyme/domain/resumen.dart';
 import 'package:vertex_ai_pyme/ui/cliente_detalle_page.dart';
 import 'package:vertex_ai_pyme/ui/comun.dart';
 import 'package:vertex_ai_pyme/ui/consent_gate.dart';
+import 'package:vertex_ai_pyme/ui/herramientas_page.dart';
 import 'package:vertex_ai_pyme/ui/home_page.dart';
 import 'package:vertex_ai_pyme/ui/tema.dart';
 import '../test/soporte.dart';
@@ -263,6 +264,26 @@ void main() {
     await _esperar(tester);
     await captura(tester, 'phone-bienvenida');
   });
+  testWidgets('pedido a proveedor', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const PedidoProveedorPage()));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-pedido');
+  });
+
+  testWidgets('comprobante', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const ComprobantesPage()));
+    });
+    await _esperar(tester);
+    await tester.tap(find.text('2 × Purina 40 kg').first);
+    await _esperar(tester);
+    await captura(tester, 'phone-comprobante');
+  });
+
   testWidgets('inventario', (tester) async {
     await tam(tester, 890);
     await tester.runAsync(() async {

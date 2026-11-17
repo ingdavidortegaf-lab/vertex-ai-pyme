@@ -6,6 +6,7 @@ import '../domain/resumen.dart';
 import 'cliente_detalle_page.dart';
 import 'clientes_page.dart';
 import 'graficas.dart';
+import 'herramientas_page.dart';
 import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'negocio_page.dart';
@@ -98,6 +99,8 @@ class _TableroPageState extends State<TableroPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const TituloSeccion('Herramientas'),
+            const HerramientasGrid(),
             if (d.nombreNegocio.isEmpty) ...[
               const SizedBox(height: 16),
               _InvitacionNegocio(onTap: () => mostrarMiNegocio(context)),
