@@ -145,7 +145,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | test_api | 0.7.14 | BSD-3-Clause |
 | typed_data | 1.4.0 | BSD-3-Clause |
 | url_launcher | 6.3.3 | BSD-3-Clause |
-| url_launcher_android | 6.3.33 | BSD-3-Clause |
+| url_launcher_android | 6.3.35 | BSD-3-Clause |
 | url_launcher_ios | 6.4.2 | BSD-3-Clause |
 | url_launcher_linux | 3.2.3 | BSD-3-Clause |
 | url_launcher_macos | 3.2.6 | BSD-3-Clause |
@@ -153,7 +153,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | url_launcher_web | 2.4.3 | BSD-3-Clause |
 | url_launcher_windows | 3.1.6 | BSD-3-Clause |
 | uuid | 4.6.0 | MIT |
-| vector_math | 2.4.4 | BSD-3-Clause |
+| vector_math | 2.4.3 | BSD-3-Clause |
 | vm_service | 15.4.0 | BSD-3-Clause |
 | web | 1.1.2 | BSD-3-Clause |
 | web_socket | 1.0.1 | BSD-3-Clause |

@@ -28,7 +28,9 @@ LENGUAJES Y HERRAMIENTAS
 
   Pieza                     Tecnologia                       Licencia
   ------------------------  -------------------------------  ----------------
-  App (Android e iOS)       Flutter 3.50 con lenguaje Dart   BSD-3 (gratis)
+  App (Android, iOS y PC)   Flutter 3.50 con lenguaje Dart   BSD-3 (gratis)
+  Base local en el PC       SQLite por FFI (sqflite_common_ffi) BSD-2
+  Compilar para Windows     Visual Studio Build Tools 2022    gratis (Microsoft)
   Base de datos local       SQLite cifrado con SQLCipher     BSD / dominio
                             (paquete sqflite_sqlcipher)        publico
   Clave de cifrado          flutter_secure_storage           BSD-3
@@ -345,6 +347,25 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   Resultado:            build\app\outputs\flutter-apk\app-release.apk
   Sin dart_defines.json la app funciona en modo solo local (sin nube).
 
+  VERSION PARA PC (WINDOWS)
+  Requisitos extra: Visual Studio Build Tools 2022 con "Desarrollo para el
+  escritorio con C++" y el componente "ATL de C++", y el "Modo de
+  programador" de Windows activado.
+  Compilar:  flutter build windows --release
+               --dart-define-from-file=dart_defines.json
+  Resultado: build\windows\x64\runner\Release\vertex_ai_pyme.exe
+             (copiar TODA la carpeta Release; el .exe necesita sus DLL)
+  Diferencias en el PC: la base local es SQLite normal en
+  %APPDATA%\co.vertextech\vertex_ai_pyme\vertex.db (en el celular va
+  cifrada con SQLCipher); los codigos de barras se leen con lector USB o
+  escribiendo el codigo (la camara solo en el celular). La ventana muestra
+  la app centrada como en el celular.
+  Archivos de Windows: carpeta windows/ (runner/main.cpp pone el titulo y
+  el tamano de la ventana).
+
+  Desde VS Code: abrir C:\dev\vertex_ai_pyme, elegir abajo a la derecha el
+  dispositivo "Windows (desktop)" o el celular, y presionar F5 (.vscode/).
+
   Nube: correr supabase_schema.sql en el SQL Editor de Supabase; la funcion
   de IA se despliega con "supabase functions deploy asistente" y su clave con
   "supabase secrets set GEMINI_API_KEY=...".
@@ -359,7 +380,8 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   actualizacion a la version con inventario conservando datos.
   Falta probar en el celular: version con herramientas, codigo de barras,
   gramera e impresion (probadas con pruebas automaticas y capturas en PC).
+  Version Windows: compila y abre en este PC (base local SQLite sin cifrar).
   Pendiente: respuesta real de la IA (falta la clave de Gemini), version
-  para iPhone (requiere Mac), version de escritorio Windows, factura
+  para iPhone (requiere Mac), cifrado de la base en Windows, factura
   electronica DIAN (requiere proveedor autorizado), roles vendedor/admin.
 ===============================================================================
