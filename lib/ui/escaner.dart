@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -14,7 +15,9 @@ class _EscanerPage extends StatefulWidget {
 }
 
 class _EscanerPageState extends State<_EscanerPage> {
-  final _ctrl = MobileScannerController(
+  late final MobileScannerController? _ctrl = !_conCamara
+      ? null
+      : MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
     formats: const [
       BarcodeFormat.ean13,
@@ -31,7 +34,7 @@ class _EscanerPageState extends State<_EscanerPage> {
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    if (_conCamara) _ctrl?.dispose();
     _manual.dispose();
     super.dispose();
   }
@@ -43,16 +46,41 @@ class _EscanerPageState extends State<_EscanerPage> {
     Navigator.of(context).pop(v);
   }
 
+  /// La cámara solo se usa en el celular; en el PC se usa un lector USB.
+  static final _conCamara = Platform.isAndroid || Platform.isIOS;
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(title: const Text('Leer código de barras')),
       body: Column(children: [
+        if (!_conCamara)
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.qr_code_scanner,
+                      size: 72, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(height: 16),
+                  Text('Pasa el producto por el lector de códigos',
+                      textAlign: TextAlign.center, style: t.titleLarge),
+                  const SizedBox(height: 8),
+                  Text(
+                      'El lector USB o Bluetooth escribe el código solo. '
+                      'También puedes escribirlo abajo y presionar Enter.',
+                      textAlign: TextAlign.center,
+                      style: t.bodyLarge),
+                ]),
+              ),
+            ),
+          ),
+        if (_conCamara)
         Expanded(
           child: Stack(fit: StackFit.expand, children: [
             MobileScanner(
-              controller: _ctrl,
+              controller: _ctrl!,
               onDetect: (captura) {
                 for (final b in captura.barcodes) {
                   if ((b.rawValue ?? '').isNotEmpty) {
@@ -102,6 +130,7 @@ class _EscanerPageState extends State<_EscanerPage> {
               Expanded(
                 child: TextField(
                   controller: _manual,
+                  autofocus: !_conCamara,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.done,
                   decoration: const InputDecoration(

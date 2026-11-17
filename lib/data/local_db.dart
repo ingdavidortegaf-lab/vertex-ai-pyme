@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart'
+    show sqfliteFfiInit, databaseFactoryFfi;
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
@@ -38,7 +42,28 @@ class LocalDb {
   final cambios = ValueNotifier<int>(0);
   void _avisar() => cambios.value++;
 
+  /// En el PC (Windows) se usa SQLite por FFI en la carpeta privada de la
+  /// app. SQLCipher (cifrado) solo existe para Android e iOS; en el PC la
+  /// protección es la de la cuenta de Windows.
+  static bool get esEscritorio =>
+      Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+
   Future<void> open() async {
+    if (esEscritorio) {
+      sqfliteFfiInit();
+      final dir = await getApplicationSupportDirectory();
+      _db = await databaseFactoryFfi.openDatabase(p.join(dir.path, 'vertex.db'),
+          options: OpenDatabaseOptions(
+            version: 4,
+            onCreate: (d, _) => crearEsquema(d),
+            onUpgrade: (d, viejo, _) async {
+              if (viejo < 2) await crearInventario(d);
+              if (viejo < 3) await crearHerramientas(d);
+              if (viejo < 4) await agregarCodigoYUnidad(d);
+            },
+          ));
+      return;
+    }
     const storage = FlutterSecureStorage();
     var key = await storage.read(key: 'db_key');
     if (key == null) {
