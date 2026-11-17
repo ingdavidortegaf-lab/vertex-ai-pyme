@@ -1,0 +1,365 @@
+===============================================================================
+  VERTEX AI Pyme - COMO ESTA CONSTRUIDA LA APLICACION
+  Equipo VERTEX TECH - CreaTIC Casanare 2026
+===============================================================================
+
+Este documento explica, para exponer y para quien reciba el codigo:
+  1. Que es la app y con que programas esta hecha
+  2. Como esta organizada (arquitectura por capas)
+  3. Donde esta cada archivo y que hace cada uno
+  4. Como funcionan los procesos principales (algoritmos)
+  5. Seguridad y datos personales
+  6. Como compilar, probar y desplegar
+  7. Que esta probado y que falta
+
+
+-------------------------------------------------------------------------------
+1. QUE ES Y CON QUE PROGRAMAS ESTA HECHA
+-------------------------------------------------------------------------------
+
+VERTEX AI Pyme es una app movil para tiendas y MiPymes de Casanare: ventas de
+contado y fiadas, gastos, abonos, clientes, inventario (con codigo de barras y
+productos por peso), reportes con graficas, comprobantes y cotizaciones en PDF
+o por WhatsApp, pedidos a proveedores, promociones y un asistente que responde
+preguntas del negocio. Todo funciona SIN SENAL y se sincroniza con la nube
+cuando vuelve la conexion.
+
+LENGUAJES Y HERRAMIENTAS
+
+  Pieza                     Tecnologia                       Licencia
+  ------------------------  -------------------------------  ----------------
+  App (Android e iOS)       Flutter 3.50 con lenguaje Dart   BSD-3 (gratis)
+  Base de datos local       SQLite cifrado con SQLCipher     BSD / dominio
+                            (paquete sqflite_sqlcipher)        publico
+  Clave de cifrado          flutter_secure_storage           BSD-3
+                            (Android Keystore / iOS Keychain)
+  Nube (backend)            Supabase: PostgreSQL + Auth +    Apache-2.0 /
+                            API REST + RLS (plan gratuito)    PostgreSQL
+  Funcion de IA             Supabase Edge Function escrita   MIT (Deno)
+                            en TypeScript (motor Deno)
+  Modelo de IA              Gemini (capa gratuita, opcional) Terminos Google
+  Lector de codigos         mobile_scanner (camara)          BSD-3
+  Facturas en PDF           pdf + printing                   Apache-2.0
+  Elegir logo               file_picker                      MIT
+  Red / WhatsApp            connectivity_plus, url_launcher  BSD-3
+  Editor usado              VS Code / Android Studio (cualquiera sirve)
+  Control de versiones      Git (historial completo de cambios)
+
+  Relacion completa de los 132 paquetes con version y licencia:
+  docs/LICENCIAS.md  (0 licencias restrictivas, todo es gratis).
+
+POR QUE FLUTTER
+  Un solo codigo produce la app de Android y la de iPhone (requisito 4.2 de
+  las bases). Se escribe en Dart, un lenguaje parecido a Java/JavaScript.
+
+
+-------------------------------------------------------------------------------
+2. ARQUITECTURA: COMO ESTA ORGANIZADA
+-------------------------------------------------------------------------------
+
+La idea central es "OFFLINE-FIRST" (primero sin conexion): el celular es donde
+se trabaja; la nube solo respalda y comparte datos entre celulares.
+
+   +--------------------------- CELULAR -----------------------------+
+   |                                                                 |
+   |  lib/ui/      PANTALLAS (lo que ve el tendero)                  |
+   |      |  leen y escriben solo en la base local                   |
+   |      v                                                          |
+   |  lib/data/    DATOS: base local cifrada + cola de envio +       |
+   |               servicio de sincronizacion + conexion a la nube   |
+   |      |                                                          |
+   |      v                                                          |
+   |  lib/domain/  REGLAS DEL NEGOCIO (funciones puras, sin pantalla |
+   |               ni base de datos): conflictos, formatos, codigos  |
+   |               de barras, textos de comprobantes, asistente      |
+   +-----------------------------------------------------------------+
+               |  HTTPS (solo cuando hay senal y sesion)
+               v
+   +---------------------------- NUBE -------------------------------+
+   |  Supabase: Auth (correo y clave) + PostgreSQL con RLS por       |
+   |  empresa + Edge Function "asistente" -> Gemini (IA)             |
+   +-----------------------------------------------------------------+
+
+  Regla de oro: las pantallas NUNCA hablan directo con la nube. Todo pasa por
+  la base local; la sincronizacion trabaja en segundo plano.
+
+
+-------------------------------------------------------------------------------
+3. DONDE ESTA CADA ARCHIVO Y QUE HACE
+-------------------------------------------------------------------------------
+
+Carpeta del proyecto en el PC:  C:\dev\vertex_ai_pyme
+Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuente
+(El numero entre parentesis es la cantidad de lineas del archivo.)
+
+3.1  ARCHIVOS DE LA RAIZ
+  pubspec.yaml (33)      Lista de paquetes que usa la app y su version.
+  pubspec.lock           Versiones exactas descargadas (no se edita a mano).
+  analysis_options.yaml  Reglas de calidad del codigo (flutter analyze).
+  supabase_schema.sql    Script completo de la base de datos en la nube:
+                         tablas, reglas de seguridad RLS, triggers. Se pega
+                         en Supabase > SQL Editor. Se puede volver a correr.
+  README.md              Como compilar y configurar.
+  ANDROID_IOS.md         Ajustes de Android/iOS y problemas del PC resueltos.
+  PRODUCT.md             Para quien es la app y principios del producto.
+  DESIGN.md              Sistema de diseno: colores, letras, graficas.
+  dart_defines.json      (NO se entrega, esta en .gitignore) direccion y
+                         clave publica de Supabase para compilar.
+
+3.2  lib/  - EL CODIGO DE LA APP (Dart)
+
+  lib/main.dart (77)
+      Punto de entrada. Abre la base cifrada, conecta Supabase si esta
+      configurado, arranca la sincronizacion y muestra la app con el tema.
+
+  lib/config.dart (24)
+      Configuracion que entra al compilar (--dart-define): direccion de
+      Supabase, clave publica, correo de privacidad, politica de la
+      Gobernacion y minutos de inactividad. Aqui NO hay claves escritas.
+
+  --- lib/domain/  REGLAS DEL NEGOCIO (logica pura, facil de probar) ---
+
+  formato.dart (63)       Pesos colombianos ($25.000), leer montos escritos,
+                          validar y mostrar celulares (300 123 4567),
+                          quitar tildes, primer nombre.
+  resumen.dart (176)      Modelos de datos: Resumen del mes, ClienteSaldo,
+                          ProductoStock (con codigo y unidad), ItemVenta,
+                          TopProducto, ResumenPeriodo, DatosAsistente.
+  conflictos.dart (170)   Regla de conflictos entre celulares: "gana el
+                          cambio mas reciente DE CADA CAMPO" para clientes
+                          y productos. Fechas en UTC. Espera de reintento
+                          (15 s, 30 s, 1 min... tope 30 min).
+  asistente_local.dart (242)  Asistente SIN senal: detecta la intencion de
+                          la pregunta por palabras clave (ventas de hoy,
+                          quien debe, que se agota, mas vendido, meta...) y
+                          responde con los datos del celular. Mensaje de
+                          cobro y enlace de WhatsApp (wa.me).
+  privacidad.dart (31)    anonimizarPregunta: quita nombres de clientes,
+                          numeros largos y correos antes de enviar algo a
+                          la IA (Ley 1581, minimizacion).
+  documentos.dart (197)   Textos para WhatsApp: comprobante de venta,
+                          cotizacion, pedido al proveedor y promocion.
+                          Calcula el pedido sugerido. Perfil del negocio.
+  codigos.dart (72)       Codigos de barras: valida el digito de control
+                          EAN, lee etiquetas de gramera (20-29 + producto +
+                          gramos), busca el producto y convierte gramos a
+                          kg o libras.
+
+  --- lib/data/  DATOS Y SINCRONIZACION ---
+
+  local_db.dart (980)     LA BASE LOCAL CIFRADA. Crea las tablas (version 4,
+                          con migraciones que conservan los datos): clientes,
+                          ventas, productos, inventario, cola_sync,
+                          preguntas_ia, cotizaciones, proveedores, ajustes.
+                          Cada guardado escribe el dato Y su entrada en la
+                          cola en UNA transaccion. Tambien: reportes por
+                          periodo, serie por dia, mas vendidos, recibir
+                          pedidos, cotizaciones, aplicar cambios de la nube.
+  sync_service.dart (195) El MOTOR DE SINCRONIZACION: cada 30 s, al cambiar
+                          la red o al guardar, envia la cola en orden, marca
+                          lo enviado, reintenta con espera creciente, aparta
+                          errores sin borrarlos y descarga lo nuevo de otros
+                          celulares. Publica el estado para la barra.
+  remote_api.dart (91)    Conexion con Supabase: envio idempotente (upsert
+                          por id), descarga incremental, llamada a la IA.
+                          Traduce errores (sesion vencida, rechazo, red).
+  asistente_service.dart (119)  Decide si responde el asistente local o la
+                          IA del servidor; deja en cola las preguntas sin
+                          senal; arma lo unico que viaja a la IA (totales).
+
+  --- lib/ui/  PANTALLAS ---
+
+  tema.dart (414)          Colores "pizarra del mercado", letras, botones,
+                           avatares de clientes, titulos y estados vacios.
+  ilustraciones.dart (337) Dibujos hechos en codigo: logo, palotes de tiza,
+                           pizarra, nube, escudo (sin imagenes externas).
+  graficas.dart (342)      Graficas dibujadas en codigo: barras de ventas y
+                           gastos, contado vs fiado, ranking de productos.
+  home_page.dart (239)     Estructura principal: barra superior, pildora de
+                           sincronizacion, menu y navegacion inferior
+                           (Inicio, Caja, Inventario, Clientes, Asistente).
+  tablero_page.dart (745)  INICIO: pizarra del dia, acciones rapidas,
+                           herramientas, meta del mes, reportes por periodo,
+                           por reponer, quien debe, mejores clientes.
+  ventas_page.dart (690)   CAJA: movimientos por dia y formulario para
+                           registrar venta/gasto/abono, con productos,
+                           escaner y peso de gramera.
+  clientes_page.dart (268) Lista de clientes con buscador y formulario.
+  cliente_detalle_page.dart (244)  Ficha del cliente: cuanto debe, cobrar
+                           por WhatsApp, historial.
+  inventario_page.dart (527)  Productos, stock, por reponer, llego
+                           mercancia, conteo, formulario (codigo y unidad).
+  herramientas_page.dart (1070)  Comprobantes, cotizaciones, pedir
+                           mercancia (proveedores) y promociones; vista
+                           previa con WhatsApp, Imprimir y PDF.
+  pdf_factura.dart (174)   Genera la factura/cotizacion en PDF con logo:
+                           tirilla de 80 mm o tamano carta; imprimir o
+                           compartir.
+  escaner.dart (118)       Pantalla de camara para leer codigos de barras
+                           (o escribir el codigo / lector USB).
+  asistente_page.dart (274)  Chat con el asistente y sugerencias.
+  negocio_page.dart (231)  "Mi negocio": nombre, tipo, meta, NIT,
+                           direccion, WhatsApp y logo.
+  login_page.dart (505)    Cuenta: entrar, crear cuenta (clave robusta),
+                           bloqueo tras 5 intentos, perfil, cerrar sesion.
+  consent_gate.dart (128)  Pide la autorizacion de datos al primer uso.
+  privacidad_page.dart (128)  Aviso de privacidad, derechos, revocar y
+                           borrar datos del celular.
+  inactividad.dart (62)    Cierra la sesion tras 30 minutos sin uso.
+  comun.dart (67)          Avisos en pantalla, abrir WhatsApp, confirmar.
+
+3.3  supabase/functions/asistente/index.ts (112)  - TypeScript
+      Funcion en el servidor: valida que quien pregunta tenga sesion, limpia
+      la pregunta, arma el mensaje para Gemini con los totales y devuelve la
+      respuesta. La clave de la IA es un secreto del servidor (GEMINI_API_KEY),
+      nunca esta en la app ni en el codigo.
+
+3.4  android/  - CONFIGURACION DE ANDROID
+  android/app/build.gradle.kts   Version minima Android 12 (minSdk 31).
+  android/app/src/main/AndroidManifest.xml  Permiso de internet, WhatsApp,
+                     correo, sin copias de seguridad, nombre de la app.
+  android/app/src/main/res/xml/data_extraction_rules.xml  Impide que la
+                     base salga del celular por copias de Android.
+  (La carpeta ios/ tiene la configuracion de iPhone, iOS 16.)
+
+3.5  test/  - PRUEBAS AUTOMATICAS (78 pruebas, todas pasan)
+  soporte.dart                 Base de pruebas y un servidor falso.
+  sync_test.dart               Modo avion, envio unico, caida de red a mitad,
+                               reintentos, sesion vencida, otro celular.
+  conflictos_test.dart         Union por campo y cambios tardios.
+  local_db_test.dart           Tablero, validaciones y cola.
+  inventario_test.dart         Stock, venta con productos, ganancia, sync.
+  codigos_test.dart            Codigos de barras, gramera, migracion.
+  documentos_test.dart         Comprobante, cotizacion, pedido, promocion.
+  pdf_test.dart                PDF en tirilla y carta.
+  asistente_local_test.dart y asistente_inventario_test.dart  Preguntas.
+  formato_test.dart            Pesos, celulares, anonimizacion.
+  tool/capturas_test.dart      Genera capturas de pantalla para revisar.
+
+3.6  scripts/
+  preparar_proyecto.ps1  Prepara el proyecto la primera vez.
+  generar_licencias.ps1  Genera docs/LICENCIAS.md desde los paquetes.
+
+3.7  docs/  - DOCUMENTACION
+  AUDITORIA.md                   Estado, 38 hallazgos corregidos, OWASP.
+  LICENCIAS.md                   Componentes de terceros y licencias.
+  POLITICA_TRATAMIENTO_DATOS.md  Politica de datos (borrador juridico).
+  AVISO_PRIVACIDAD_Y_AUTORIZACION.md  Aviso y formato de autorizacion.
+  MANUAL_USUARIO.md              Manual para el tendero.
+  COMO_ESTA_CONSTRUIDO.txt       Este documento.
+
+
+-------------------------------------------------------------------------------
+4. COMO FUNCIONA POR DENTRO (ALGORITMOS)
+-------------------------------------------------------------------------------
+
+4.1  GUARDAR SIN SENAL (cola transaccional)
+  Al guardar una venta, en UNA sola transaccion se escribe:
+    - la venta,
+    - una salida de inventario por cada producto,
+    - una entrada en la cola por cada registro.
+  Si el celular se apaga a mitad, o se guarda todo o nada.
+
+4.2  SINCRONIZACION
+  Cada 30 s / al cambiar la red / al guardar:
+    1. Hay nube? hay red? hay sesion? Si no, la barra lo dice y se espera.
+    2. Lee la cola en orden y envia cada registro con "upsert por id".
+       - Aceptado: sale de la cola y queda "enviado".
+       - Rechazado: espera 15 s, 30 s, 1 min... y a los 5 intentos queda
+         "con error" (NUNCA se borra; se reintenta al tocar la barra).
+       - Se cae la red: se para; la cola queda intacta.
+    3. Descarga lo nuevo de otros celulares desde el ultimo recibido, en
+       lotes de 500, y lo une con lo local.
+  Garantias: nada se pierde, nada se duplica (cada registro tiene un UUID
+  creado en el celular; el servidor ignora un id repetido).
+
+4.3  CONFLICTOS ENTRE CELULARES
+  - Ventas, gastos, abonos e inventario: SOLO SE AGREGAN. No hay como
+    editarlos ni borrarlos (ni en la app ni en el servidor).
+  - Clientes y productos: cada campo guarda la hora de su ultimo cambio;
+    al unir gana el mas reciente CAMPO POR CAMPO. Corre igual en el celular
+    (conflictos.dart) y en el servidor (triggers merge_cliente/producto).
+
+4.4  INVENTARIO
+  El stock NO se guarda como numero: es la SUMA de movimientos
+  (entrada +, venta -, ajuste +/-). Asi dos celulares sin senal que venden
+  el mismo producto llegan al mismo stock correcto al sincronizar.
+  Ganancia = suma de cantidad x (precio - costo) de lo vendido.
+  Pedido sugerido = lo que falta para llegar al doble del minimo.
+
+4.5  REPORTES
+  Variacion % = (actual - anterior) / anterior x 100, frente al periodo
+  anterior de igual duracion (hoy vs ayer, 7 dias vs los 7 anteriores...).
+  Si el anterior es 0 se dice "Sin datos para comparar".
+
+4.6  CODIGO DE BARRAS Y GRAMERA
+  - Producto empacado: se busca por su codigo exacto.
+  - Etiqueta de gramera EAN-13: 2X PPPPP GGGGG C
+      2X = prefijo 20-29, PPPPP = codigo del producto en la gramera,
+      GGGGG = peso en gramos, C = digito de control (se verifica).
+    Se agrega el producto con su peso (gramos -> kg o libras).
+  - Sin etiqueta: el tendero escribe el peso que marca la gramera.
+  - Un lector USB/Bluetooth funciona porque escribe como un teclado.
+
+4.7  ASISTENTE
+  Pregunta -> normalizar (minusculas, sin tildes) -> detectar intencion ->
+    si es sobre datos: responde el celular con SQL, exacto y sin senal;
+    si es abierta y hay senal: anonimizar -> Edge Function -> Gemini;
+    sin senal: resumen local y la pregunta queda en cola.
+
+4.8  COMPROBANTE / FACTURA
+  Numero = primeros 8 caracteres del UUID de la venta (unico entre
+  celulares). Texto para WhatsApp y PDF con logo (tirilla 80 mm o carta).
+  NO es factura electronica DIAN: tiene los datos (emisor, cliente, items,
+  cantidades, precios, total) para conectarlo despues con un proveedor
+  tecnologico autorizado.
+
+
+-------------------------------------------------------------------------------
+5. SEGURIDAD Y DATOS PERSONALES (bases 4.4 y 4.5)
+-------------------------------------------------------------------------------
+  - Base del celular cifrada AES-256 (SQLCipher); clave aleatoria de 256 bits
+    en el Android Keystore. Sin copias de seguridad de Android.
+  - Solo HTTPS (TLS 1.2+); la app rechaza direcciones http://.
+  - Supabase Auth guarda la clave con hash y sal. Clave robusta: 8+
+    caracteres con letras y numeros.
+  - Bloqueo de 5 minutos tras 5 intentos; cierre tras 30 min sin uso.
+  - RLS: cada consulta en la nube se filtra por la empresa del usuario;
+    sin sesion no se lee nada.
+  - Secretos fuera del codigo: --dart-define y secretos de Supabase.
+  - La IA nunca recibe nombres, celulares ni correos.
+  - Ley 1581: autorizacion al primer uso, aviso visible, derechos, revocar
+    y borrar. MiPyme = responsable; Gobernacion = encargada.
+
+
+-------------------------------------------------------------------------------
+6. COMO COMPILAR Y PROBAR
+-------------------------------------------------------------------------------
+  Requisitos: Flutter 3.50, Android SDK (en C:\Android\sdk), Git.
+
+  Revisar calidad:      flutter analyze
+  Pruebas:              flutter test
+  APK para el celular:  flutter build apk --release --obfuscate
+                          --split-debug-info=build\debug-info
+                          --dart-define-from-file=dart_defines.json
+  Resultado:            build\app\outputs\flutter-apk\app-release.apk
+  Sin dart_defines.json la app funciona en modo solo local (sin nube).
+
+  Nube: correr supabase_schema.sql en el SQL Editor de Supabase; la funcion
+  de IA se despliega con "supabase functions deploy asistente" y su clave con
+  "supabase secrets set GEMINI_API_KEY=...".
+  Problemas del PC (antivirus, ruta con espacios, NDK): ANDROID_IOS.md.
+
+
+-------------------------------------------------------------------------------
+7. QUE ESTA PROBADO Y QUE FALTA
+-------------------------------------------------------------------------------
+  Probado: 78 pruebas automaticas; app instalada en Xiaomi 14T; flujo
+  completo en modo avion; sincronizacion real con Supabase sin duplicados;
+  actualizacion a la version con inventario conservando datos.
+  Falta probar en el celular: version con herramientas, codigo de barras,
+  gramera e impresion (probadas con pruebas automaticas y capturas en PC).
+  Pendiente: respuesta real de la IA (falta la clave de Gemini), version
+  para iPhone (requiere Mac), version de escritorio Windows, factura
+  electronica DIAN (requiere proveedor autorizado), roles vendedor/admin.
+===============================================================================
