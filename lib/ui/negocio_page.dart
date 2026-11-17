@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import '../data/local_db.dart';
 import '../domain/documentos.dart';
@@ -64,9 +64,10 @@ class _FormNegocioState extends State<_FormNegocio> {
   /// Elige una imagen y la copia a la carpeta privada de la app.
   Future<void> _elegirLogo() async {
     try {
-      final r = await FilePicker.pickFiles(type: FileType.image, withData: true);
-      final bytes = r?.files.single.bytes;
-      if (bytes == null) return;
+      final img = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
+      if (img == null) return;
+      final bytes = await img.readAsBytes();
       if (bytes.length > 2 * 1024 * 1024) {
         avisar('La imagen pesa más de 2 MB; elige una más liviana');
         return;

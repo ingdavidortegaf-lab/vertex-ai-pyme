@@ -40,12 +40,12 @@ LENGUAJES Y HERRAMIENTAS
   Modelo de IA              Gemini (capa gratuita, opcional) Terminos Google
   Lector de codigos         mobile_scanner (camara)          BSD-3
   Facturas en PDF           pdf + printing                   Apache-2.0
-  Elegir logo               file_picker                      MIT
+  Elegir logo               image_picker (equipo Flutter)    BSD-3
   Red / WhatsApp            connectivity_plus, url_launcher  BSD-3
   Editor usado              VS Code / Android Studio (cualquiera sirve)
   Control de versiones      Git (historial completo de cambios)
 
-  Relacion completa de los 132 paquetes con version y licencia:
+  Relacion completa de los paquetes con version y licencia:
   docs/LICENCIAS.md  (0 licencias restrictivas, todo es gratis).
 
 POR QUE FLUTTER

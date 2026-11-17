@@ -16,7 +16,7 @@ a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 
 Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apache-2.0, incluidos en Flutter).
 
-## Paquetes Dart/Flutter (132)
+## Paquetes Dart/Flutter (143)
 
 | Paquete | Version | Licencia |
 |---|---|---|
@@ -44,7 +44,10 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | fake_async | 1.3.3 | Apache-2.0 |
 | ffi | 2.2.0 | BSD-3-Clause |
 | file | 7.0.1 | BSD-3-Clause |
-| file_picker | 11.0.3 | MIT |
+| file_selector_linux | 0.9.4+1 | BSD-3-Clause |
+| file_selector_macos | 0.9.5+2 | BSD-3-Clause |
+| file_selector_platform_interface | 2.7.0 | BSD-3-Clause |
+| file_selector_windows | 0.9.3+6 | BSD-3-Clause |
 | fixnum | 1.1.1 | BSD-3-Clause |
 | flutter | SDK | BSD-3-Clause |
 | flutter_lints | 5.0.0 | BSD-3-Clause |
@@ -65,6 +68,14 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | http | 1.6.0 | BSD-3-Clause |
 | http_parser | 4.1.2 | BSD-3-Clause |
 | image | 4.13.1 | MIT |
+| image_picker | 1.2.4 | Apache-2.0 |
+| image_picker_android | 0.8.13+25 | Apache-2.0 |
+| image_picker_for_web | 3.1.1 | BSD-3-Clause |
+| image_picker_ios | 0.8.13+15 | Apache-2.0 |
+| image_picker_linux | 0.2.2 | BSD-3-Clause |
+| image_picker_macos | 0.2.2+1 | BSD-3-Clause |
+| image_picker_platform_interface | 2.11.2 | BSD-3-Clause |
+| image_picker_windows | 0.2.2 | BSD-3-Clause |
 | intl | 0.20.3 # This should follow semver to not break Flutter, where it is unpinned, see https://github.com/flutter/flutter/blob/main/pubspec.yaml | BSD-3-Clause |
 | jni | 1.1.2 | BSD-3-Clause |
 | jni_flutter | 1.0.4+1 | BSD-3-Clause |
