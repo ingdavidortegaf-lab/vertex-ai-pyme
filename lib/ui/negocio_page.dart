@@ -1,4 +1,7 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import '../data/local_db.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
@@ -35,6 +38,7 @@ Future<void> mostrarMiNegocio(BuildContext context) async {
   await db.setAjuste('negocio_nit', r.nit);
   await db.setAjuste('negocio_direccion', r.direccion);
   await db.setAjuste('negocio_telefono', r.telefono);
+  await db.setAjuste('negocio_logo', r.logo);
   db.cambios.value++;
   avisar('Datos del negocio guardados');
 }
@@ -55,6 +59,26 @@ class _FormNegocioState extends State<_FormNegocio> {
   late final _nit = TextEditingController(text: widget.actual.nit);
   late final _dir = TextEditingController(text: widget.actual.direccion);
   late final _tel = TextEditingController(text: mostrarTelefono(widget.actual.telefono));
+  late String _logo = widget.actual.logo;
+
+  /// Elige una imagen y la copia a la carpeta privada de la app.
+  Future<void> _elegirLogo() async {
+    try {
+      final r = await FilePicker.pickFiles(type: FileType.image, withData: true);
+      final bytes = r?.files.single.bytes;
+      if (bytes == null) return;
+      if (bytes.length > 2 * 1024 * 1024) {
+        avisar('La imagen pesa más de 2 MB; elige una más liviana');
+        return;
+      }
+      final dir = await getApplicationDocumentsDirectory();
+      final f = File('${dir.path}/logo_${DateTime.now().millisecondsSinceEpoch}.img');
+      await f.writeAsBytes(bytes, flush: true);
+      if (mounted) setState(() => _logo = f.path);
+    } catch (_) {
+      avisar('No se pudo cargar la imagen');
+    }
+  }
 
   @override
   void dispose() {
@@ -75,6 +99,7 @@ class _FormNegocioState extends State<_FormNegocio> {
           nit: _nit.text.trim(),
           direccion: _dir.text.trim().replaceAll(RegExp(r'\s+'), ' '),
           telefono: normalizarTelefono(_tel.text) ?? '',
+          logo: _logo,
         ));
   }
 
@@ -139,6 +164,44 @@ class _FormNegocioState extends State<_FormNegocio> {
                   ? 'Escribe un monto válido'
                   : null,
             ),
+            pregunta('Logo del negocio (opcional)'),
+            Row(children: [
+              Container(
+                width: 64,
+                height: 64,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                ),
+                child: _logo.isNotEmpty && File(_logo).existsSync()
+                    ? Image.file(File(_logo), fit: BoxFit.contain)
+                    : Icon(Icons.image_outlined,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text('Sale en tus facturas y cotizaciones impresas o en PDF.',
+                    style: t.bodyMedium),
+              ),
+            ]),
+            const SizedBox(height: 8),
+            Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _elegirLogo,
+                  icon: const Icon(Icons.upload_outlined),
+                  label: Text(_logo.isEmpty ? 'Elegir imagen' : 'Cambiar'),
+                ),
+              ),
+              if (_logo.isNotEmpty) ...[
+                const SizedBox(width: 10),
+                TextButton(
+                    onPressed: () => setState(() => _logo = ''),
+                    child: const Text('Quitar')),
+              ],
+            ]),
             pregunta('Datos para tus comprobantes (opcional)'),
             TextFormField(
               controller: _nit,

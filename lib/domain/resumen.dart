@@ -58,6 +58,12 @@ class ProductoStock {
   final double minimo;
   final double stock;
   final String sync;
+
+  /// Código de barras (o código interno / PLU de gramera).
+  final String codigo;
+
+  /// Unidad de venta: 'und', 'kg' o 'lb' (por peso, con gramera).
+  final String unidad;
   const ProductoStock({
     required this.id,
     required this.nombre,
@@ -66,6 +72,8 @@ class ProductoStock {
     this.minimo = 0,
     this.stock = 0,
     this.sync = 'pendiente',
+    this.codigo = '',
+    this.unidad = 'und',
   });
 
   bool get agotado => stock <= 0;
@@ -80,12 +88,16 @@ class ItemVenta {
   final double cantidad;
   final double precio;
   final double costo;
+
+  /// 'und', 'kg' o 'lb'.
+  final String unidad;
   const ItemVenta({
     required this.productoId,
     required this.nombre,
     required this.cantidad,
     required this.precio,
     this.costo = 0,
+    this.unidad = 'und',
   });
   double get total => cantidad * precio;
 }

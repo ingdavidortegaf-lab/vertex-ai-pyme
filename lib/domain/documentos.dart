@@ -8,6 +8,7 @@
 library;
 
 import 'package:intl/intl.dart';
+import 'codigos.dart';
 import 'formato.dart';
 import 'resumen.dart';
 
@@ -19,7 +20,11 @@ class PerfilNegocio {
   final String direccion;
   final String telefono;
   final double meta;
+
+  /// Ruta del logo guardado en el celular (vacío si no hay).
+  final String logo;
   const PerfilNegocio({
+    this.logo = '',
     this.nombre = '',
     this.tipo = '',
     this.nit = '',
@@ -36,8 +41,13 @@ class LineaDoc {
   final String nombre;
   final double cantidad;
   final double precio;
-  const LineaDoc(this.nombre, this.cantidad, this.precio);
+
+  /// 'und', 'kg' o 'lb'.
+  final String unidad;
+  const LineaDoc(this.nombre, this.cantidad, this.precio, [this.unidad = 'und']);
   double get total => cantidad * precio;
+  String get cantidadTexto => cantidadConUnidad(cantidad, unidad);
+  String get precioTexto => unidad == 'und' ? '${cop(precio)} c/u' : '${cop(precio)}/$unidad';
 }
 
 String cantidadDoc(double c) =>
@@ -61,9 +71,11 @@ String _encabezado(PerfilNegocio n) {
 
 String _lineas(List<LineaDoc> l) => [
       for (final x in l)
-        x.cantidad == 1
+        x.cantidad == 1 && x.unidad == 'und'
             ? '• ${x.nombre}: ${cop(x.total)}'
-            : '• ${cantidadDoc(x.cantidad)} × ${x.nombre} (${cop(x.precio)} c/u): ${cop(x.total)}'
+            : x.unidad == 'und'
+                ? '• ${x.cantidadTexto} × ${x.nombre} (${x.precioTexto}): ${cop(x.total)}'
+                : '• ${x.nombre} ${x.cantidadTexto} (${x.precioTexto}): ${cop(x.total)}'
     ].join('\n');
 
 final _fecha = DateFormat('d/MM/y h:mm a', 'es_CO');

@@ -5,7 +5,9 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
+import 'escaner.dart';
 import 'herramientas_page.dart';
+import '../domain/codigos.dart';
 import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'tema.dart';
@@ -264,10 +266,49 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 nombre: p.nombre,
                 cantidad: e.value,
                 precio: p.precio,
-                costo: p.costo),
+                costo: p.costo,
+                unidad: p.unidad),
       ];
 
   double get _totalCarrito => _items.fold(0.0, (s, i) => s + i.total);
+
+  /// Peso que marca la gramera, en la unidad del producto.
+  Future<double?> _pedirPeso(ProductoStock p, {double? actual}) async {
+    final ctrl = TextEditingController(
+        text: actual == null ? '' : actual.toString().replaceAll('.', ','));
+    final r = await showDialog<double>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(p.nombre),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+              labelText: 'Peso en ${p.unidad == 'kg' ? 'kilos' : 'libras'}',
+              helperText: 'Lo que marca la gramera. Ej.: 0,750',
+              suffixText: p.unidad),
+          onSubmitted: (v) => Navigator.pop(c, double.tryParse(v.replaceAll(',', '.'))),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
+          FilledButton(
+              onPressed: () =>
+                  Navigator.pop(c, double.tryParse(ctrl.text.trim().replaceAll(',', '.'))),
+              child: const Text('Agregar')),
+        ],
+      ),
+    );
+    ctrl.dispose();
+    return r == null || r <= 0 ? null : r;
+  }
+
+  Future<void> _sumar(ProductoStock p, {double? cantidad}) async {
+    var c = cantidad;
+    if (c == null && esPorPeso(p.unidad)) c = await _pedirPeso(p);
+    if (c == null && esPorPeso(p.unidad)) return;
+    setState(() => _carrito[p.id] = (_carrito[p.id] ?? 0) + (c ?? 1));
+  }
 
   Future<void> _agregarProducto() async {
     final p = await showModalBottomSheet<ProductoStock>(
@@ -277,7 +318,18 @@ class _FormMovimientoState extends State<_FormMovimiento> {
       builder: (_) => ElegirProducto(productos: widget.productos),
     );
     if (p == null) return;
-    setState(() => _carrito[p.id] = (_carrito[p.id] ?? 0) + 1);
+    await _sumar(p);
+  }
+
+  Future<void> _escanear() async {
+    final c = await escanearCodigo(context);
+    if (c == null || !mounted) return;
+    final r = buscarPorCodigo(widget.productos, c);
+    if (r == null) {
+      avisar('No hay un producto con el código $c. Agrégalo en Inventario.');
+      return;
+    }
+    await _sumar(r.producto, cantidad: r.cantidad);
   }
 
   void _cambiarCantidad(String id, double delta) => setState(() {
@@ -448,8 +500,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                             overflow: TextOverflow.ellipsis,
                             style: t.titleSmall),
                         Text(
-                            '${cop(i.precio)} c/u'
-                            '${(_producto(i.productoId)?.stock ?? 0) < i.cantidad ? ' · solo hay ${(_producto(i.productoId)?.stock ?? 0).toStringAsFixed(0)}' : ''}',
+                            '${i.unidad == 'und' ? '${cop(i.precio)} c/u' : '${cop(i.precio)}/${i.unidad}'}'
+                            '${(_producto(i.productoId)?.stock ?? 0) < i.cantidad ? ' · solo hay ${cantidadConUnidad(_producto(i.productoId)?.stock ?? 0, i.unidad)}' : ''}',
                             style: t.bodySmall?.copyWith(
                                 color: (_producto(i.productoId)?.stock ?? 0) < i.cantidad
                                     ? p.gastos
@@ -457,14 +509,26 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                       ]),
                     ),
                     IconButton(
-                      tooltip: 'Quitar uno',
-                      onPressed: () => _cambiarCantidad(i.productoId, -1),
+                      tooltip: 'Quitar',
+                      onPressed: () => _cambiarCantidad(
+                          i.productoId, esPorPeso(i.unidad) ? -0.25 : -1),
                       icon: const Icon(Icons.remove_circle_outline),
                     ),
-                    Text(i.cantidad.toStringAsFixed(0), style: cifras(t.titleMedium)),
+                    InkWell(
+                      onTap: esPorPeso(i.unidad) && _producto(i.productoId) != null
+                          ? () async {
+                              final v = await _pedirPeso(_producto(i.productoId)!,
+                                  actual: i.cantidad);
+                              if (v != null) setState(() => _carrito[i.productoId] = v);
+                            }
+                          : null,
+                      child: Text(cantidadConUnidad(i.cantidad, i.unidad),
+                          style: cifras(esPorPeso(i.unidad) ? t.titleSmall : t.titleMedium)),
+                    ),
                     IconButton(
-                      tooltip: 'Agregar uno',
-                      onPressed: () => _cambiarCantidad(i.productoId, 1),
+                      tooltip: 'Agregar',
+                      onPressed: () => _cambiarCantidad(
+                          i.productoId, esPorPeso(i.unidad) ? 0.25 : 1),
                       icon: const Icon(Icons.add_circle_outline),
                     ),
                     SizedBox(
@@ -481,6 +545,12 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 label: Text(_carrito.isEmpty
                     ? 'Elegir productos del inventario'
                     : 'Agregar otro producto'),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: _escanear,
+                icon: const Icon(Icons.qr_code_scanner),
+                label: const Text('Escanear código de barras'),
               ),
             ],
             if (_tipo == 'ingreso' && _carrito.isNotEmpty) ...[
@@ -609,7 +679,8 @@ class _ElegirProductoState extends State<ElegirProducto> {
     final t = Theme.of(context).textTheme;
     final f = _f.trim().toLowerCase();
     final lista = widget.productos
-        .where((x) => f.isEmpty || x.nombre.toLowerCase().contains(f))
+        .where((x) =>
+            f.isEmpty || x.nombre.toLowerCase().contains(f) || x.codigo.contains(f.trim()))
         .toList();
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),

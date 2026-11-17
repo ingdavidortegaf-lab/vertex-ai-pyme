@@ -6,7 +6,10 @@ import '../domain/documentos.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
+import 'escaner.dart';
 import 'inventario_page.dart';
+import 'pdf_factura.dart';
+import '../domain/codigos.dart';
 import 'tema.dart';
 import 'ventas_page.dart';
 
@@ -40,10 +43,25 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
     saldoCliente: saldo,
   );
   if (!context.mounted) return;
+  final fiado = v['credito'] == 1;
   await mostrarDocumento(context,
       titulo: 'Comprobante de venta',
       texto: texto,
       telefono: (v['cliente_telefono'] as String?) ?? '',
+      imprimible: DocImprimible(
+        titulo: 'Comprobante de venta',
+        numero: numeroDoc(ventaId),
+        fecha: DateTime.parse(v['fecha'] as String).toLocal(),
+        negocio: negocio,
+        cliente: v['cliente_nombre'] as String?,
+        lineas: lineas,
+        total: (v['monto'] as num).toDouble(),
+        notas: [
+          'Forma de pago: ${fiado ? 'a crédito (fiado)' : 'contado'}',
+          if (fiado && saldo > 0) 'Saldo pendiente a la fecha: ${cop(saldo)}',
+          '¡Gracias por su compra!',
+        ],
+      ),
       nota: negocio.nombre.isEmpty
           ? 'Consejo: en el menú ⋮ → «Mi negocio» pon el nombre, NIT y '
               'dirección para que salgan en el comprobante.'
@@ -56,6 +74,7 @@ Future<void> mostrarDocumento(BuildContext context,
     required String texto,
     String telefono = '',
     String? nota,
+    DocImprimible? imprimible,
     String boton = 'Enviar por WhatsApp'}) {
   return showModalBottomSheet<void>(
     context: context,
@@ -100,6 +119,38 @@ Future<void> mostrarDocumento(BuildContext context,
               icon: const Icon(Icons.chat_outlined),
               label: Text(telefono.isEmpty ? '$boton (elegir contacto)' : boton),
             ),
+            if (imprimible != null) ...[
+              const SizedBox(height: 10),
+              Row(children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      try {
+                        await imprimirDocumento(imprimible);
+                      } catch (_) {
+                        avisar('No se pudo abrir la impresión');
+                      }
+                    },
+                    icon: const Icon(Icons.print_outlined),
+                    label: const Text('Imprimir'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      try {
+                        await compartirPdf(imprimible);
+                      } catch (_) {
+                        avisar('No se pudo crear el PDF');
+                      }
+                    },
+                    icon: const Icon(Icons.picture_as_pdf_outlined),
+                    label: const Text('PDF'),
+                  ),
+                ),
+              ]),
+            ],
           ]),
         ),
       );
@@ -273,14 +324,15 @@ class _Carrito extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.titleSmall),
                 Text(
-                    '${cop(usarCosto ? p.costo : p.precio)} c/u · hay ${cantidadTexto(p.stock)}',
+                    '${cop(usarCosto ? p.costo : p.precio)}${p.unidad == 'und' ? ' c/u' : '/${p.unidad}'}'
+                    ' · hay ${cantidadConUnidad(p.stock, p.unidad)}',
                     style: t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
               ]),
             ),
             IconButton(
-              tooltip: 'Quitar uno',
+              tooltip: 'Quitar',
               onPressed: () {
-                final n = c - 1;
+                final n = c - (esPorPeso(p.unidad) ? 0.25 : 1);
                 if (n <= 0) {
                   cantidades.remove(p.id);
                 } else {
@@ -291,13 +343,13 @@ class _Carrito extends StatelessWidget {
               icon: const Icon(Icons.remove_circle_outline),
             ),
             SizedBox(
-                width: 32,
-                child: Text(cantidadDoc(c),
-                    textAlign: TextAlign.center, style: cifras(t.titleMedium))),
+                width: esPorPeso(p.unidad) ? 64 : 32,
+                child: Text(cantidadConUnidad(c, p.unidad),
+                    textAlign: TextAlign.center, style: cifras(t.titleSmall))),
             IconButton(
-              tooltip: 'Agregar uno',
+              tooltip: 'Agregar',
               onPressed: () {
-                cantidades[p.id] = c + 1;
+                cantidades[p.id] = c + (esPorPeso(p.unidad) ? 0.25 : 1);
                 onCambio();
               },
               icon: const Icon(Icons.add_circle_outline),
@@ -306,6 +358,25 @@ class _Carrito extends StatelessWidget {
         ),
     ]);
   }
+}
+
+/// Lee un código (cámara, lector o teclado) y suma el producto a [cant].
+/// Con etiqueta de gramera suma el peso leído.
+Future<void> agregarPorCodigo(BuildContext context, List<ProductoStock> productos,
+    Map<String, double> cant, VoidCallback alCambiar) async {
+  final c = await escanearCodigo(context);
+  if (c == null) return;
+  final r = buscarPorCodigo(productos, c);
+  if (r == null) {
+    avisar('No hay un producto con el código $c. Agrégalo en Inventario.');
+    return;
+  }
+  final p = r.producto;
+  cant[p.id] = (cant[p.id] ?? 0) + (r.cantidad ?? 1);
+  alCambiar();
+  avisar(r.cantidad == null
+      ? '${p.nombre} agregado'
+      : '${p.nombre}: ${cantidadConUnidad(r.cantidad!, p.unidad)}');
 }
 
 Future<ProductoStock?> _elegirProducto(BuildContext context, List<ProductoStock> l) {
@@ -530,14 +601,27 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final p = await _elegirProducto(context, _productos);
-                  if (p != null) setState(() => _cant[p.id] = (_cant[p.id] ?? 0) + 1);
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Agregar producto'),
-              ),
+              Row(children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final p = await _elegirProducto(context, _productos);
+                      if (p != null) setState(() => _cant[p.id] = (_cant[p.id] ?? 0) + 1);
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Agregar'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () =>
+                        agregarPorCodigo(context, _productos, _cant, () => setState(() {})),
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text('Escanear'),
+                  ),
+                ),
+              ]),
               const SizedBox(height: 20),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
@@ -591,17 +675,35 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
     var tel = '';
     final cid = c['cliente_id'] as String?;
     if (cid != null) tel = ((await db.cliente(cid))?['telefono'] as String?) ?? '';
+    final lineas = [
+      for (final i in LocalDb.itemsCotizacion(c))
+        LineaDoc(i.nombre, i.cantidad, i.precio, i.unidad)
+    ];
+    final fecha = DateTime.parse(c['creado'] as String).toLocal();
     final texto = textoCotizacion(
       negocio: negocio,
       cotizacionId: c['id'] as String,
-      fecha: DateTime.parse(c['creado'] as String).toLocal(),
-      lineas: [
-        for (final i in LocalDb.itemsCotizacion(c)) LineaDoc(i.nombre, i.cantidad, i.precio)
-      ],
+      fecha: fecha,
+      lineas: lineas,
       cliente: c['cliente_nombre'] as String?,
     );
     if (!mounted) return;
-    await mostrarDocumento(context, titulo: 'Cotización', texto: texto, telefono: tel);
+    await mostrarDocumento(context,
+        titulo: 'Cotización',
+        texto: texto,
+        telefono: tel,
+        imprimible: DocImprimible(
+          titulo: 'Cotización',
+          numero: numeroDoc(c['id'] as String),
+          fecha: fecha,
+          negocio: negocio,
+          cliente: c['cliente_nombre'] as String?,
+          lineas: lineas,
+          total: (c['total'] as num).toDouble(),
+          notas: [
+            'Precios válidos por 8 días o hasta agotar existencias.',
+          ],
+        ));
   }
 
   Future<void> _acciones(Map<String, Object?> c) async {
@@ -796,7 +898,8 @@ class _NuevaCotizacionPageState extends State<NuevaCotizacionPage> {
               nombre: p.nombre,
               cantidad: _cant[p.id]!,
               precio: p.precio,
-              costo: p.costo)
+              costo: p.costo,
+              unidad: p.unidad)
     ];
     if (items.isEmpty) {
       avisar('Agrega al menos un producto');
@@ -845,14 +948,27 @@ class _NuevaCotizacionPageState extends State<NuevaCotizacionPage> {
           ),
         ),
         const SizedBox(height: 10),
-        OutlinedButton.icon(
-          onPressed: () async {
-            final x = await _elegirProducto(context, _productos);
-            if (x != null) setState(() => _cant[x.id] = (_cant[x.id] ?? 0) + 1);
-          },
-          icon: const Icon(Icons.add),
-          label: const Text('Agregar producto'),
-        ),
+        Row(children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final x = await _elegirProducto(context, _productos);
+                if (x != null) setState(() => _cant[x.id] = (_cant[x.id] ?? 0) + 1);
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Agregar'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  agregarPorCodigo(context, _productos, _cant, () => setState(() {})),
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text('Escanear'),
+            ),
+          ),
+        ]),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

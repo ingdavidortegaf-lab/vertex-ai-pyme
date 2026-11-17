@@ -4,6 +4,8 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
+import 'escaner.dart';
+import '../domain/codigos.dart';
 import 'ilustraciones.dart';
 import 'tema.dart';
 
@@ -56,7 +58,7 @@ class _InventarioPageState extends State<InventarioPage> {
     final f = _filtro.trim().toLowerCase();
     final lista = _items
         .where((x) => !_soloReponer || x.agotado || x.bajo)
-        .where((x) => f.isEmpty || x.nombre.toLowerCase().contains(f))
+        .where((x) => f.isEmpty || x.nombre.toLowerCase().contains(f) || x.codigo.contains(f.trim()))
         .toList();
 
     return Scaffold(
@@ -191,8 +193,8 @@ class EtiquetaStock extends StatelessWidget {
     final (Color fondo, Color tinta, String texto) = x.agotado
         ? (p.gastosFondo, p.gastos, 'Agotado')
         : x.bajo
-            ? (p.fiadoFondo, p.fiado, 'Quedan ${cantidadTexto(x.stock)}')
-            : (p.ventasFondo, p.ventas, '${cantidadTexto(x.stock)} und.');
+            ? (p.fiadoFondo, p.fiado, 'Quedan ${cantidadConUnidad(x.stock, x.unidad)}')
+            : (p.ventasFondo, p.ventas, x.unidad == 'und' ? '${cantidadTexto(x.stock)} und.' : cantidadConUnidad(x.stock, x.unidad));
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(10)),
@@ -223,7 +225,7 @@ class _FilaProducto extends StatelessWidget {
       ),
       title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(
-          '${cop(x.precio)}${x.costo > 0 ? ' · gana ${(x.margen * 100).round()} %' : ''}'),
+          '${cop(x.precio)}${x.unidad == 'und' ? '' : '/${x.unidad}'}${x.costo > 0 ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}'),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         EtiquetaStock(x: x),
         const SizedBox(width: 6),
@@ -360,6 +362,8 @@ Future<void> mostrarFormProducto(BuildContext context, {ProductoStock? producto}
       costo: r.costo,
       minimo: r.minimo,
       stockInicial: r.stock,
+      codigo: r.codigo,
+      unidad: r.unidad,
       id: producto?.id);
   SyncService.instance.sync();
   avisar(producto == null ? 'Producto guardado' : 'Producto actualizado');
@@ -368,7 +372,9 @@ Future<void> mostrarFormProducto(BuildContext context, {ProductoStock? producto}
 class _DatosProducto {
   final String nombre;
   final double precio, costo, minimo, stock;
-  const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo, this.stock);
+  final String codigo, unidad;
+  const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo, this.stock,
+      this.codigo, this.unidad);
 }
 
 class _FormProducto extends StatefulWidget {
@@ -388,10 +394,12 @@ class _FormProductoState extends State<_FormProducto> {
   late final _minimo = TextEditingController(
       text: (widget.producto?.minimo ?? 0) > 0 ? cantidadTexto(widget.producto!.minimo) : '');
   final _stock = TextEditingController();
+  late final _codigo = TextEditingController(text: widget.producto?.codigo ?? '');
+  late String _unidad = widget.producto?.unidad ?? 'und';
 
   @override
   void dispose() {
-    for (final c in [_nombre, _precio, _costo, _minimo, _stock]) {
+    for (final c in [_nombre, _precio, _costo, _minimo, _stock, _codigo]) {
       c.dispose();
     }
     super.dispose();
@@ -407,6 +415,8 @@ class _FormProductoState extends State<_FormProducto> {
           _costo.text.trim().isEmpty ? 0 : (parseMonto(_costo.text) ?? 0),
           _numero(_minimo.text) ?? 0,
           _numero(_stock.text) ?? 0,
+          _codigo.text.replaceAll(RegExp(r'\s'), ''),
+          _unidad,
         ));
   }
 
@@ -434,13 +444,53 @@ class _FormProductoState extends State<_FormProducto> {
                   (v ?? '').trim().length < 2 ? 'Escribe el nombre del producto' : null,
             ),
             const SizedBox(height: 12),
+            Text('Se vende por', style: t.titleSmall),
+            const SizedBox(height: 8),
+            SegmentedButton<String>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: 'und', label: Text('Unidad')),
+                ButtonSegment(value: 'kg', icon: Icon(Icons.scale_outlined), label: Text('Kilo')),
+                ButtonSegment(value: 'lb', icon: Icon(Icons.scale_outlined), label: Text('Libra')),
+              ],
+              selected: {_unidad},
+              onSelectionChanged: (s) => setState(() => _unidad = s.first),
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _codigo,
+              keyboardType: TextInputType.number,
+              maxLength: 40,
+              decoration: InputDecoration(
+                labelText: _unidad == 'und'
+                    ? 'Código de barras (opcional)'
+                    : 'Código en la gramera (PLU, opcional)',
+                helperText: _unidad == 'und'
+                    ? 'Escanéalo o escríbelo; sirve también con lector USB'
+                    : 'El número del producto en la etiqueta de la gramera',
+                counterText: '',
+                suffixIcon: IconButton(
+                  tooltip: 'Escanear',
+                  icon: const Icon(Icons.qr_code_scanner),
+                  onPressed: () async {
+                    final c = await escanearCodigo(context);
+                    if (c == null) return;
+                    final b = leerEtiquetaBalanza(c);
+                    // Si se escanea una etiqueta de gramera, se guarda su PLU.
+                    setState(() => _codigo.text = b?.plu ?? normalizarCodigo(c));
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             Row(children: [
               Expanded(
                 child: TextFormField(
                   controller: _precio,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      labelText: 'Precio de venta', prefixText: r'$ '),
+                  decoration: InputDecoration(
+                      labelText: _unidad == 'und' ? 'Precio de venta' : 'Precio por $_unidad',
+                      prefixText: r'$ '),
                   validator: (v) =>
                       parseMonto(v ?? '') == null ? 'Precio mayor a cero' : null,
                 ),

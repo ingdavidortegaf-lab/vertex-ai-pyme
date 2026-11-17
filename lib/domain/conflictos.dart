@@ -105,7 +105,22 @@ class ClienteCampos {
 /// reciente de cada campo). El stock NO es un campo: se calcula sumando los
 /// movimientos de inventario, que solo se agregan.
 class ProductoCampos {
-  static const campos = ['nombre', 'precio', 'costo', 'minimo', 'deleted'];
+  static const campos = [
+    'nombre',
+    'precio',
+    'costo',
+    'minimo',
+    'deleted',
+    'codigo',
+    'unidad'
+  ];
+
+  /// Unidades de venta: por unidad o por peso (gramera).
+  static const unidades = ['und', 'kg', 'lb'];
+
+  /// Fecha para campos que no existían en versiones anteriores: cualquier
+  /// cambio real gana sobre ella al unir.
+  static final _inicio = DateTime.utc(1970);
 
   final String id;
   final Map<String, Object> valores;
@@ -117,6 +132,8 @@ class ProductoCampos {
   double get costo => (valores['costo'] as num).toDouble();
   double get minimo => (valores['minimo'] as num).toDouble();
   bool get deleted => valores['deleted'] == true;
+  String get codigo => valores['codigo'] as String;
+  String get unidad => valores['unidad'] as String;
 
   DateTime get updatedAt =>
       ts.values.reduce((a, b) => b.isAfter(a) ? b : a);
@@ -140,8 +157,13 @@ class ProductoCampos {
       'costo': (r['costo'] as num? ?? 0).toDouble(),
       'minimo': (r['minimo'] as num? ?? 0).toDouble(),
       'deleted': local ? (r['deleted'] as int? ?? 0) == 1 : r['deleted'] == true,
+      'codigo': (r['codigo'] as String?) ?? '',
+      'unidad': unidades.contains(r['unidad']) ? r['unidad'] as String : 'und',
     };
-    final t = {for (final c in campos) c: DateTime.parse(r['${c}_ts'] as String)};
+    final t = {
+      for (final c in campos)
+        c: r['${c}_ts'] is String ? DateTime.parse(r['${c}_ts'] as String) : _inicio
+    };
     return ProductoCampos(r['id'] as String, v, t);
   }
 

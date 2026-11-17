@@ -49,12 +49,13 @@ class LocalDb {
     final path = p.join(await getDatabasesPath(), 'vertex.db');
     _db = await openDatabase(path,
         password: key,
-        version: 3,
+        version: 4,
         onCreate: (d, _) => crearEsquema(d),
         onUpgrade: (d, viejo, _) async {
           // Los datos anteriores se conservan en cada versión.
           if (viejo < 2) await crearInventario(d); // v2: inventario
           if (viejo < 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
+          if (viejo < 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
         });
   }
 
@@ -103,6 +104,19 @@ class LocalDb {
         'CREATE TABLE ajustes(clave TEXT PRIMARY KEY, valor TEXT NOT NULL)');
     await crearInventario(d);
     await crearHerramientas(d);
+    await agregarCodigoYUnidad(d);
+  }
+
+  /// v4: código de barras y unidad de venta (und, kg, lb) por producto.
+  static Future<void> agregarCodigoYUnidad(Database d) async {
+    const inicio = '1970-01-01T00:00:00.000Z';
+    await d.execute("ALTER TABLE productos ADD COLUMN codigo TEXT NOT NULL DEFAULT ''");
+    await d.execute(
+        "ALTER TABLE productos ADD COLUMN codigo_ts TEXT NOT NULL DEFAULT '$inicio'");
+    await d.execute("ALTER TABLE productos ADD COLUMN unidad TEXT NOT NULL DEFAULT 'und'");
+    await d.execute(
+        "ALTER TABLE productos ADD COLUMN unidad_ts TEXT NOT NULL DEFAULT '$inicio'");
+    await d.execute('CREATE INDEX productos_codigo_idx ON productos(codigo)');
   }
 
   /// Cotizaciones y proveedores. Viven solo en el celular (no se
@@ -492,6 +506,8 @@ class LocalDb {
           minimo: _dbl(x['minimo']),
           stock: _dbl(x['stock']),
           sync: x['sync'] as String? ?? 'pendiente',
+          codigo: (x['codigo'] as String?) ?? '',
+          unidad: (x['unidad'] as String?) ?? 'und',
         )
     ];
   }
@@ -523,8 +539,11 @@ class LocalDb {
       double costo = 0,
       double minimo = 0,
       double stockInicial = 0,
+      String codigo = '',
+      String unidad = 'und',
       String? id}) async {
     if (nombre.trim().isEmpty) throw ArgumentError('nombre');
+    if (!ProductoCampos.unidades.contains(unidad)) throw ArgumentError('unidad');
     if (!precio.isFinite || precio < 0 || !costo.isFinite || costo < 0) {
       throw ArgumentError('precio');
     }
@@ -538,6 +557,8 @@ class LocalDb {
         'precio': precio,
         'costo': costo,
         'minimo': minimo < 0 ? 0 : minimo,
+        'codigo': codigo.replaceAll(RegExp(r'\s'), ''),
+        'unidad': unidad,
       };
       final Map<String, Object?> row;
       if (prev.isEmpty) {
@@ -651,6 +672,7 @@ class LocalDb {
         direccion: await ajuste('negocio_direccion') ?? '',
         telefono: await ajuste('negocio_telefono') ?? '',
         meta: double.tryParse(await ajuste('negocio_meta') ?? '') ?? 0,
+        logo: await ajuste('negocio_logo') ?? '',
       );
 
   /// Una venta con el nombre y celular del cliente.
@@ -665,14 +687,15 @@ class LocalDb {
   /// Líneas de una venta: sus productos, o el concepto si no tuvo productos.
   Future<List<LineaDoc>> lineasDeVenta(String ventaId) async {
     final r = await db.rawQuery(
-        'SELECT p.nombre, -i.cantidad AS cant, COALESCE(i.precio_unit, 0) AS precio '
+        'SELECT p.nombre, p.unidad, -i.cantidad AS cant, COALESCE(i.precio_unit, 0) AS precio '
         'FROM inventario i JOIN productos p ON p.id = i.producto_id '
         "WHERE i.venta_id = ? AND i.motivo = 'venta' ORDER BY i.rowid",
         [ventaId]);
     if (r.isNotEmpty) {
       return [
         for (final x in r)
-          LineaDoc(x['nombre'] as String, _dbl(x['cant']), _dbl(x['precio']))
+          LineaDoc(x['nombre'] as String, _dbl(x['cant']), _dbl(x['precio']),
+              (x['unidad'] as String?) ?? 'und')
       ];
     }
     final v = await movimiento(ventaId);
@@ -750,6 +773,7 @@ class LocalDb {
             'cantidad': i.cantidad,
             'precio': i.precio,
             'costo': i.costo,
+            'unidad': i.unidad,
           }
       ]),
       'total': validos.fold<double>(0, (s, i) => s + i.total),
@@ -767,6 +791,7 @@ class LocalDb {
             cantidad: (x['cantidad'] as num).toDouble(),
             precio: (x['precio'] as num).toDouble(),
             costo: (x['costo'] as num? ?? 0).toDouble(),
+            unidad: (x['unidad'] as String?) ?? 'und',
           )
       ];
 

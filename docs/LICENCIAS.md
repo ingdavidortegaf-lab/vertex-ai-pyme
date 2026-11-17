@@ -1,6 +1,6 @@
 # Relacion de licencias - VERTEX AI Pyme
 
-Generado automaticamente el 2026-11-16 con `scripts/generar_licencias.ps1`
+Generado automaticamente el 2026-11-17 con `scripts/generar_licencias.ps1`
 a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 
 ## Componentes principales
@@ -16,7 +16,7 @@ a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 
 Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apache-2.0, incluidos en Flutter).
 
-## Paquetes Dart/Flutter (118)
+## Paquetes Dart/Flutter (132)
 
 | Paquete | Version | Licencia |
 |---|---|---|
@@ -24,8 +24,11 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | app_links_linux | 1.0.5 | Apache-2.0 |
 | app_links_platform_interface | 2.0.4 | Apache-2.0 |
 | app_links_web | 1.0.5 | Apache-2.0 |
+| archive | 4.7.1 | MIT |
 | args | 2.7.0 | BSD-3-Clause |
 | async | 2.13.1 | BSD-3-Clause |
+| barcode | 2.2.9 | Apache-2.0 |
+| bidi | 2.0.13 | MIT |
 | boolean_selector | 2.1.2 | BSD-3-Clause |
 | characters | 1.4.1 | BSD-3-Clause |
 | clock | 1.1.3 | Apache-2.0 |
@@ -34,16 +37,19 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | connectivity_plus | 6.1.5 | BSD-3-Clause |
 | connectivity_plus_platform_interface | 2.1.0 | BSD-3-Clause |
 | convert | 3.1.2 | BSD-3-Clause |
+| cross_file | 0.3.5+5 | BSD-3-Clause |
 | crypto | 3.0.8 | BSD-3-Clause |
 | dart_jsonwebtoken | 3.4.1 | MIT |
 | dbus | 0.7.15 | MPL-2.0 |
 | fake_async | 1.3.3 | Apache-2.0 |
 | ffi | 2.2.0 | BSD-3-Clause |
 | file | 7.0.1 | BSD-3-Clause |
+| file_picker | 11.0.3 | MIT |
 | fixnum | 1.1.1 | BSD-3-Clause |
 | flutter | SDK | BSD-3-Clause |
 | flutter_lints | 5.0.0 | BSD-3-Clause |
 | flutter_localizations | SDK | BSD-3-Clause (Flutter SDK) |
+| flutter_plugin_android_lifecycle | 2.0.35 | BSD-3-Clause |
 | flutter_secure_storage | 9.2.4 | BSD-3-Clause |
 | flutter_secure_storage_linux | 1.2.3 | BSD-3-Clause |
 | flutter_secure_storage_macos | 3.1.3 | BSD-3-Clause |
@@ -58,6 +64,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | hooks | 2.2.0 | BSD-3-Clause |
 | http | 1.6.0 | BSD-3-Clause |
 | http_parser | 4.1.2 | BSD-3-Clause |
+| image | 4.13.1 | MIT |
 | intl | 0.20.3 # This should follow semver to not break Flutter, where it is unpinned, see https://github.com/flutter/flutter/blob/main/pubspec.yaml | BSD-3-Clause |
 | jni | 1.1.2 | BSD-3-Clause |
 | jni_flutter | 1.0.4+1 | BSD-3-Clause |
@@ -74,25 +81,32 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | material_color_utilities | 0.13.0 | Apache-2.0 |
 | meta | 1.19.0 | BSD-3-Clause |
 | mime | 2.1.0 | BSD-3-Clause |
+| mobile_scanner | 7.5.0 | BSD-3-Clause |
 | native_toolchain_c | 0.19.6 | BSD-3-Clause |
 | nm | 0.5.0 | MPL-2.0 |
 | objective_c | 9.6.4 | BSD-3-Clause |
 | package_config | 3.0.0 | BSD-3-Clause |
 | passkeys_platform_interface | 2.11.0 | BSD-3-Clause |
 | path | 1.9.1 | BSD-3-Clause |
+| path_parsing | 1.1.0 | MIT |
 | path_provider | 2.1.6 | BSD-3-Clause |
 | path_provider_android | 2.3.1 | BSD-3-Clause |
 | path_provider_foundation | 2.6.0 | BSD-3-Clause |
 | path_provider_linux | 2.2.2 | BSD-3-Clause |
 | path_provider_platform_interface | 2.1.3 | BSD-3-Clause |
 | path_provider_windows | 2.3.0 | BSD-3-Clause |
+| pdf | 3.13.1 | Apache-2.0 |
+| pdf_widget_wrapper | 1.0.4 | Apache-2.0 |
 | petitparser | 7.1.0 | MIT |
 | platform | 3.2.0 | BSD-3-Clause |
 | plugin_platform_interface | 2.1.8 | BSD-3-Clause |
 | pointycastle | 4.0.0 | MIT |
+| posix | 6.5.4 | MIT |
 | postgrest | 2.9.1 | MIT |
+| printing | 5.15.1 | Apache-2.0 |
 | process | 5.0.6 | BSD-3-Clause |
 | pub_semver | 2.2.1 | BSD-3-Clause |
+| qr | 3.0.3 | BSD-3-Clause |
 | realtime_client | 2.13.2 | MIT |
 | record_use | 1.1.1 | BSD-3-Clause |
 | shared_preferences | 2.5.6 | BSD-3-Clause |
