@@ -38,9 +38,16 @@ class TextoAvisoPrivacidad extends StatelessWidget {
           'nombres, celulares ni correos.'),
       h('Quién es responsable'),
       const Text('Tu negocio es el responsable de los datos de sus clientes y '
-          'debe contar con su autorización para registrarlos. La plataforma '
-          'actúa como encargada del tratamiento y solo los usa para prestarte '
-          'el servicio.'),
+          'debe contar con su autorización para registrarlos. La Gobernación '
+          'de Casanare, como operadora de la app, actúa como encargada del '
+          'tratamiento y solo los usa para prestarte el servicio.'),
+      h('Política de tratamiento de datos'),
+      Text(Config.politicaGobernacion.isEmpty
+          ? 'Puedes consultar la Política de Tratamiento de Datos Personales '
+              'de la Gobernación de Casanare en su Dirección TIC o en su '
+              'sitio web oficial.'
+          : 'Consulta la Política de Tratamiento de Datos Personales de la '
+              'Gobernación de Casanare en: ${Config.politicaGobernacion}'),
       h('Tus derechos'),
       const Text('Puedes conocer, actualizar, rectificar y suprimir tus datos, '
           'revocar esta autorización y presentar quejas ante la '

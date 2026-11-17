@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
+import '../domain/documentos.dart';
 import '../domain/resumen.dart';
 
 /// Base local CIFRADA (SQLCipher). La clave (256 bits aleatorios) se genera
@@ -48,11 +49,12 @@ class LocalDb {
     final path = p.join(await getDatabasesPath(), 'vertex.db');
     _db = await openDatabase(path,
         password: key,
-        version: 2,
+        version: 3,
         onCreate: (d, _) => crearEsquema(d),
         onUpgrade: (d, viejo, _) async {
-          // v2: inventario. Los datos anteriores se conservan.
-          if (viejo < 2) await crearInventario(d);
+          // Los datos anteriores se conservan en cada versión.
+          if (viejo < 2) await crearInventario(d); // v2: inventario
+          if (viejo < 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
         });
   }
 
@@ -100,6 +102,26 @@ class LocalDb {
     await d.execute(
         'CREATE TABLE ajustes(clave TEXT PRIMARY KEY, valor TEXT NOT NULL)');
     await crearInventario(d);
+    await crearHerramientas(d);
+  }
+
+  /// Cotizaciones y proveedores. Viven solo en el celular (no se
+  /// sincronizan): son borradores de trabajo del tendero.
+  static Future<void> crearHerramientas(Database d) async {
+    await d.execute('''CREATE TABLE cotizaciones(
+      id TEXT PRIMARY KEY,
+      cliente_id TEXT,
+      cliente_nombre TEXT,
+      items TEXT NOT NULL,
+      total REAL NOT NULL,
+      estado TEXT NOT NULL DEFAULT 'abierta',
+      venta_id TEXT,
+      creado TEXT NOT NULL)''');
+    await d.execute('''CREATE TABLE proveedores(
+      id TEXT PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      telefono TEXT NOT NULL DEFAULT '',
+      creado TEXT NOT NULL)''');
   }
 
   /// Productos (campos con marca de tiempo, como clientes) y movimientos de
@@ -621,6 +643,152 @@ class LocalDb {
     return id;
   }
 
+  // ----------------------------------------------------------- herramientas
+  Future<PerfilNegocio> perfilNegocio() async => PerfilNegocio(
+        nombre: await ajuste('negocio_nombre') ?? '',
+        tipo: await ajuste('negocio_tipo') ?? '',
+        nit: await ajuste('negocio_nit') ?? '',
+        direccion: await ajuste('negocio_direccion') ?? '',
+        telefono: await ajuste('negocio_telefono') ?? '',
+        meta: double.tryParse(await ajuste('negocio_meta') ?? '') ?? 0,
+      );
+
+  /// Una venta con el nombre y celular del cliente.
+  Future<Map<String, Object?>?> movimiento(String id) async {
+    final r = await db.rawQuery(
+        'SELECT v.*, c.nombre AS cliente_nombre, c.telefono AS cliente_telefono '
+        'FROM ventas v LEFT JOIN clientes c ON c.id = v.cliente_id WHERE v.id = ?',
+        [id]);
+    return r.isEmpty ? null : r.first;
+  }
+
+  /// Líneas de una venta: sus productos, o el concepto si no tuvo productos.
+  Future<List<LineaDoc>> lineasDeVenta(String ventaId) async {
+    final r = await db.rawQuery(
+        'SELECT p.nombre, -i.cantidad AS cant, COALESCE(i.precio_unit, 0) AS precio '
+        'FROM inventario i JOIN productos p ON p.id = i.producto_id '
+        "WHERE i.venta_id = ? AND i.motivo = 'venta' ORDER BY i.rowid",
+        [ventaId]);
+    if (r.isNotEmpty) {
+      return [
+        for (final x in r)
+          LineaDoc(x['nombre'] as String, _dbl(x['cant']), _dbl(x['precio']))
+      ];
+    }
+    final v = await movimiento(ventaId);
+    if (v == null) return const [];
+    return [LineaDoc(v['concepto'] as String, 1, _dbl(v['monto']))];
+  }
+
+  Future<List<Map<String, Object?>>> proveedores() =>
+      db.query('proveedores', orderBy: 'nombre COLLATE NOCASE');
+
+  Future<String> saveProveedor(String nombre, String telefono, {String? id}) async {
+    final pid = id ?? newId();
+    await db.insert(
+        'proveedores',
+        {'id': pid, 'nombre': nombre.trim(), 'telefono': telefono, 'creado': _ahora()},
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    _avisar();
+    return pid;
+  }
+
+  Future<void> deleteProveedor(String id) async {
+    await db.delete('proveedores', where: 'id = ?', whereArgs: [id]);
+    _avisar();
+  }
+
+  /// Llegó la mercancía: entrada de inventario por cada producto y, si se
+  /// pide, el gasto de la compra; todo en una sola transacción.
+  Future<void> recibirPedido(List<(String productoId, double cantidad, double costo)> items,
+      {String? conceptoGasto}) async {
+    final validos = items.where((x) => x.$2 > 0).toList();
+    if (validos.isEmpty) throw ArgumentError('items');
+    final total = validos.fold(0.0, (s, x) => s + x.$2 * x.$3);
+    await db.transaction((t) async {
+      for (final (pid, cant, costo) in validos) {
+        await _insertarInventario(
+            t, _filaInventario(newId(), pid, cant, 'entrada', costo: costo));
+      }
+      if (conceptoGasto != null && total > 0) {
+        final id = newId();
+        var c = conceptoGasto.trim().isEmpty ? 'Compra de mercancía' : conceptoGasto.trim();
+        if (c.length > 120) c = '${c.substring(0, 117)}…';
+        final row = <String, Object?>{
+          'id': id,
+          'cliente_id': null,
+          'concepto': c,
+          'monto': total,
+          'tipo': 'egreso',
+          'credito': 0,
+          'fecha': _ahora(),
+        };
+        await t.insert('ventas', {...row, 'sync': 'pendiente'});
+        await _enqueue(t, 'ventas', id, {...row, 'credito': false});
+      }
+    });
+    _avisar();
+  }
+
+  Future<List<Map<String, Object?>>> cotizaciones() =>
+      db.query('cotizaciones', orderBy: 'creado DESC', limit: 100);
+
+  Future<String> saveCotizacion(List<ItemVenta> items,
+      {String? clienteId, String? clienteNombre}) async {
+    final validos = items.where((i) => i.cantidad > 0).toList();
+    if (validos.isEmpty) throw ArgumentError('items');
+    final id = newId();
+    await db.insert('cotizaciones', {
+      'id': id,
+      'cliente_id': clienteId,
+      'cliente_nombre': clienteNombre,
+      'items': jsonEncode([
+        for (final i in validos)
+          {
+            'producto_id': i.productoId,
+            'nombre': i.nombre,
+            'cantidad': i.cantidad,
+            'precio': i.precio,
+            'costo': i.costo,
+          }
+      ]),
+      'total': validos.fold<double>(0, (s, i) => s + i.total),
+      'creado': _ahora(),
+    });
+    _avisar();
+    return id;
+  }
+
+  static List<ItemVenta> itemsCotizacion(Map<String, Object?> c) => [
+        for (final x in jsonDecode(c['items'] as String) as List)
+          ItemVenta(
+            productoId: x['producto_id'] as String,
+            nombre: x['nombre'] as String,
+            cantidad: (x['cantidad'] as num).toDouble(),
+            precio: (x['precio'] as num).toDouble(),
+            costo: (x['costo'] as num? ?? 0).toDouble(),
+          )
+      ];
+
+  /// Convierte la cotización en venta (descuenta inventario) y la marca.
+  Future<String> venderCotizacion(String id, {bool fiado = false}) async {
+    final r = await db.query('cotizaciones', where: 'id = ?', whereArgs: [id]);
+    if (r.isEmpty) throw ArgumentError('cotizacion');
+    final c = r.first;
+    if (c['estado'] == 'vendida') throw StateError('ya vendida');
+    final ventaId = await saveVentaProductos(itemsCotizacion(c),
+        fiado: fiado, clienteId: c['cliente_id'] as String?);
+    await db.update('cotizaciones', {'estado': 'vendida', 'venta_id': ventaId},
+        where: 'id = ?', whereArgs: [id]);
+    _avisar();
+    return ventaId;
+  }
+
+  Future<void> deleteCotizacion(String id) async {
+    await db.delete('cotizaciones', where: 'id = ?', whereArgs: [id]);
+    _avisar();
+  }
+
   // -------------------------------------------------------------- reportes
   /// Totales entre [desde] y [hasta] (fechas locales; hasta excluido).
   Future<ResumenPeriodo> resumenPeriodo(DateTime desde, DateTime hasta) async {
@@ -842,7 +1010,9 @@ class LocalDb {
         'clientes',
         'preguntas_ia',
         'inventario',
-        'productos'
+        'productos',
+        'cotizaciones',
+        'proveedores'
       ]) {
         await t.delete(tabla);
       }

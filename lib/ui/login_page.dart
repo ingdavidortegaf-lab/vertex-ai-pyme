@@ -13,6 +13,16 @@ const _maxFallos = 5;
 const _minutosBloqueo = 5;
 const _claveMinima = 8;
 
+/// Política de contraseña robusta (bases 4.4.3): mínimo 8 caracteres, con
+/// letras y números. Devuelve el problema o null si la clave sirve.
+String? problemaClave(String c) {
+  if (c.length < _claveMinima) return 'Usa al menos $_claveMinima caracteres';
+  if (!RegExp(r'[A-Za-zÁÉÍÓÚáéíóúÑñ]').hasMatch(c)) return 'Incluye al menos una letra';
+  if (!RegExp(r'[0-9]').hasMatch(c)) return 'Incluye al menos un número';
+  if (c.trim() != c) return 'No empieces ni termines con espacios';
+  return null;
+}
+
 SupabaseClient? _cliente() {
   if (SyncService.instance.remoto == null) return null;
   try {
@@ -322,7 +332,9 @@ class _AccesoState extends State<_Acceso> {
                 decoration: InputDecoration(
                   labelText: 'Clave',
                   prefixIcon: const Icon(Icons.lock_outline),
-                  helperText: _crear ? 'Mínimo $_claveMinima caracteres' : null,
+                  helperText: _crear
+                      ? 'Mínimo $_claveMinima caracteres, con letras y números'
+                      : null,
                   suffixIcon: IconButton(
                     tooltip: _ver ? 'Ocultar clave' : 'Ver clave',
                     icon: Icon(_ver ? Icons.visibility_off : Icons.visibility),
@@ -332,9 +344,7 @@ class _AccesoState extends State<_Acceso> {
                 validator: (v) {
                   final c = v ?? '';
                   if (c.isEmpty) return 'Escribe tu clave';
-                  if (_crear && c.length < _claveMinima) {
-                    return 'Usa al menos $_claveMinima caracteres';
-                  }
+                  if (_crear) return problemaClave(c);
                   return null;
                 },
               ),
