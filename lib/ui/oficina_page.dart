@@ -743,3 +743,172 @@ class _CierreCajaPageState extends State<CierreCajaPage> {
     );
   }
 }
+
+// --------------------------------------------- lo que se le debe a proveedores
+/// Cuentas por pagar: la tienda paga una parte del pedido (casi siempre la
+/// mitad) y el resto queda fiado con el proveedor. Aquí se ve cuánto se
+/// debe, a quién y hasta cuándo, y se registran los abonos.
+class CuentasPagarPage extends StatefulWidget {
+  const CuentasPagarPage({super.key});
+  @override
+  State<CuentasPagarPage> createState() => _CuentasPagarPageState();
+}
+
+class _CuentasPagarPageState extends State<CuentasPagarPage> {
+  List<Map<String, Object?>>? _l;
+
+  @override
+  void initState() {
+    super.initState();
+    LocalDb.instance.cambios.addListener(_load);
+    _load();
+  }
+
+  @override
+  void dispose() {
+    LocalDb.instance.cambios.removeListener(_load);
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final l = await LocalDb.instance.cuentasPorPagar();
+    if (mounted) setState(() => _l = l);
+  }
+
+  Future<void> _abonar(Map<String, Object?> c) async {
+    final saldo = (c['saldo'] as num).toDouble();
+    final ctrl = TextEditingController(text: saldo.toStringAsFixed(0));
+    final monto = await showDialog<double>(
+      context: context,
+      builder: (d) => AlertDialog(
+        title: Text('Abono a ${c['proveedor_nombre']}'),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Le debes ${cop(saldo)}.'),
+          const SizedBox(height: 10),
+          TextField(
+            controller: ctrl,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: '¿Cuánto le vas a pagar?', prefixText: r'$ '),
+          ),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(d), child: const Text('Cancelar')),
+          FilledButton(
+            onPressed: () {
+              final m = parseMonto(ctrl.text);
+              if (m == null || m <= 0 || m > saldo + 0.5) {
+                avisar('Escribe un valor entre 1 y ${cop(saldo)}');
+                return;
+              }
+              Navigator.pop(d, m);
+            },
+            child: const Text('Seguir'),
+          ),
+        ],
+      ),
+    );
+    ctrl.dispose();
+    if (monto == null || !mounted) return;
+    final pagos = await pedirPagos(context, monto, titulo: '¿Con qué le pagaste?');
+    if (pagos == null) return;
+    await LocalDb.instance.pagarProveedor(c['id'] as String, monto, pagos);
+    avisar(monto >= saldo - 0.5 ? 'Deuda saldada con ${c['proveedor_nombre']}' : 'Abono registrado');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = _l;
+    final t = Theme.of(context).textTheme;
+    final pal = Paleta.of(context);
+    final error = Theme.of(context).colorScheme.error;
+    final hoy = DateTime.now();
+    double saldoDe(Map<String, Object?> c) => (c['saldo'] as num).toDouble();
+    final total = (l ?? const []).fold(0.0, (s, c) => s + saldoDe(c));
+    final vencido = (l ?? const [])
+        .where((c) => DateTime.parse(c['vence'] as String).isBefore(hoy))
+        .fold(0.0, (s, c) => s + saldoDe(c));
+    return Scaffold(
+      appBar: AppBar(title: const Text('Lo que debo a proveedores')),
+      body: l == null
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(padding: const EdgeInsets.all(16), children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('Total por pagar', style: t.labelLarge),
+                    Text(cop(total), style: t.headlineMedium?.copyWith(color: pal.gastos)),
+                    if (vencido > 0.5)
+                      Text('Ya vencido: ${cop(vencido)}', style: t.bodyMedium?.copyWith(color: error)),
+                    const SizedBox(height: 6),
+                    Text(
+                        'Cuando recibes un pedido y pagas solo una parte, el resto aparece aquí '
+                        'con su fecha límite. Cada abono queda como gasto del día.',
+                        style: t.bodySmall),
+                  ]),
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (l.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('No le debes nada a ningún proveedor. ¡Bien!', textAlign: TextAlign.center),
+                ),
+              for (final c in l) _tarjeta(context, c, hoy),
+            ]),
+    );
+  }
+
+  Widget _tarjeta(BuildContext context, Map<String, Object?> c, DateTime hoy) {
+    final t = Theme.of(context).textTheme;
+    final pal = Paleta.of(context);
+    final error = Theme.of(context).colorScheme.error;
+    final vence = DateTime.parse(c['vence'] as String).toLocal();
+    final dias = DateTime(vence.year, vence.month, vence.day)
+        .difference(DateTime(hoy.year, hoy.month, hoy.day))
+        .inDays;
+    final estado = dias < 0
+        ? 'Venció hace ${-dias} ${-dias == 1 ? 'día' : 'días'}'
+        : dias == 0
+            ? 'Vence hoy'
+            : 'Vence en $dias ${dias == 1 ? 'día' : 'días'} (${_dia.format(vence)})';
+    final tel = (c['proveedor_telefono'] as String?) ?? '';
+    final saldo = (c['saldo'] as num).toDouble();
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(child: Text(c['proveedor_nombre'] as String, style: t.titleMedium)),
+            Text(cop(saldo), style: t.titleMedium),
+          ]),
+          Text(c['concepto'] as String, style: t.bodySmall),
+          Text(
+              'Abonado ${cop((c['abonado'] as num).toDouble())} de ${cop((c['total'] as num).toDouble())}',
+              style: t.bodySmall),
+          Text(estado,
+              style: t.bodyMedium?.copyWith(
+                  color: dias < 0 ? error : (dias <= 3 ? pal.fiado : null),
+                  fontWeight: dias <= 3 ? FontWeight.w600 : null)),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            if (tel.isNotEmpty)
+              TextButton.icon(
+                onPressed: () => enviarWhatsApp(
+                    'Hola, le escribo de la tienda. Tengo presente el saldo de ${cop(saldo)} '
+                    'por ${c['concepto']}; le aviso cuando le haga el abono.',
+                    telefono: tel),
+                icon: const Icon(Icons.chat_outlined),
+                label: const Text('WhatsApp'),
+              ),
+            FilledButton.tonalIcon(
+              onPressed: () => _abonar(c),
+              icon: const Icon(Icons.payments_outlined),
+              label: const Text('Abonar'),
+            ),
+          ]),
+        ]),
+      ),
+    );
+  }
+}

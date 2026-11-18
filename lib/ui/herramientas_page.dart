@@ -227,6 +227,15 @@ class HerramientasGrid extends StatelessWidget {
           p.fiado,
           () => ir(const PedidoProveedorPage())
         ),
+      if (modo.vendeProductos && modo.pedidos)
+        (
+          Icons.account_balance_outlined,
+          'Lo que debo',
+          'Proveedores: saldos y abonos',
+          p.gastosFondo,
+          p.gastos,
+          () => ir(const CuentasPagarPage())
+        ),
       (
         Icons.campaign_outlined,
         'Promociones',
@@ -655,54 +664,127 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       return;
     }
     final total = items.fold(0.0, (s, x) => s + x.$2 * x.$1.costo);
-    var gasto = total > 0;
     final pv = _proveedor;
-    final ok = await showDialog<bool>(
+    // Cómo se le paga al proveedor: todo, una parte (lo más común en la
+    // tienda de barrio: la mitad y la otra mitad fiada) o todo fiado.
+    var modo = total > 0 ? 'parte' : 'nada';
+    final parte = TextEditingController(text: (total / 2).toStringAsFixed(0));
+    var vence = DateTime.now().add(const Duration(days: 15));
+    final fmt = DateFormat('d MMM y', 'es_CO');
+    final ok = await showModalBottomSheet<bool>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (c) => StatefulBuilder(
-        builder: (c, set) => AlertDialog(
-          title: const Text('¿Llegó el pedido?'),
-          content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    'Se sumarán ${items.length == 1 ? '1 producto' : '${items.length} productos'} '
-                    'al inventario con las cantidades del pedido.'),
-                const SizedBox(height: 8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: gasto,
-                  onChanged: total > 0 ? (v) => set(() => gasto = v) : null,
-                  title: const Text('Registrar la compra como gasto'),
-                  subtitle: Text(total > 0
-                      ? 'Total a precio de costo: ${cop(total)}'
-                      : 'Los productos no tienen costo registrado'),
+        builder: (c, set) {
+          final t = Theme.of(c).textTheme;
+          final pagado = switch (modo) {
+            'todo' => total,
+            'parte' => (parseMonto(parte.text) ?? 0).clamp(0.0, total),
+            _ => 0.0,
+          };
+          return Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(c).bottom),
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Text('¿Llegó el pedido?', style: t.headlineSmall),
+                const SizedBox(height: 4),
+                Text('Se suman ${items.length == 1 ? '1 producto' : '${items.length} productos'} al inventario. '
+                    'Total a precio de costo: ${cop(total)}.'),
+                if (total > 0) ...[
+                  const SizedBox(height: 14),
+                  Text('¿Cuánto le pagaste${pv == null ? '' : ' a ${pv['nombre']}'}?', style: t.titleSmall),
+                  const SizedBox(height: 8),
+                  SegmentedButton<String>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(value: 'todo', label: Text('Todo')),
+                      ButtonSegment(value: 'parte', label: Text('Una parte')),
+                      ButtonSegment(value: 'nada', label: Text('Todo fiado')),
+                    ],
+                    selected: {modo},
+                    onSelectionChanged: (v) => set(() => modo = v.first),
+                  ),
+                  if (modo == 'parte') ...[
+                    const SizedBox(height: 10),
+                    Row(children: [
+                      Expanded(
+                        child: TextField(
+                          controller: parte,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 'Le pagué ahora', prefixText: r'$ '),
+                          onChanged: (_) => set(() {}),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      for (final pct in const [30, 50, 70])
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: ActionChip(
+                            label: Text('$pct %'),
+                            onPressed: () => set(() => parte.text = (total * pct / 100).toStringAsFixed(0)),
+                          ),
+                        ),
+                    ]),
+                  ],
+                  if (modo != 'todo') ...[
+                    const SizedBox(height: 10),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.event_outlined),
+                      title: Text('Queda debiendo ${cop(total - pagado)}'),
+                      subtitle: Text('Pagar a más tardar el ${fmt.format(vence)} (toca para cambiar)'),
+                      onTap: () async {
+                        final f = await showDatePicker(
+                            context: c,
+                            initialDate: vence,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(const Duration(days: 180)));
+                        if (f != null) set(() => vence = f);
+                      },
+                    ),
+                  ],
+                ],
+                const SizedBox(height: 14),
+                FilledButton(
+                  onPressed: () {
+                    if (modo == 'parte' && (pagado <= 0 || pagado >= total)) {
+                      avisar('Escribe cuánto pagaste (más de 0 y menos del total)');
+                      return;
+                    }
+                    Navigator.pop(c, true);
+                  },
+                  child: const Text('Ingresar al inventario'),
                 ),
               ]),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(c, false),
-                child: const Text('Cancelar')),
-            FilledButton(
-                onPressed: () => Navigator.pop(c, true),
-                child: const Text('Sí, ingresar')),
-          ],
-        ),
+            ),
+          );
+        },
       ),
     );
+    final pagado = switch (modo) {
+      'todo' => total,
+      'parte' => (parseMonto(parte.text) ?? 0).clamp(0.0, total),
+      _ => 0.0,
+    };
+    parte.dispose();
     if (ok != true || !mounted) return;
-    final pagosGasto =
-        gasto ? await pedirPagos(context, total, titulo: '¿Con qué le pagó al proveedor?') : null;
-    if (gasto && pagosGasto == null) return;
+    final pagosGasto = pagado > 0
+        ? await pedirPagos(context, pagado, titulo: '¿Con qué le pagaste al proveedor?')
+        : null;
+    if (pagado > 0 && pagosGasto == null) return;
     await LocalDb.instance.recibirPedido(
         [for (final (p, c) in items) (p.id, c, p.costo)],
-        conceptoGasto: gasto
-            ? 'Compra de mercancía${pv == null ? '' : ' a ${pv['nombre']}'}'
-            : null,
-        pagosGasto: pagosGasto);
+        conceptoGasto: total > 0 ? 'Compra de mercancía${pv == null ? '' : ' a ${pv['nombre']}'}' : null,
+        pagosGasto: pagosGasto,
+        pagadoAhora: pagado,
+        proveedorId: pv?['id'] as String?,
+        proveedorNombre: pv?['nombre'] as String?,
+        venceSaldo: vence);
     SyncService.instance.sync();
-    avisar('Mercancía ingresada al inventario');
+    avisar(total - pagado > 0.5
+        ? 'Mercancía ingresada. Le debes ${cop(total - pagado)} al proveedor'
+        : 'Mercancía ingresada al inventario');
     if (mounted) Navigator.of(context).pop();
   }
 

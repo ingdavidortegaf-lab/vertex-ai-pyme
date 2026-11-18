@@ -24,7 +24,9 @@ class MemoriaAvisos {
   final String metaMes; // 'AAAA-MM' del último aviso de meta cumplida
   final String carteraDia; // 'AAAA-MM-DD' del último aviso de cartera
   final int errores; // registros con error de envío ya avisados
+  final String proveedoresDia; // 'AAAA-MM-DD' del último aviso de pagos a proveedores
   const MemoriaAvisos({
+    this.proveedoresDia = '',
     this.agotados = const {},
     this.bajos = const {},
     this.metaMes = '',
@@ -53,6 +55,8 @@ String _diaClave(DateTime d) =>
   double saldoVencido = 0,
   int erroresEnvio = 0,
   bool avisarCartera = true,
+  int pagosPorVencer = 0, // cuentas con proveedores que vencen en 3 días o ya vencieron
+  double saldoPorVencer = 0,
 }) {
   final avisos = <Aviso>[];
   final agotados = {
@@ -118,6 +122,18 @@ String _diaClave(DateTime d) =>
         'Por cobrar: ${cop(saldoVencido)}. Envíales la cuenta de cobro desde «Cartera».'));
   }
 
+  var proveedoresClave = previa.proveedoresDia;
+  if (pagosPorVencer > 0 && previa.proveedoresDia != _diaClave(ahora) && ahora.hour >= 8) {
+    proveedoresClave = _diaClave(ahora);
+    avisos.add(Aviso(
+        6,
+        'cobros',
+        pagosPorVencer == 1
+            ? 'Tienes 1 pago a proveedor por vencer'
+            : 'Tienes $pagosPorVencer pagos a proveedores por vencer',
+        'Suman ${cop(saldoPorVencer)}. Míralos en «Lo que debo».'));
+  }
+
   if (erroresEnvio > previa.errores) {
     avisos.add(const Aviso(
         5,
@@ -134,6 +150,7 @@ String _diaClave(DateTime d) =>
       metaMes: metaClave,
       carteraDia: carteraClave,
       errores: erroresEnvio,
+      proveedoresDia: proveedoresClave,
     ),
   );
 }

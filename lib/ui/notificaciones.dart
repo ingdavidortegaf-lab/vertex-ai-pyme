@@ -105,6 +105,15 @@ class Avisos {
           }
         }
       }
+      var porVencer = 0;
+      var saldoPorVencer = 0.0;
+      final limite = ahora.add(const Duration(days: 3));
+      for (final c in await db.cuentasPorPagar()) {
+        if (DateTime.parse(c['vence'] as String).isBefore(limite)) {
+          porVencer++;
+          saldoPorVencer += (c['saldo'] as num).toDouble();
+        }
+      }
       final r = revisarAvisos(
         previa: previa,
         productos: await db.productos(),
@@ -115,6 +124,8 @@ class Avisos {
         saldoVencido: saldoVencido,
         erroresEnvio: await db.conError(),
         avisarCartera: modo.fia,
+        pagosPorVencer: porVencer,
+        saldoPorVencer: saldoPorVencer,
       );
       await db.setAjuste('avisos_memoria', _escribir(r.memoria));
       for (final a in r.avisos) {
@@ -157,6 +168,7 @@ class Avisos {
         metaMes: m['metaMes'] as String? ?? '',
         carteraDia: m['carteraDia'] as String? ?? '',
         errores: m['errores'] as int? ?? 0,
+        proveedoresDia: m['proveedoresDia'] as String? ?? '',
       );
     } catch (_) {
       return const MemoriaAvisos();
@@ -169,5 +181,6 @@ class Avisos {
         'metaMes': m.metaMes,
         'carteraDia': m.carteraDia,
         'errores': m.errores,
+        'proveedoresDia': m.proveedoresDia,
       });
 }

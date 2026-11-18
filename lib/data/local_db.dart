@@ -101,10 +101,11 @@ class LocalDb {
     await agregarCodigoYUnidad(d);
     await crearDocumentos(d);
     await agregarPagos(d);
+    await crearCuentasPagar(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 6;
+  static const versionEsquema = 7;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
@@ -113,6 +114,29 @@ class LocalDb {
     if (viejo < 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
     if (viejo < 5) await crearDocumentos(d); // v5: archivo de documentos
     if (viejo < 6) await agregarPagos(d); // v6: medios de pago
+    if (viejo < 7) await crearCuentasPagar(d); // v7: lo que se le debe a proveedores
+  }
+
+  /// v7: cuentas por pagar a proveedores (la tienda paga una parte del
+  /// pedido y el resto queda fiado) y los abonos que se les hacen. Como los
+  /// proveedores, viven en este dispositivo; cada abono además queda como
+  /// gasto en `ventas` (sí se sincroniza) con su medio de pago.
+  static Future<void> crearCuentasPagar(Database d) async {
+    await d.execute('''CREATE TABLE cuentas_pagar(
+      id TEXT PRIMARY KEY,
+      proveedor_id TEXT,
+      proveedor_nombre TEXT NOT NULL,
+      concepto TEXT NOT NULL,
+      total REAL NOT NULL CHECK (total > 0),
+      fecha TEXT NOT NULL,
+      vence TEXT NOT NULL)''');
+    await d.execute('''CREATE TABLE pagos_proveedor(
+      id TEXT PRIMARY KEY,
+      cuenta_id TEXT NOT NULL REFERENCES cuentas_pagar(id),
+      monto REAL NOT NULL CHECK (monto > 0),
+      fecha TEXT NOT NULL,
+      egreso_id TEXT)''');
+    await d.execute('CREATE INDEX pagos_proveedor_cuenta_idx ON pagos_proveedor(cuenta_id)');
   }
 
   /// v6: medios de pago de cada movimiento (JSON: [{"medio","monto"}]).
@@ -825,8 +849,15 @@ class LocalDb {
 
   /// Llegó la mercancía: entrada de inventario por cada producto y, si se
   /// pide, el gasto de la compra; todo en una sola transacción.
+  /// [pagadoAhora]: cuánto se le pagó al proveedor al recibir (por defecto,
+  /// todo). Lo que falte queda como cuenta por pagar que vence en [venceSaldo].
   Future<void> recibirPedido(List<(String productoId, double cantidad, double costo)> items,
-      {String? conceptoGasto, List<Pago>? pagosGasto}) async {
+      {String? conceptoGasto,
+      List<Pago>? pagosGasto,
+      double? pagadoAhora,
+      String? proveedorId,
+      String? proveedorNombre,
+      DateTime? venceSaldo}) async {
     final validos = items.where((x) => x.$2 > 0).toList();
     if (validos.isEmpty) throw ArgumentError('items');
     final total = validos.fold(0.0, (s, x) => s + x.$2 * x.$3);
@@ -836,19 +867,33 @@ class LocalDb {
             t, _filaInventario(newId(), pid, cant, 'entrada', costo: costo));
       }
       if (conceptoGasto != null && total > 0) {
-        final id = newId();
         var c = conceptoGasto.trim().isEmpty ? 'Compra de mercancía' : conceptoGasto.trim();
         if (c.length > 120) c = '${c.substring(0, 117)}…';
+        final pagado = (pagadoAhora ?? total).clamp(0.0, total);
+        final saldo = total - pagado;
+        if (saldo > 0.5) {
+          await t.insert('cuentas_pagar', {
+            'id': newId(),
+            'proveedor_id': proveedorId,
+            'proveedor_nombre': (proveedorNombre ?? '').trim().isEmpty ? 'Proveedor' : proveedorNombre!.trim(),
+            'concepto': c,
+            'total': saldo,
+            'fecha': _ahora(),
+            'vence': isoUtc(venceSaldo ?? reloj().add(const Duration(days: 15))),
+          });
+        }
+        if (pagado <= 0.5) return;
+        final id = newId();
         final row = <String, Object?>{
           'id': id,
           'cliente_id': null,
-          'concepto': c,
-          'monto': total,
+          'concepto': saldo > 0.5 ? '$c (pago parcial)' : c,
+          'monto': pagado,
           'tipo': 'egreso',
           'credito': 0,
           'fecha': _ahora(),
         };
-        final medios = _pagosDe('egreso', false, total, pagosGasto)!;
+        final medios = _pagosDe('egreso', false, pagado, pagosGasto)!;
         await t.insert('ventas',
             {...row, 'pagos': codificarPagos(medios), 'sync': 'pendiente'});
         await _enqueue(t, 'ventas', id, {
@@ -857,6 +902,47 @@ class LocalDb {
           'pagos': medios.map((p) => p.aMapa()).toList(),
         });
       }
+    });
+    _avisar();
+  }
+
+  /// Lo que se le debe a cada proveedor: total, abonado, saldo y vencimiento.
+  Future<List<Map<String, Object?>>> cuentasPorPagar({bool soloPendientes = true}) => db.rawQuery(
+      'SELECT c.*, COALESCE((SELECT SUM(p.monto) FROM pagos_proveedor p WHERE p.cuenta_id = c.id), 0) AS abonado, '
+      'c.total - COALESCE((SELECT SUM(p.monto) FROM pagos_proveedor p WHERE p.cuenta_id = c.id), 0) AS saldo, '
+      'pr.telefono AS proveedor_telefono '
+      'FROM cuentas_pagar c LEFT JOIN proveedores pr ON pr.id = c.proveedor_id '
+      '${soloPendientes ? 'WHERE c.total - COALESCE((SELECT SUM(p.monto) FROM pagos_proveedor p WHERE p.cuenta_id = c.id), 0) > 0.5 ' : ''}'
+      'ORDER BY c.vence');
+
+  Future<double> totalPorPagar() async =>
+      (await cuentasPorPagar()).fold<double>(0, (s, c) => s + _dbl(c['saldo']));
+
+  /// Abono a un proveedor: queda el pago y un gasto con su medio de pago.
+  Future<void> pagarProveedor(String cuentaId, double monto, List<Pago> pagos) async {
+    final r = await cuentasPorPagar(soloPendientes: false);
+    final c = r.firstWhere((x) => x['id'] == cuentaId, orElse: () => const {});
+    if (c.isEmpty) throw ArgumentError('cuenta');
+    if (monto <= 0 || monto > _dbl(c['saldo']) + 0.5) throw ArgumentError('monto');
+    final medios = _pagosDe('egreso', false, monto, pagos)!;
+    await db.transaction((t) async {
+      final id = newId();
+      var concepto = 'Abono a ${c['proveedor_nombre']}';
+      if (concepto.length > 120) concepto = concepto.substring(0, 120);
+      final row = <String, Object?>{
+        'id': id,
+        'cliente_id': null,
+        'concepto': concepto,
+        'monto': monto,
+        'tipo': 'egreso',
+        'credito': 0,
+        'fecha': _ahora(),
+      };
+      await t.insert('ventas', {...row, 'pagos': codificarPagos(medios), 'sync': 'pendiente'});
+      await _enqueue(t, 'ventas', id,
+          {...row, 'credito': false, 'pagos': medios.map((p) => p.aMapa()).toList()});
+      await t.insert('pagos_proveedor',
+          {'id': newId(), 'cuenta_id': cuentaId, 'monto': monto, 'fecha': _ahora(), 'egreso_id': id});
     });
     _avisar();
   }
@@ -1278,7 +1364,9 @@ class LocalDb {
         'productos',
         'cotizaciones',
         'proveedores',
-        'documentos'
+        'documentos',
+        'pagos_proveedor',
+        'cuentas_pagar'
       ]) {
         await t.delete(tabla);
       }
