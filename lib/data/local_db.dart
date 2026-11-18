@@ -54,13 +54,9 @@ class LocalDb {
       final dir = await getApplicationSupportDirectory();
       _db = await databaseFactoryFfi.openDatabase(p.join(dir.path, 'vertex.db'),
           options: OpenDatabaseOptions(
-            version: 4,
+            version: versionEsquema,
             onCreate: (d, _) => crearEsquema(d),
-            onUpgrade: (d, viejo, _) async {
-              if (viejo < 2) await crearInventario(d);
-              if (viejo < 3) await crearHerramientas(d);
-              if (viejo < 4) await agregarCodigoYUnidad(d);
-            },
+            onUpgrade: migrar,
           ));
       return;
     }
@@ -74,14 +70,9 @@ class LocalDb {
     final path = p.join(await getDatabasesPath(), 'vertex.db');
     _db = await openDatabase(path,
         password: key,
-        version: 4,
+        version: versionEsquema,
         onCreate: (d, _) => crearEsquema(d),
-        onUpgrade: (d, viejo, _) async {
-          // Los datos anteriores se conservan en cada versión.
-          if (viejo < 2) await crearInventario(d); // v2: inventario
-          if (viejo < 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
-          if (viejo < 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
-        });
+        onUpgrade: migrar);
   }
 
   /// Solo para pruebas: usa una base ya abierta (sqflite_common_ffi).
@@ -130,6 +121,37 @@ class LocalDb {
     await crearInventario(d);
     await crearHerramientas(d);
     await agregarCodigoYUnidad(d);
+    await crearDocumentos(d);
+  }
+
+  /// Versión actual del esquema local.
+  static const versionEsquema = 5;
+
+  /// Migraciones: los datos anteriores se conservan en cada versión.
+  static Future<void> migrar(Database d, int viejo, int nuevo) async {
+    if (viejo < 2) await crearInventario(d); // v2: inventario
+    if (viejo < 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
+    if (viejo < 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
+    if (viejo < 5) await crearDocumentos(d); // v5: archivo de documentos
+  }
+
+  /// v5: archivo de documentos emitidos (facturas, cotizaciones, cuentas de
+  /// cobro, pedidos e informes) con número único y su PDF guardado. Solo en
+  /// este dispositivo.
+  static Future<void> crearDocumentos(Database d) async {
+    await d.execute('''CREATE TABLE documentos(
+      id TEXT PRIMARY KEY,
+      tipo TEXT NOT NULL,
+      numero TEXT NOT NULL UNIQUE,
+      ref_id TEXT,
+      cliente_id TEXT,
+      cliente_nombre TEXT,
+      total REAL NOT NULL DEFAULT 0,
+      fecha TEXT NOT NULL,
+      archivo TEXT,
+      resumen TEXT)''');
+    await d.execute('CREATE INDEX documentos_ref_idx ON documentos(tipo, ref_id)');
+    await d.execute('CREATE INDEX documentos_fecha_idx ON documentos(fecha)');
   }
 
   /// v4: código de barras y unidad de venta (und, kg, lb) por producto.
@@ -839,6 +861,97 @@ class LocalDb {
     _avisar();
   }
 
+  // ------------------------------------------------- documentos emitidos
+  /// Prefijos de cada tipo de documento.
+  static const prefijosDoc = {
+    'factura': 'FV',
+    'cotizacion': 'CT',
+    'cobro': 'CC',
+    'pedido': 'PD',
+    'informe': 'IN',
+  };
+
+  /// Código corto de este dispositivo (4 caracteres) para que los números
+  /// de documento no choquen entre celulares de la misma empresa.
+  Future<String> codigoDispositivo() async {
+    final c = await ajuste('dispositivo');
+    if (c != null) return c;
+    final nuevo = newId().replaceAll('-', '').substring(0, 4).toUpperCase();
+    await setAjuste('dispositivo', nuevo);
+    return nuevo;
+  }
+
+  /// Emite un documento con número único (p. ej. FV-A3F1-000012) y lo deja
+  /// en el archivo. Con [reutilizar], si ese mismo registro ya tenía un
+  /// documento de ese tipo, devuelve el mismo número (reimpresión).
+  Future<Map<String, Object?>> emitirDocumento(String tipo,
+      {String? refId,
+      String? clienteId,
+      String? clienteNombre,
+      double total = 0,
+      String resumen = '',
+      bool reutilizar = false}) async {
+    final prefijo = prefijosDoc[tipo];
+    if (prefijo == null) throw ArgumentError('tipo');
+    if (reutilizar && refId != null) {
+      final r = await db.query('documentos',
+          where: 'tipo = ? AND ref_id = ?', whereArgs: [tipo, refId], limit: 1);
+      if (r.isNotEmpty) return r.first;
+    }
+    final disp = await codigoDispositivo();
+    late Map<String, Object?> fila;
+    await db.transaction((t) async {
+      final r = await t.query('ajustes', where: 'clave = ?', whereArgs: ['consec_$tipo']);
+      final n = (r.isEmpty ? 0 : int.tryParse(r.first['valor'] as String) ?? 0) + 1;
+      await t.insert('ajustes', {'clave': 'consec_$tipo', 'valor': '$n'},
+          conflictAlgorithm: ConflictAlgorithm.replace);
+      fila = {
+        'id': newId(),
+        'tipo': tipo,
+        'numero': '$prefijo-$disp-${n.toString().padLeft(6, '0')}',
+        'ref_id': refId,
+        'cliente_id': clienteId,
+        'cliente_nombre': clienteNombre,
+        'total': total,
+        'fecha': _ahora(),
+        'resumen': resumen.length > 200 ? resumen.substring(0, 200) : resumen,
+      };
+      await t.insert('documentos', fila);
+    });
+    _avisar();
+    return fila;
+  }
+
+  /// Guarda la ruta del PDF del documento.
+  Future<void> archivarPdf(String documentoId, String ruta) async {
+    await db.update('documentos', {'archivo': ruta},
+        where: 'id = ?', whereArgs: [documentoId]);
+    _avisar();
+  }
+
+  Future<List<Map<String, Object?>>> documentos({String? tipo, int limite = 300}) =>
+      db.query('documentos',
+          where: tipo == null ? null : 'tipo = ?',
+          whereArgs: tipo == null ? null : [tipo],
+          orderBy: 'fecha DESC',
+          limit: limite);
+
+  /// Movimientos entre dos fechas locales (para informes).
+  Future<List<Map<String, Object?>>> movimientosEntre(DateTime desde, DateTime hasta) =>
+      db.rawQuery(
+          'SELECT v.*, c.nombre AS cliente_nombre FROM ventas v '
+          'LEFT JOIN clientes c ON c.id = v.cliente_id '
+          'WHERE v.fecha >= ? AND v.fecha < ? ORDER BY v.fecha',
+          [isoUtc(desde), isoUtc(hasta)]);
+
+  /// Fiados y abonos de un cliente, del más antiguo al más nuevo (para la
+  /// cuenta de cobro).
+  Future<List<Map<String, Object?>>> movimientosDeCredito(String clienteId) =>
+      db.rawQuery(
+          "SELECT * FROM ventas WHERE cliente_id = ? AND "
+          "((tipo = 'ingreso' AND credito = 1) OR tipo = 'abono') ORDER BY fecha",
+          [clienteId]);
+
   // -------------------------------------------------------------- reportes
   /// Totales entre [desde] y [hasta] (fechas locales; hasta excluido).
   Future<ResumenPeriodo> resumenPeriodo(DateTime desde, DateTime hasta) async {
@@ -1062,7 +1175,8 @@ class LocalDb {
         'inventario',
         'productos',
         'cotizaciones',
-        'proveedores'
+        'proveedores',
+        'documentos'
       ]) {
         await t.delete(tabla);
       }
