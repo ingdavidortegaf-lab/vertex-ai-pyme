@@ -26,7 +26,7 @@ Todo es **gratis** y de código abierto (ver `09_documentos/LICENCIAS.md`).
 | `03_reglas_del_negocio` | Las cuentas y las reglas | "Aquí está la inteligencia del negocio, sin pantallas" |
 | `04_datos_sin_senal` | Guardar y sincronizar | "Nada se pierde, nada se duplica" |
 | `05_nube` | Supabase e IA | "Cada tienda solo ve sus datos; la IA no ve nombres" |
-| `06_pruebas` | 78 pruebas automáticas | "La computadora revisa que todo funcione" |
+| `06_pruebas` | 88 pruebas automáticas | "La computadora revisa que todo funcione" |
 | `07_configuracion` | Android, Windows y paquetes | "Android 12+, sin copias de seguridad, ventana de PC" |
 | `08_seguridad_y_privacidad` | Mapa de la seguridad | "Ley 1581 y OWASP: dónde está cada protección" |
 | `09_documentos` | Manual, política de datos, auditoría | "Todo lo que pide la convocatoria" |
@@ -69,3 +69,8 @@ Todo es **gratis** y de código abierto (ver `09_documentos/LICENCIAS.md`).
 | Asistente | `03_reglas_del_negocio/asistente_local.dart` y `05_nube/asistente_index.ts` |
 | Reportes y gráficas | `02_pantallas/tablero_page.dart` y `graficas.dart` |
 | Seguridad | `08_seguridad_y_privacidad/EXPLICACION.md` |
+| Contador: informes, cuenta de cobro | `03_reglas_del_negocio/contabilidad.dart` y `02_pantallas/reportes_contables.dart` |
+| Documentos con número y archivo | `04_datos_sin_senal/local_db.dart` (`emitirDocumento`) y `02_pantallas/archivo.dart` |
+| La app se adapta al negocio | `03_reglas_del_negocio/modo_negocio.dart` y `02_pantallas/registro_negocio_page.dart` |
+| Avisos en el celular | `03_reglas_del_negocio/avisos.dart` y `02_pantallas/notificaciones.dart` |
+| Explicación completa de lo nuevo | `09_documentos/CONTABILIDAD_DOCUMENTOS_Y_ADAPTACION.md` |

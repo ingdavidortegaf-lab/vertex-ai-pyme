@@ -65,7 +65,13 @@
 | 35 | Sin manual de usuario | Entregable 9.2 (4) | `docs/MANUAL_USUARIO.md` |
 | 36 | Sin código de barras ni venta por peso | Tiendas que venden a granel (queso, carne, granos) y con lector | Código de barras y unidad (und/kg/lb) por producto, sincronizados por campo (base local v4 y columnas en Supabase); escáner con cámara (mobile_scanner, BSD-3) o lector USB/teclado; etiquetas de gramera EAN-13 (20–29 + PLU + gramos) con dígito de control. La gramera no se conecta por cable: se usa su etiqueta o se escribe el peso |
 | 37 | Comprobantes solo como texto | El tendero necesita imprimir y entregar | PDF con logo del negocio en tirilla de 80 mm o carta (pdf y printing, Apache-2.0), impresión con el diálogo del sistema y compartir PDF. Sigue sin ser factura electrónica |
-| 38 | Versión para PC | Pedida por el usuario | Pendiente para después del pitch: requiere Visual Studio Build Tools (no instalado) y ajustar la base cifrada en Windows |
+| 38 | Versión para PC | Pedida por el usuario | Hecha: Windows con SQLite (sqflite_common_ffi) en %APPDATA%; compila y abre. La base del PC no va cifrada (pendiente) |
+| 39 | Documentos sin número consecutivo ni archivo | Trazabilidad para el contador y el cliente | Tabla `documentos` (base local v5): número único TIPO-EQUIPO-000001 asignado en transacción, reimpresión con el mismo número, PDF guardado en VERTEX_documentos y pantalla «Documentos» |
+| 40 | Sin cuenta de cobro ni antigüedad de la deuda | Cobrar con soporte: qué, desde cuándo | Cuenta de cobro en PDF con extracto, abonos aplicados FIFO, días de mora y rangos 0-30/31-60/61-90/+90; pantalla «Cartera» |
+| 41 | Reportes solo en pantalla | El contador necesita un soporte | Informes semanal, quincenal y mensual en PDF: resultados vs. periodo anterior, flujo de caja, gastos por concepto, cartera, inventario y libro de movimientos |
+| 42 | Solo negocios de productos | MiPymes de servicios quedaban por fuera | Unidad `serv` sin inventario (local y Supabase, migración v5_unidad_servicio) |
+| 43 | La app era igual para todos | Botones que no aplican confunden | Registro guiado en 5 pasos; la app esconde lo que el negocio no usa (fiado, gramera, códigos, pedidos) y renombra el catálogo |
+| 44 | Sin avisos | El tendero se entera tarde de un agotado | Notificaciones locales (flutter_local_notifications, BSD-3) sin servidor: agotado, por acabarse, cartera vencida, meta y errores de envío; cada aviso una sola vez. Android compila con compileSdk 37 (el mínimo sigue en Android 12) |
 | 28 | Las cuentas solo se creaban desde el panel | El negocio no podía empezar solo | Pantalla «Tu cuenta»: entrar, crear cuenta (clave ≥ 8), perfil, cerrar sesión avisando lo pendiente; errores en español; bloqueo tras 5 intentos |
 
 ## 2. Hallazgos de la primera revisión (se mantienen)
@@ -122,3 +128,4 @@ lógico, validación de montos colombianos, reintento por cambio de red,
 - La revocación y la supresión en la nube se atienden por correo (canal de derechos).
 - Nombre del modelo gratuito de IA: confirmarlo al desplegar (`GEMINI_MODEL`).
 - Si la red del evento es mala: demo en modo avión (es el punto fuerte) y video de respaldo.
+- Bloque del 17 nov. (documentos, cobro, informes, servicios, registro guiado, avisos): 88 pruebas en verde, PDF revisados a ojo, capturas en PC, APK y Windows compilados, base del PC migrada a v5. Falta en el celular: permiso y sonido de los avisos, compartir PDF por WhatsApp, registro guiado al tacto. Los avisos no salen con la app cerrada del todo. El archivo de documentos no se sincroniza a la nube.

@@ -19,6 +19,12 @@ Cada archivo es una pantalla o una pieza visual. Ninguna habla con internet: tod
 | `privacidad_page.dart` | Aviso de privacidad, derechos, revocar y borrar datos. |
 | `escaner.dart` | Lee el **código de barras** con la cámara (en el PC, con lector USB o escribiéndolo). |
 | `pdf_factura.dart` | Arma la **factura en PDF con logo**: tirilla de 80 mm o tamaño carta; imprimir o compartir. |
+| `pdf_reportes.dart` | PDF de **varias páginas** para el contador: tarjetas con cifras, tablas, barras y número de página. |
+| `reportes_contables.dart` | Arma el **informe semanal, quincenal o mensual** y la **cuenta de cobro** con los datos del celular. |
+| `archivo.dart` | **Archiva** el PDF de cada documento en la carpeta VERTEX_documentos y lo vuelve a abrir. |
+| `oficina_page.dart` | Pantallas **Informes**, **Cartera** (quién debe y desde cuándo) y **Documentos emitidos**. |
+| `registro_negocio_page.dart` | **Registro guiado** en 5 pasos: la app pregunta y se adapta al negocio. |
+| `notificaciones.dart` | **Avisos en el celular**: se agotó, se está acabando, cobros vencidos, meta cumplida. |
 
 ## Piezas visuales
 | Archivo | Para qué sirve |

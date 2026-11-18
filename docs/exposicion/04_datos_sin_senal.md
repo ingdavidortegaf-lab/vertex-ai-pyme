@@ -28,4 +28,4 @@ Esta es **la parte más importante para el jurado de Tecnología**: aquí está 
 **Para qué sirve:** si la pregunta es sobre datos ("¿cuánto vendí?"), responde el celular, exacto y sin señal. Si es abierta ("¿cómo vendo más?") y hay internet, pregunta a la IA solo con **totales**, nunca con nombres. Sin señal, la pregunta queda en cola.
 
 ## Frase para exponer
-*"Cada registro nace con un número único en el celular y entra a una cola en la misma operación. Por eso, con o sin señal, nada se pierde y nada se duplica. Lo probamos en un celular real y con 78 pruebas automáticas."*
+*"Cada registro nace con un número único en el celular y entra a una cola en la misma operación. Por eso, con o sin señal, nada se pierde y nada se duplica. Lo probamos en un celular real y con 88 pruebas automáticas."*

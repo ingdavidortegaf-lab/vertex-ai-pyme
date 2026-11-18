@@ -11,6 +11,9 @@ Estos archivos **no tienen pantallas ni base de datos**: son las cuentas y las r
 | `documentos.dart` | Arma los **mensajes de WhatsApp**: comprobante de venta, cotización, pedido al proveedor y promoción. Calcula el **pedido sugerido** (lo que falta para llegar al doble del mínimo). |
 | `asistente_local.dart` | El **asistente sin señal**: entiende la pregunta por palabras clave ("vendí hoy", "me debe", "agotando", "meta") y responde con los datos del celular. También arma el **mensaje de cobro**. |
 | `privacidad.dart` | Antes de preguntarle algo a la IA, **borra nombres de clientes, números y correos** de la pregunta (Ley 1581). |
+| `contabilidad.dart` | **Como un contador**: la cuenta de cobro aplica cada abono a la deuda **más antigua** (FIFO), calcula **desde cuándo debe** y los **días de mora**, y separa la deuda en 0-30, 31-60, 61-90 y más de 90 días. También define la **semana, la quincena y el mes** de los informes. |
+| `avisos.dart` | Decide **qué avisar** (agotado, por acabarse, cartera vencida, meta, errores) y **no repite** un aviso. |
+| `modo_negocio.dart` | Guarda **cómo trabaja el negocio** (productos, servicios o ambos; si fía, gramera, códigos, pedidos) para que la app se adapte. |
 
 ## Qué mostrar en pantalla
 - `conflictos.dart` → la función `merge` de `ClienteCampos`: compara campo por campo y se queda con el más nuevo.

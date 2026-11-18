@@ -142,10 +142,23 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   documentos.dart (197)   Textos para WhatsApp: comprobante de venta,
                           cotizacion, pedido al proveedor y promocion.
                           Calcula el pedido sugerido. Perfil del negocio.
-  codigos.dart (72)       Codigos de barras: valida el digito de control
+  codigos.dart (83)       Codigos de barras: valida el digito de control
                           EAN, lee etiquetas de gramera (20-29 + producto +
                           gramos), busca el producto y convierte gramos a
-                          kg o libras.
+                          kg o libras. Unidad 'serv' (servicio) y precio
+                          con su unidad.
+  contabilidad.dart       CUENTA DE COBRO: ordena fiados y abonos, aplica
+                          cada abono a lo mas antiguo (FIFO), calcula dias
+                          de mora y la antiguedad (0-30, 31-60, 61-90, +90).
+                          Periodos de informe (semana lunes-domingo,
+                          quincena 1-15 / 16-fin, mes) con su periodo
+                          anterior; gastos por concepto; variacion en %.
+  avisos.dart             REGLAS DE LOS AVISOS: que avisar (agotado, por
+                          acabarse, cartera vencida, meta, errores) y como
+                          no repetir un aviso (memoria de lo ya avisado).
+  modo_negocio.dart       COMO TRABAJA EL NEGOCIO (respuestas del registro
+                          guiado): productos/servicios/ambos, fia, gramera,
+                          codigos, pedidos, avisos. Sugerencias por tipo.
 
   --- lib/data/  DATOS Y SINCRONIZACION ---
 
@@ -154,7 +167,9 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                           ventas, productos, inventario, cola_sync,
                           preguntas_ia, cotizaciones, proveedores, ajustes.
                           Cada guardado escribe el dato Y su entrada en la
-                          cola en UNA transaccion. Tambien: reportes por
+                          cola en UNA transaccion. Version 5: tabla
+                          documentos (numero unico TIPO-EQUIPO-000001 en
+                          transaccion) y el modo del negocio. Tambien: reportes por
                           periodo, serie por dia, mas vendidos, recibir
                           pedidos, cotizaciones, aplicar cambios de la nube.
   sync_service.dart (195) El MOTOR DE SINCRONIZACION: cada 30 s, al cambiar
@@ -194,9 +209,18 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   herramientas_page.dart (1070)  Comprobantes, cotizaciones, pedir
                            mercancia (proveedores) y promociones; vista
                            previa con WhatsApp, Imprimir y PDF.
-  pdf_factura.dart (174)   Genera la factura/cotizacion en PDF con logo:
-                           tirilla de 80 mm o tamano carta; imprimir o
-                           compartir.
+  pdf_factura.dart (174)   Genera el comprobante/cotizacion/pedido en PDF
+                           con logo: tirilla de 80 mm o tamano carta.
+  pdf_reportes.dart        PDF de varias paginas por bloques (indicadores,
+                           tablas, barras, parrafos): informes y cuenta de
+                           cobro, con encabezado, numero y "Pagina x de y".
+  reportes_contables.dart  Arma el informe del periodo y la cuenta de cobro
+                           con los datos de la base del celular.
+  archivo.dart             Guarda el PDF de cada documento en la carpeta
+                           VERTEX_documentos y lo vuelve a abrir.
+  oficina_page.dart        Pantallas Informes, Cartera y Documentos.
+  registro_negocio_page.dart  Registro guiado en 5 pasos; la app se adapta.
+  notificaciones.dart      Avisos en el celular (notificaciones locales).
   escaner.dart (118)       Pantalla de camara para leer codigos de barras
                            (o escribir el codigo / lector USB).
   asistente_page.dart (274)  Chat con el asistente y sugerencias.
@@ -224,7 +248,7 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                      base salga del celular por copias de Android.
   (La carpeta ios/ tiene la configuracion de iPhone, iOS 16.)
 
-3.5  test/  - PRUEBAS AUTOMATICAS (78 pruebas, todas pasan)
+3.5  test/  - PRUEBAS AUTOMATICAS (88 pruebas, todas pasan)
   soporte.dart                 Base de pruebas y un servidor falso.
   sync_test.dart               Modo avion, envio unico, caida de red a mitad,
                                reintentos, sesion vencida, otro celular.
@@ -310,11 +334,37 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
     sin senal: resumen local y la pregunta queda en cola.
 
 4.8  COMPROBANTE / FACTURA
-  Numero = primeros 8 caracteres del UUID de la venta (unico entre
-  celulares). Texto para WhatsApp y PDF con logo (tirilla 80 mm o carta).
+  Numero = CV-EQUIPO-000001 (tipo + codigo del equipo + consecutivo,
+  asignado dentro de una transaccion; unico entre celulares). Reabrir la
+  misma venta conserva su numero. Texto para WhatsApp y PDF con logo
+  (tirilla 80 mm o carta), archivado en VERTEX_documentos.
   NO es factura electronica DIAN: tiene los datos (emisor, cliente, items,
   cantidades, precios, total) para conectarlo despues con un proveedor
   tecnologico autorizado.
+
+
+4.9  CUENTA DE COBRO (FIFO)
+  Fiados y abonos del cliente en orden de fecha. Cada abono paga primero
+  el fiado mas antiguo. Lo que queda pendiente se agrupa por antiguedad.
+  El PDF trae el extracto con el saldo despues de cada movimiento.
+
+4.10 INFORMES SEMANAL / QUINCENAL / MENSUAL
+  Del periodo y del anterior: ventas (contado y credito), gastos,
+  utilidad, flujo de caja (contado + abonos - gastos), ventas por dia,
+  mas vendidos, gastos por concepto, cartera por edades, inventario por
+  reponer y libro de movimientos. Sale todo de la base local: sin senal.
+
+4.11 REGISTRO GUIADO Y ADAPTACION
+  RegistroGate muestra 5 pasos la primera vez. Las respuestas quedan en
+  ajustes (modo_*) y en LocalDb.modo (ValueNotifier): las pantallas se
+  redibujan y esconden lo que no aplica.
+
+4.12 AVISOS
+  notificaciones.dart escucha los cambios de la base, espera 2 s y llama
+  a revisarAvisos (avisos.dart). Recuerda lo ya avisado en ajustes para
+  no repetir. Notificaciones locales: sin servidor ni internet.
+
+  Explicacion completa: docs/CONTABILIDAD_DOCUMENTOS_Y_ADAPTACION.md
 
 
 -------------------------------------------------------------------------------
@@ -375,12 +425,17 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 -------------------------------------------------------------------------------
 7. QUE ESTA PROBADO Y QUE FALTA
 -------------------------------------------------------------------------------
-  Probado: 78 pruebas automaticas; app instalada en Xiaomi 14T; flujo
+  Probado: 88 pruebas automaticas; app instalada en Xiaomi 14T; flujo
   completo en modo avion; sincronizacion real con Supabase sin duplicados;
   actualizacion a la version con inventario conservando datos.
   Falta probar en el celular: version con herramientas, codigo de barras,
   gramera e impresion (probadas con pruebas automaticas y capturas en PC).
-  Version Windows: compila y abre en este PC (base local SQLite sin cifrar).
+  Version Windows: compila y abre en este PC (base local SQLite sin cifrar);
+  la base del PC paso sola a la version 5 conservando los datos.
+  Bloque del 17 nov.: documentos numerados, cuenta de cobro, informes,
+  servicios, registro guiado y avisos: probados con pruebas automaticas,
+  PDF revisados y capturas en PC. Falta probarlos en el celular (permiso y
+  sonido de los avisos, compartir PDF por WhatsApp).
   Pendiente: respuesta real de la IA (falta la clave de Gemini), version
   para iPhone (requiere Mac), cifrado de la base en Windows, factura
   electronica DIAN (requiere proveedor autorizado), roles vendedor/admin.

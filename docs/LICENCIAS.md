@@ -16,7 +16,7 @@ a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 
 Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apache-2.0, incluidos en Flutter).
 
-## Paquetes Dart/Flutter (143)
+## Paquetes Dart/Flutter (149)
 
 | Paquete | Version | Licencia |
 |---|---|---|
@@ -51,6 +51,11 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | fixnum | 1.1.1 | BSD-3-Clause |
 | flutter | SDK | BSD-3-Clause |
 | flutter_lints | 5.0.0 | BSD-3-Clause |
+| flutter_local_notifications | 23.0.2 | BSD-3-Clause |
+| flutter_local_notifications_linux | 9.0.0 | BSD-3-Clause |
+| flutter_local_notifications_platform_interface | 13.0.0 | BSD-3-Clause |
+| flutter_local_notifications_web | 2.0.0 | BSD-3-Clause |
+| flutter_local_notifications_windows | 4.0.1 | BSD-3-Clause |
 | flutter_localizations | SDK | BSD-3-Clause (Flutter SDK) |
 | flutter_plugin_android_lifecycle | 2.0.35 | BSD-3-Clause |
 | flutter_secure_storage | 9.2.4 | BSD-3-Clause |
@@ -143,6 +148,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | synchronized | 3.6.1+1 | MIT |
 | term_glyph | 1.2.2 | BSD-3-Clause |
 | test_api | 0.7.14 | BSD-3-Clause |
+| timezone | 0.11.2 | BSD-3-Clause |
 | typed_data | 1.4.0 | BSD-3-Clause |
 | url_launcher | 6.3.3 | BSD-3-Clause |
 | url_launcher_android | 6.3.35 | BSD-3-Clause |
