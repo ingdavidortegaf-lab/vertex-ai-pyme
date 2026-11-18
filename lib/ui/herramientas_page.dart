@@ -8,6 +8,8 @@ import '../domain/resumen.dart';
 import 'comun.dart';
 import 'escaner.dart';
 import 'inventario_page.dart';
+import 'archivo.dart';
+import 'oficina_page.dart';
 import 'pdf_factura.dart';
 import '../domain/codigos.dart';
 import 'tema.dart';
@@ -42,15 +44,19 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
     fiado: v['credito'] == 1,
     saldoCliente: saldo,
   );
-  if (!context.mounted) return;
   final fiado = v['credito'] == 1;
-  await mostrarDocumento(context,
-      titulo: 'Comprobante de venta',
-      texto: texto,
-      telefono: (v['cliente_telefono'] as String?) ?? '',
-      imprimible: DocImprimible(
+  // Número único y archivado: reimprimir la misma venta conserva el número.
+  final documento = await db.emitirDocumento('venta',
+      refId: ventaId,
+      clienteId: clienteId,
+      clienteNombre: v['cliente_nombre'] as String?,
+      total: (v['monto'] as num).toDouble(),
+      resumen: lineas.map((l) => l.nombre).join(', '),
+      reutilizar: true);
+  final numero = documento['numero'] as String;
+  final doc = DocImprimible(
         titulo: 'Comprobante de venta',
-        numero: numeroDoc(ventaId),
+        numero: numero,
         fecha: DateTime.parse(v['fecha'] as String).toLocal(),
         negocio: negocio,
         cliente: v['cliente_nombre'] as String?,
@@ -61,7 +67,15 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
           if (fiado && saldo > 0) 'Saldo pendiente a la fecha: ${cop(saldo)}',
           '¡Gracias por su compra!',
         ],
-      ),
+      );
+  final pdf = pdfListo(doc);
+  await archivarDocumento(documento, pdf);
+  if (!context.mounted) return;
+  await mostrarDocumento(context,
+      titulo: 'Comprobante N.º $numero',
+      texto: texto.replaceFirst(numeroDoc(ventaId), numero),
+      telefono: (v['cliente_telefono'] as String?) ?? '',
+      pdf: pdf,
       nota: negocio.nombre.isEmpty
           ? 'Consejo: en el menú ⋮ → «Mi negocio» pon el nombre, NIT y '
               'dirección para que salgan en el comprobante.'
@@ -74,7 +88,7 @@ Future<void> mostrarDocumento(BuildContext context,
     required String texto,
     String telefono = '',
     String? nota,
-    DocImprimible? imprimible,
+    PdfListo? pdf,
     String boton = 'Enviar por WhatsApp'}) {
   return showModalBottomSheet<void>(
     context: context,
@@ -119,14 +133,14 @@ Future<void> mostrarDocumento(BuildContext context,
               icon: const Icon(Icons.chat_outlined),
               label: Text(telefono.isEmpty ? '$boton (elegir contacto)' : boton),
             ),
-            if (imprimible != null) ...[
+            if (pdf != null) ...[
               const SizedBox(height: 10),
               Row(children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () async {
                       try {
-                        await imprimirDocumento(imprimible);
+                        await pdf.imprimir();
                       } catch (_) {
                         avisar('No se pudo abrir la impresión');
                       }
@@ -140,7 +154,7 @@ Future<void> mostrarDocumento(BuildContext context,
                   child: OutlinedButton.icon(
                     onPressed: () async {
                       try {
-                        await compartirPdf(imprimible);
+                        await pdf.compartir();
                       } catch (_) {
                         avisar('No se pudo crear el PDF');
                       }
@@ -150,6 +164,10 @@ Future<void> mostrarDocumento(BuildContext context,
                   ),
                 ),
               ]),
+              const SizedBox(height: 6),
+              Text('El PDF queda guardado en «Documentos emitidos».',
+                  textAlign: TextAlign.center,
+                  style: t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
             ],
           ]),
         ),
@@ -177,6 +195,12 @@ class HerramientasGrid extends StatelessWidget {
           p.fiadoFondo, p.fiado, () => ir(const PedidoProveedorPage())),
       (Icons.campaign_outlined, 'Promociones', 'Ofertas para tu WhatsApp',
           p.gastosFondo, p.gastos, () => ir(const PromocionPage())),
+      (Icons.insert_chart_outlined, 'Informes', 'Semana, quincena y mes en PDF',
+          p.ventasFondo, p.ventas, () => ir(const InformesPage())),
+      (Icons.account_balance_wallet_outlined, 'Cartera', 'Quién debe y desde cuándo',
+          p.fiadoFondo, p.fiado, () => ir(const CarteraPage())),
+      (Icons.folder_open_outlined, 'Documentos', 'Todo lo emitido, con su número',
+          p.asistenteFondo, p.asistente, () => ir(const DocumentosPage())),
     ];
     return LayoutBuilder(builder: (context, box) {
       final ancho = (box.maxWidth - 10) / 2;
@@ -499,11 +523,39 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       items: [for (final (p, c) in items) (p.nombre, c)],
       proveedor: pv?['nombre'] as String?,
     );
+    final total = items.fold(0.0, (s, x) => s + x.$2 * x.$1.costo);
+    final documento = await LocalDb.instance.emitirDocumento('pedido',
+        clienteNombre: pv?['nombre'] as String?,
+        total: total,
+        resumen: items.map((x) => x.$1.nombre).join(', '));
+    final numero = documento['numero'] as String;
+    final pdf = pdfListo(
+        DocImprimible(
+          titulo: 'Pedido de mercancía',
+          numero: numero,
+          fecha: DateTime.now(),
+          negocio: negocio,
+          cliente: pv?['nombre'] as String?,
+          etiquetaCliente: 'Proveedor',
+          etiquetaPrecio: 'Costo aprox.',
+          lineas: [
+            for (final (p, c) in items)
+              LineaDoc(p.nombre, c, p.costo, p.unidad == 'serv' ? 'und' : p.unidad)
+          ],
+          total: total,
+          notas: [
+            'Total aproximado según el último costo registrado.',
+            'Por favor confirmar precios y fecha de entrega.',
+          ],
+        ),
+        tirilla: false);
+    await archivarDocumento(documento, pdf);
     if (!mounted) return;
     await mostrarDocumento(context,
-        titulo: 'Pedido al proveedor',
-        texto: texto,
-        telefono: (pv?['telefono'] as String?) ?? '');
+        titulo: 'Pedido N.º $numero',
+        texto: '$texto\n\nPedido N.º $numero',
+        telefono: (pv?['telefono'] as String?) ?? '',
+        pdf: pdf);
   }
 
   Future<void> _llego() async {
@@ -687,14 +739,17 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
       lineas: lineas,
       cliente: c['cliente_nombre'] as String?,
     );
-    if (!mounted) return;
-    await mostrarDocumento(context,
-        titulo: 'Cotización',
-        texto: texto,
-        telefono: tel,
-        imprimible: DocImprimible(
+    final documento = await db.emitirDocumento('cotizacion',
+        refId: c['id'] as String,
+        clienteId: cid,
+        clienteNombre: c['cliente_nombre'] as String?,
+        total: (c['total'] as num).toDouble(),
+        resumen: lineas.map((l) => l.nombre).join(', '),
+        reutilizar: true);
+    final numero = documento['numero'] as String;
+    final pdf = pdfListo(DocImprimible(
           titulo: 'Cotización',
-          numero: numeroDoc(c['id'] as String),
+          numero: numero,
           fecha: fecha,
           negocio: negocio,
           cliente: c['cliente_nombre'] as String?,
@@ -704,6 +759,13 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
             'Precios válidos por 8 días o hasta agotar existencias.',
           ],
         ));
+    await archivarDocumento(documento, pdf);
+    if (!mounted) return;
+    await mostrarDocumento(context,
+        titulo: 'Cotización N.º $numero',
+        texto: texto.replaceFirst(numeroDoc(c['id'] as String), numero),
+        telefono: tel,
+        pdf: pdf);
   }
 
   Future<void> _acciones(Map<String, Object?> c) async {

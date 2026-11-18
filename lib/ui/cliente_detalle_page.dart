@@ -9,6 +9,7 @@ import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'clientes_page.dart';
 import 'comun.dart';
+import 'oficina_page.dart';
 import 'tema.dart';
 import 'ventas_page.dart';
 
@@ -220,6 +221,14 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
                 ),
               ],
             ]),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: () => generarCuentaCobro(context, widget.clienteId),
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              label: Text(debe
+                  ? 'Cuenta de cobro en PDF (desde cuándo debe)'
+                  : 'Estado de cuenta en PDF (paz y salvo)'),
+            ),
             const TituloSeccion('Historial'),
             if (_movs.isEmpty)
               Padding(

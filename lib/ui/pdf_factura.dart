@@ -6,6 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
+import 'archivo.dart';
 
 /// Datos de un documento imprimible (comprobante de venta o cotización).
 class DocImprimible {
@@ -17,6 +18,12 @@ class DocImprimible {
   final List<LineaDoc> lineas;
   final double total;
   final List<String> notas;
+
+  /// «Cliente», o «Proveedor» en un pedido.
+  final String etiquetaCliente;
+
+  /// Encabezado de la columna de precio («Precio» o «Costo aprox.»).
+  final String etiquetaPrecio;
   const DocImprimible({
     required this.titulo,
     required this.numero,
@@ -26,13 +33,16 @@ class DocImprimible {
     required this.total,
     this.cliente,
     this.notas = const [],
+    this.etiquetaCliente = 'Cliente',
+    this.etiquetaPrecio = 'Precio',
   });
 
   String get archivo =>
       '${titulo.toLowerCase().replaceAll(' ', '_')}_$numero.pdf';
 }
 
-Future<pw.MemoryImage?> _logo(String ruta) async {
+/// Logo del negocio para los PDF (null si no hay o no se puede leer).
+Future<pw.MemoryImage?> cargarLogo(String ruta) async {
   if (ruta.isEmpty) return null;
   try {
     final f = File(ruta);
@@ -46,7 +56,7 @@ Future<pw.MemoryImage?> _logo(String ruta) async {
 /// Genera el PDF. Si el papel es angosto (impresora térmica de 58 u 80 mm)
 /// usa el formato de tirilla; si no, formato carta/A4.
 Future<Uint8List> pdfDocumento(DocImprimible d, PdfPageFormat formato) async {
-  final logo = await _logo(d.negocio.logo);
+  final logo = await cargarLogo(d.negocio.logo);
   final rollo = formato.width < 120 * PdfPageFormat.mm;
   final fmt = DateFormat('d/MM/y h:mm a', 'es_CO');
   final n = d.negocio;
@@ -94,7 +104,7 @@ Future<Uint8List> pdfDocumento(DocImprimible d, PdfPageFormat formato) async {
       ]);
     }
     return pw.TableHelper.fromTextArray(
-      headers: ['Producto', 'Cantidad', 'Precio', 'Total'],
+      headers: ['Descripción', 'Cantidad', d.etiquetaPrecio, 'Total'],
       data: [
         for (final l in d.lineas) [l.nombre, l.cantidadTexto, l.precioTexto, cop(l.total)]
       ],
@@ -146,7 +156,7 @@ Future<Uint8List> pdfDocumento(DocImprimible d, PdfPageFormat formato) async {
         if (d.cliente != null && d.cliente!.trim().isNotEmpty)
           pw.Padding(
               padding: const pw.EdgeInsets.only(top: 4),
-              child: pw.Text('Cliente: ${d.cliente}', style: estilo)),
+              child: pw.Text('${d.etiquetaCliente}: ${d.cliente}', style: estilo)),
         pw.SizedBox(height: 6),
         pw.Divider(thickness: .5),
         tabla(),
@@ -159,7 +169,7 @@ Future<Uint8List> pdfDocumento(DocImprimible d, PdfPageFormat formato) async {
         for (final x in d.notas)
           pw.Text(x, style: estilo, textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
         pw.SizedBox(height: 6),
-        pw.Text('Documento generado con VERTEX AI Pyme. No es factura electrónica.',
+        pw.Text('Documento generado con VERTEX AI Pyme. No es factura electrónica DIAN.',
             style: pw.TextStyle(fontSize: base - 1, color: PdfColors.grey700),
             textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
       ],
@@ -180,4 +190,12 @@ Future<void> imprimirDocumento(DocImprimible d) => Printing.layoutPdf(
 Future<void> compartirPdf(DocImprimible d, {bool carta = true}) async => Printing.sharePdf(
       bytes: await pdfDocumento(d, carta ? PdfPageFormat.letter : PdfPageFormat.roll80),
       filename: d.archivo,
+    );
+
+/// El documento listo para imprimir (tirilla de 80 mm por defecto),
+/// compartir o archivar (carta).
+PdfListo pdfListo(DocImprimible d, {bool tirilla = true}) => PdfListo(
+      nombre: nombreArchivo(d.numero),
+      generar: (f) => pdfDocumento(d, f),
+      papelImpresion: tirilla ? PdfPageFormat.roll80 : PdfPageFormat.letter,
     );

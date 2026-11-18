@@ -864,7 +864,7 @@ class LocalDb {
   // ------------------------------------------------- documentos emitidos
   /// Prefijos de cada tipo de documento.
   static const prefijosDoc = {
-    'factura': 'FV',
+    'venta': 'CV', // comprobante de venta (no es factura electrónica DIAN)
     'cotizacion': 'CT',
     'cobro': 'CC',
     'pedido': 'PD',
@@ -951,6 +951,20 @@ class LocalDb {
           "SELECT * FROM ventas WHERE cliente_id = ? AND "
           "((tipo = 'ingreso' AND credito = 1) OR tipo = 'abono') ORDER BY fecha",
           [clienteId]);
+
+  /// Fiados y abonos de todos los clientes activos, agrupados por cliente
+  /// (para la cartera por edades).
+  Future<Map<String, List<Map<String, Object?>>>> creditoPorCliente() async {
+    final r = await db.rawQuery(
+        "SELECT v.* FROM ventas v JOIN clientes c ON c.id = v.cliente_id "
+        "WHERE c.deleted = 0 AND ((v.tipo = 'ingreso' AND v.credito = 1) "
+        "OR v.tipo = 'abono') ORDER BY v.fecha");
+    final m = <String, List<Map<String, Object?>>>{};
+    for (final x in r) {
+      (m[x['cliente_id'] as String] ??= []).add(x);
+    }
+    return m;
+  }
 
   // -------------------------------------------------------------- reportes
   /// Totales entre [desde] y [hasta] (fechas locales; hasta excluido).

@@ -68,13 +68,13 @@ void main() {
 
   test('documentos: número único con prefijo, dispositivo y consecutivo; reimpresión', () async {
     final db = await baseDePrueba();
-    final a = await db.emitirDocumento('factura', refId: 'v1', total: 1000);
-    final b = await db.emitirDocumento('factura', refId: 'v2', total: 2000);
-    final a2 = await db.emitirDocumento('factura', refId: 'v1', reutilizar: true);
+    final a = await db.emitirDocumento('venta', refId: 'v1', total: 1000);
+    final b = await db.emitirDocumento('venta', refId: 'v2', total: 2000);
+    final a2 = await db.emitirDocumento('venta', refId: 'v1', reutilizar: true);
     final c = await db.emitirDocumento('cobro', clienteNombre: 'Ana', total: 5000);
     final disp = await db.codigoDispositivo();
-    expect(a['numero'], 'FV-$disp-000001');
-    expect(b['numero'], 'FV-$disp-000002');
+    expect(a['numero'], 'CV-$disp-000001');
+    expect(b['numero'], 'CV-$disp-000002');
     expect(a2['numero'], a['numero']);
     expect(c['numero'], 'CC-$disp-000001');
     await db.archivarPdf(c['id'] as String, 'C:/x/CC.pdf');
