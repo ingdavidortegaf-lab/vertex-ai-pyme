@@ -13,7 +13,7 @@ Este documento resume lo que se mejoró en esta ronda, por qué se hizo y qué s
 | **Promociones** | Lista de precios en texto | **Foto o video** (cámara o galería), **imagen lista para el estado** (1080×1080 con logo y precios), **redactor con IA**: 5 estilos, temporada automática (quincena, fin de semana, viernes negro, Navidad), etiquetas del municipio | Marketing (20), Tecnología |
 | **Clientes (CRM)** | Lista y cartera | **Seguimiento**: quién hace rato no viene, mejores clientes, nuevos y perdidos; mensaje sugerido por WhatsApp; solo a quien autorizó; no repetir antes de 7 días | Marketing, Jurídica |
 | **Cualquier negocio** | 10 tipos | **22 tipos** con emoji (panadería, frutas, carnicería, ropa, celulares, transporte, hospedaje…) y la app se ajusta sola (inventario, servicios, gramera, códigos, fiado) | Emprendimiento |
-| **Marca** | «V» de tiza | Logo **vértice de dos caras** con luz y chispa de IA, en el ícono del celular, la web y dentro de la app (con brillo animado suave) | Marketing |
+| **Marca** | «V» de tiza | **Logo oficial de VERTEX TECH**: «V» blanca con facetas y el rombo del vértice, en los colores de la app, en el ícono del celular, la web y dentro de la app (el rombo brilla suave) | Marketing |
 | **Experiencia** | Estática | Entrada animada de las herramientas, logo vivo, deuda con proveedores en el Inicio. Todo respeta «reducir movimiento» del celular | Tecnología |
 
 Pruebas automáticas: **106**, todas pasan.

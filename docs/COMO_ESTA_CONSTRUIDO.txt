@@ -214,8 +214,8 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 
   tema.dart (414)          Colores "pizarra del mercado", letras, botones,
                            avatares de clientes, titulos y estados vacios.
-  ilustraciones.dart (337) Dibujos hechos en codigo: logo (vertice de dos
-                           caras con la chispa de la IA, brillo animado), palotes de tiza,
+  ilustraciones.dart (337) Dibujos hechos en codigo: logo de VERTEX TECH (V
+                           blanca, facetas y rombo; brillo animado), palotes de tiza,
                            pizarra, nube, escudo (sin imagenes externas).
   graficas.dart (342)      Graficas dibujadas en codigo: barras de ventas y
                            gastos, contado vs fiado, ranking de productos.

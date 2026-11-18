@@ -34,7 +34,7 @@ Cada archivo de esta carpeta es **una pantalla o una pieza visual** de la app, h
 | `escaner.dart` | La cámara para leer **códigos de barras** | |
 | `inactividad.dart` | Cierra la sesión tras **30 minutos** sin uso | |
 | `tema.dart` | Colores "pizarra del mercado", letras y botones | "El diseño" |
-| `ilustraciones.dart` | Dibujos hechos con código: el **logo** (vértice de dos caras con la chispa de la IA, que brilla suave) y la pizarra | "Sin imágenes descargadas" |
+| `ilustraciones.dart` | Dibujos hechos con código: el **logo** (la «V» de VERTEX TECH con sus facetas y el rombo del vértice, que brilla suave) y la pizarra | "Sin imágenes descargadas" |
 | `graficas.dart` | Gráficas dibujadas con código | |
 | `comun.dart` | Ayudas comunes: mensajes abajo, abrir WhatsApp | |
 

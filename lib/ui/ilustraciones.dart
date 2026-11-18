@@ -24,9 +24,10 @@ Paint _tiza(Color c, double ancho) => Paint()
   ..style = PaintingStyle.stroke;
 
 // ------------------------------------------------------------------ logo
-/// Marca de VERTEX: un vértice de dos caras (la «V») con un punto de luz y
-/// la chispa amarilla de la IA. Es el mismo dibujo del ícono de la app
-/// (docs/pitch/generador/iconos.js). Con [animar], la chispa titila suave.
+/// Marca de VERTEX: la «V» blanca de dos brazos con sus facetas y el rombo
+/// del vértice, sobre verde con un halo de luz. Es el mismo dibujo del ícono
+/// de la app (docs/pitch/generador/iconos.js). Con [animar], el rombo y el
+/// halo brillan suave.
 class LogoVertex extends StatefulWidget {
   final double tam;
   final bool animar;
@@ -62,67 +63,71 @@ class _LogoVertexState extends State<LogoVertex> with SingleTickerProviderStateM
     return AnimatedBuilder(
       animation: c,
       builder: (_, __) => CustomPaint(
-          size: Size.square(widget.tam), painter: _LogoPainter(0.82 + 0.18 * Curves.easeInOut.transform(c.value))),
+          size: Size.square(widget.tam), painter: _LogoPainter(Curves.easeInOut.transform(c.value))),
     );
   }
 }
 
 class _LogoPainter extends CustomPainter {
-  final double brillo; // 0..1, tamaño relativo de la chispa
+  final double brillo; // 0..1: intensidad del halo del rombo
   _LogoPainter(this.brillo);
+
+  // Mismo dibujo que el ícono (docs/pitch/generador/iconos.js), sobre 1080.
+  static const _k = 1.38, _cx = 540.0, _cy = 542.0;
 
   @override
   void paint(Canvas c, Size s) {
     final w = s.width;
-    double g(double x) => x / 512 * w;
+    Offset p(double x, double y) =>
+        Offset((_cx + (x - _cx) * _k) / 1080 * w, (_cy + (y - _cy) * _k) / 1080 * w);
+    Path pol(List<(double, double)> pts) {
+      final r = Path()..moveTo(p(pts[0].$1, pts[0].$2).dx, p(pts[0].$1, pts[0].$2).dy);
+      for (final (x, y) in pts.skip(1)) {
+        final o = p(x, y);
+        r.lineTo(o.dx, o.dy);
+      }
+      return r..close();
+    }
+
     final caja = Offset.zero & s;
     c.drawRRect(
-        RRect.fromRectAndRadius(caja, Radius.circular(g(116))),
+        RRect.fromRectAndRadius(caja, Radius.circular(w * 245 / 1080)),
         Paint()
           ..shader = const LinearGradient(
             begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF245C49), Color(0xFF17362C), Color(0xFF0D211A)],
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF245C49), Color(0xFF17362C), Color(0xFF0B1F18)],
             stops: [0, .55, 1],
           ).createShader(caja));
-    final izq = Path()
-      ..moveTo(g(104), g(132))
-      ..lineTo(g(186), g(132))
-      ..lineTo(g(256), g(318))
-      ..lineTo(g(256), g(400))
-      ..close();
-    final der = Path()
-      ..moveTo(g(408), g(132))
-      ..lineTo(g(326), g(132))
-      ..lineTo(g(256), g(318))
-      ..lineTo(g(256), g(400))
-      ..close();
-    final alto = Rect.fromLTRB(0, g(132), w, g(400));
-    c.drawPath(
-        izq,
-        Paint()
-          ..shader = const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFB4F0C9), Color(0xFF5FCB8C)])
-              .createShader(alto));
-    c.drawPath(
-        der,
-        Paint()
-          ..shader = const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF7FD9A3), Color(0xFF2F9E64)])
-              .createShader(alto));
-    final centro = Offset(g(256), g(392));
+    final centro = p(540, 532);
+    final r = 300 * _k / 1080 * w;
     c.drawCircle(
         centro,
-        g(30),
+        r,
         Paint()
-          ..shader = const RadialGradient(colors: [Color(0xF2FFFFFF), Color(0x00FFFFFF)])
-              .createShader(Rect.fromCircle(center: centro, radius: g(30))));
-    _chispa(c, Offset(g(396), g(108)), g(46) * brillo, const Color(0xFFF4C55A));
-    _chispa(c, Offset(g(340), g(70)), g(18) * (1.8 - brillo), const Color(0xCCF4C55A));
+          ..shader = RadialGradient(colors: [
+            const Color(0xFF8FE0AE).withValues(alpha: .35 + .2 * brillo),
+            const Color(0xFF8FE0AE).withValues(alpha: .12),
+            const Color(0x008FE0AE),
+          ], stops: const [0, .55, 1])
+              .createShader(Rect.fromCircle(center: centro, radius: r)));
+    c.drawPath(pol([(530, 450), (550, 450), (555, 632), (540, 690), (525, 632)]),
+        Paint()..color = const Color(0xFF2E7A5C));
+    const faceta = Color(0xFF5FCB8C);
+    c.drawPath(pol([(450, 403), (530, 450), (525, 632)]), Paint()..color = faceta);
+    c.drawPath(pol([(630, 403), (550, 450), (555, 632)]), Paint()..color = faceta);
+    final rombo = pol([(540, 285), (606, 351), (540, 417), (474, 351)]);
+    if (w >= 40) {
+      c.drawPath(
+          rombo,
+          Paint()
+            ..color = const Color(0xFF8FE0AE).withValues(alpha: .5 * brillo)
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * .02));
+    }
+    c.drawPath(rombo, Paint()..color = const Color(0xFF8FE0AE));
+    final blanco = Paint()..color = Colors.white;
+    c.drawPath(pol([(297, 393), (425, 393), (538, 700), (525, 800)]), blanco);
+    c.drawPath(pol([(783, 393), (655, 393), (542, 700), (555, 800)]), blanco);
   }
 
   @override

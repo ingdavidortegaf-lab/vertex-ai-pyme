@@ -1,41 +1,64 @@
-// Ícono de VERTEX AI Pyme (v2): un "vértice" geométrico de dos caras sobre
-// un degradado verde profundo, con un punto de luz en el vértice y la
-// chispa amarilla de la IA. Mismo dibujo que LogoVertex (lib/ui/ilustraciones.dart).
+// Ícono de VERTEX AI Pyme (v3): el logo de la marca VERTEX TECH, una «V»
+// blanca de dos brazos con dos facetas interiores y un rombo arriba (el
+// vértice), con un halo de luz. Mismo dibujo que LogoVertex
+// (lib/ui/ilustraciones.dart). Coordenadas sobre un lienzo de 1080.
+// Uso: node iconos.js            -> íconos de la app (paleta verde de la app)
+//      node iconos.js muestra    -> además, comparación verde / azul original
 const sharp = require('sharp');
+const path = require('path');
 const P = 'C:/dev/vertex_ai_pyme/';
 
-function svg(tam, { maskable = false, redondeado = true } = {}) {
-  // En "maskable" el sistema recorta en círculo: el dibujo va dentro del 72 %.
-  const k = maskable ? 0.72 : 1, off = (512 - 512 * k) / 2;
-  const g = (x) => (off + x * k).toFixed(1);
-  const rx = redondeado && !maskable ? 116 : 0;
-  // Coordenadas sobre 512: brazos de la V como dos facetas.
-  const vIzq = `M ${g(104)} ${g(132)} L ${g(186)} ${g(132)} L ${g(256)} ${g(318)} L ${g(256)} ${g(400)} Z`;
-  const vDer = `M ${g(408)} ${g(132)} L ${g(326)} ${g(132)} L ${g(256)} ${g(318)} L ${g(256)} ${g(400)} Z`;
-  const chispa = (cx, cy, r) =>
-    `M ${g(cx)} ${g(cy - r)} Q ${g(cx)} ${g(cy)} ${g(cx + r)} ${g(cy)} Q ${g(cx)} ${g(cy)} ${g(cx)} ${g(cy + r)} ` +
-    `Q ${g(cx)} ${g(cy)} ${g(cx - r)} ${g(cy)} Q ${g(cx)} ${g(cy)} ${g(cx)} ${g(cy - r)} Z`;
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${tam}" height="${tam}" viewBox="0 0 512 512">
+const PALETAS = {
+  verde: { f1: '#245C49', f2: '#17362C', f3: '#0B1F18', v: '#FFFFFF', faceta: '#5FCB8C', rombo: '#8FE0AE', tallo: '#2E7A5C', halo: '#8FE0AE' },
+  azul: { f1: '#0E3466', f2: '#0B2850', f3: '#061631', v: '#FFFFFF', faceta: '#22A9DC', rombo: '#22A9DC', tallo: '#0F6E91', halo: '#2BB8EE' },
+};
+
+// Forma del logo (sobre 1080), escalada con k alrededor del centro.
+function forma(k) {
+  const cx = 540, cy = 542;
+  const t = ([x, y]) => `${(cx + (x - cx) * k).toFixed(1)},${(cy + (y - cy) * k).toFixed(1)}`;
+  const pol = (pts) => pts.map(t).join(' ');
+  return {
+    izq: pol([[297, 393], [425, 393], [538, 700], [525, 800]]),
+    der: pol([[783, 393], [655, 393], [542, 700], [555, 800]]),
+    fIzq: pol([[450, 403], [530, 450], [525, 632]]),
+    fDer: pol([[630, 403], [550, 450], [555, 632]]),
+    tallo: pol([[530, 450], [550, 450], [555, 632], [540, 690], [525, 632]]),
+    rombo: pol([[540, 285], [606, 351], [540, 417], [474, 351]]),
+    halo: { x: cx, y: cy - 10, r: 300 * k },
+  };
+}
+
+function svg(tam, { maskable = false, redondeado = true, paleta = 'verde' } = {}) {
+  const c = PALETAS[paleta];
+  const k = maskable ? 1.0 : 1.38;
+  const f = forma(k);
+  const rx = redondeado && !maskable ? 245 : 0;
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${tam}" height="${tam}" viewBox="0 0 1080 1080">
   <defs>
-    <linearGradient id="f" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#245C49"/><stop offset=".55" stop-color="#17362C"/><stop offset="1" stop-color="#0D211A"/>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="${c.f1}"/><stop offset=".55" stop-color="${c.f2}"/><stop offset="1" stop-color="${c.f3}"/>
     </linearGradient>
-    <linearGradient id="a" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#B4F0C9"/><stop offset="1" stop-color="#5FCB8C"/>
-    </linearGradient>
-    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#7FD9A3"/><stop offset="1" stop-color="#2F9E64"/>
-    </linearGradient>
-    <radialGradient id="luz" cx=".5" cy=".5" r=".5">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="${c.halo}" stop-opacity=".55"/>
+      <stop offset=".55" stop-color="${c.halo}" stop-opacity=".18"/>
+      <stop offset="1" stop-color="${c.halo}" stop-opacity="0"/>
     </radialGradient>
+    <filter id="brillo" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="${rx}" fill="url(#f)"/>
-  <path d="${vIzq}" fill="url(#a)"/>
-  <path d="${vDer}" fill="url(#b)"/>
-  <circle cx="${g(256)}" cy="${g(392)}" r="${(30 * k).toFixed(1)}" fill="url(#luz)"/>
-  <path d="${chispa(396, 108, 46)}" fill="#F4C55A"/>
-  <path d="${chispa(340, 70, 18)}" fill="#F4C55A" opacity=".8"/>
+  <rect width="1080" height="1080" rx="${rx}" fill="url(#fondo)"/>
+  <circle cx="${f.halo.x}" cy="${f.halo.y}" r="${f.halo.r.toFixed(1)}" fill="url(#halo)"/>
+  <polygon points="${f.tallo}" fill="${c.tallo}"/>
+  <polygon points="${f.fIzq}" fill="${c.faceta}"/>
+  <polygon points="${f.fDer}" fill="${c.faceta}"/>
+  <polygon points="${f.rombo}" fill="${c.rombo}" filter="url(#brillo)"/>
+  <g filter="url(#brillo)">
+    <polygon points="${f.izq}" fill="${c.v}"/>
+    <polygon points="${f.der}" fill="${c.v}"/>
+  </g>
 </svg>`);
 }
 
@@ -48,10 +71,17 @@ function svg(tam, { maskable = false, redondeado = true } = {}) {
   const android = [['mdpi', 48], ['hdpi', 72], ['xhdpi', 96], ['xxhdpi', 144], ['xxxhdpi', 192]]
     .map(([d, t]) => [`android/app/src/main/res/mipmap-${d}/ic_launcher.png`, t, {}]);
   for (const [ruta, t, op] of [...web, ...android]) {
-    await sharp(svg(512, op)).resize(t, t).png().toFile(P + ruta);
+    await sharp(svg(1080, op)).resize(t, t).png().toFile(P + ruta);
   }
-  await sharp(svg(512, { redondeado: false })).resize(180, 180).png().toFile(P + 'web/icons/apple-touch-icon.png');
-  await sharp(svg(512, {})).resize(512, 512).png().toFile(__dirname + '/icono_muestra.png');
-  await sharp(svg(512, {})).resize(1024, 1024).png().toFile(P + 'docs/LOGO_VERTEX_1024.png');
+  await sharp(svg(1080, { redondeado: false })).resize(180, 180).png().toFile(P + 'web/icons/apple-touch-icon.png');
+  await sharp(svg(1080, {})).resize(512, 512).png().toFile(path.join(__dirname, 'icono_muestra.png'));
+  await sharp(svg(1080, {})).resize(1024, 1024).png().toFile(P + 'docs/LOGO_VERTEX_1024.png');
+  if (process.argv[2] === 'muestra') {
+    const a = await sharp(svg(1080, { paleta: 'verde' })).resize(480, 480).png().toBuffer();
+    const b = await sharp(svg(1080, { paleta: 'azul' })).resize(480, 480).png().toBuffer();
+    await sharp({ create: { width: 1000, height: 520, channels: 4, background: '#F4F5F2' } })
+      .composite([{ input: a, left: 20, top: 20 }, { input: b, left: 500, top: 20 }])
+      .png().toFile(path.join(__dirname, 'logo_verde_y_azul.png'));
+  }
   console.log('iconos listos');
 })();

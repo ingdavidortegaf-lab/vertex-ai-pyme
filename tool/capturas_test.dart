@@ -18,6 +18,7 @@ import 'package:vertex_ai_pyme/ui/comun.dart';
 import 'package:vertex_ai_pyme/ui/consent_gate.dart';
 import 'package:vertex_ai_pyme/ui/herramientas_page.dart';
 import 'package:vertex_ai_pyme/ui/home_page.dart';
+import 'package:vertex_ai_pyme/ui/ilustraciones.dart';
 import 'package:vertex_ai_pyme/ui/oficina_page.dart';
 import 'package:vertex_ai_pyme/ui/promocion_page.dart';
 import 'package:vertex_ai_pyme/ui/seguimiento_page.dart';
@@ -454,5 +455,22 @@ void main() {
     });
     await _esperar(tester);
     await captura(tester, 'phone-seguimiento');
+  });
+
+  testWidgets('logo', (tester) async {
+    await tam(tester, 420);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const Scaffold(
+          body: Center(
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+        LogoVertex(tam: 240),
+        SizedBox(width: 24),
+        LogoVertex(tam: 32),
+        SizedBox(width: 12),
+        LogoVertex(tam: 48),
+      ])))));
+    });
+    await _esperar(tester);
+    await captura(tester, 'logo');
   });
 }
