@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:vertex_ai_pyme/domain/documentos.dart';
 import 'package:vertex_ai_pyme/domain/formato.dart';
 import 'package:vertex_ai_pyme/domain/privacidad.dart';
 
@@ -40,6 +42,25 @@ void main() {
     test('mostrarTelefono', () {
       expect(mostrarTelefono('573001234567'), '300 123 4567');
     });
+    test('celulares de otros países con su indicativo', () {
+      expect(normalizarTelefono('305 123 4567', pais: '1'), '13051234567'); // EE. UU.
+      expect(normalizarTelefono('1 305 123 4567', pais: '1'), '13051234567');
+      expect(normalizarTelefono('412 123 4567', pais: '58'), '584121234567'); // Venezuela
+      expect(normalizarTelefono('612 345 678', pais: '34'), '34612345678'); // España
+      expect(normalizarTelefono('99 123 4567', pais: '593'), '593991234567'); // Ecuador
+      expect(normalizarTelefono('+1 (305) 123-4567'), '13051234567'); // con +, sin elegir país
+      expect(normalizarTelefono('0034 612 345 678'), '34612345678');
+      expect(normalizarTelefono('+61 412 345 678'), '61412345678'); // país que no está en la lista
+      expect(normalizarTelefono('123', pais: '1'), isNull);
+      expect(normalizarTelefono('+57 608 765 4321'), isNull); // fijo colombiano
+    });
+    test('mostrar y separar números de otros países', () {
+      expect(mostrarTelefono('13051234567'), '+1 305 123 4567');
+      expect(mostrarTelefono('584121234567'), '+58 412 123 4567');
+      expect(separarTelefono('13051234567'), ('1', '3051234567'));
+      expect(separarTelefono('573001234567'), ('57', '3001234567'));
+      expect(separarTelefono('34612345678'), ('34', '612345678'));
+    });
   });
 
   test('normalizarTexto quita tildes y signos', () {
@@ -60,5 +81,14 @@ void main() {
       final t = anonimizarPregunta('¿Cómo vendo más bananas?', ['Ana']);
       expect(t, contains('bananas'));
     });
+  });
+
+  test('el logo se guarda dentro de la base y se recupera igual (sirve en la web)', () {
+    final bytes = Uint8List.fromList([137, 80, 78, 71, 1, 2, 3, 250]);
+    final t = logoComoTexto(bytes);
+    expect(t, startsWith('b64:'));
+    expect(bytesDeLogo(t), bytes);
+    expect(bytesDeLogo('C:/viejo/logo.img'), isNull); // logo viejo: ruta de archivo
+    expect(bytesDeLogo(''), isNull);
   });
 }

@@ -7,6 +7,8 @@
 /// conectarlo después con un proveedor tecnológico autorizado.
 library;
 
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'codigos.dart';
 import 'formato.dart';
@@ -34,6 +36,25 @@ class PerfilNegocio {
   });
 
   String get nombreVisible => nombre.trim().isEmpty ? 'Mi negocio' : nombre.trim();
+}
+
+/// El logo se guarda DENTRO de la base como texto («b64:» + la imagen en
+/// base64). Así funciona igual en el celular, en Windows y en la versión
+/// web (el navegador no deja guardar archivos sueltos). Los logos viejos,
+/// guardados como ruta de archivo, siguen sirviendo en celular y PC.
+const prefijoLogo = 'b64:';
+
+String logoComoTexto(Uint8List bytes) => '$prefijoLogo${base64Encode(bytes)}';
+
+/// Bytes del logo si está guardado en la base; null si es una ruta vieja o
+/// no hay logo.
+Uint8List? bytesDeLogo(String logo) {
+  if (!logo.startsWith(prefijoLogo)) return null;
+  try {
+    return base64Decode(logo.substring(prefijoLogo.length));
+  } catch (_) {
+    return null;
+  }
 }
 
 /// Línea de un documento (venta, cotización o pedido).

@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../domain/formato.dart';
 import '../domain/modo_negocio.dart';
+import 'campo_telefono.dart';
 import 'comun.dart';
 import 'ilustraciones.dart';
 import 'negocio_page.dart';
@@ -58,7 +58,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
   final _nombre = TextEditingController();
   final _nit = TextEditingController();
   final _dir = TextEditingController();
-  final _tel = TextEditingController();
+  var _tel = TelefonoCtrl();
   final _meta = TextEditingController();
   String _tipo = '';
   String _logo = '';
@@ -81,7 +81,8 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
       _nombre.text = n.nombre;
       _nit.text = n.nit;
       _dir.text = n.direccion;
-      _tel.text = n.telefono.isEmpty ? '' : mostrarTelefono(n.telefono);
+      _tel.dispose();
+      _tel = TelefonoCtrl(n.telefono);
       _meta.text = n.meta > 0 ? cop(n.meta).substring(1) : '';
       _tipo = n.tipo;
       _logo = n.logo;
@@ -92,7 +93,8 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
 
   @override
   void dispose() {
-    for (final c in [_nombre, _nit, _dir, _tel, _meta]) {
+    _tel.dispose();
+    for (final c in [_nombre, _nit, _dir, _meta]) {
       c.dispose();
     }
     _pag.dispose();
@@ -120,9 +122,10 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
       }
     }
     if (_paso == 3) {
-      final t = _tel.text.trim();
-      if (t.isNotEmpty && normalizarTelefono(t) == null) {
-        avisar('WhatsApp: celular colombiano de 10 dígitos que empiece por 3');
+      if (_tel.valor == null) {
+        avisar(_tel.pais.codigo == '57'
+            ? 'WhatsApp: celular colombiano de 10 dígitos que empiece por 3'
+            : 'WhatsApp: revisa el número; en ${_tel.pais.nombre} se escribe como ${_tel.pais.ejemplo}');
         return;
       }
       if (_meta.text.trim().isNotEmpty && parseMonto(_meta.text) == null) {
@@ -148,7 +151,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
       await db.setAjuste('negocio_nit', _nit.text.trim());
       await db.setAjuste('negocio_direccion', _dir.text.trim());
       await db.setAjuste(
-          'negocio_telefono', normalizarTelefono(_tel.text) ?? '');
+          'negocio_telefono', _tel.valor ?? '');
       await db.setAjuste(
           'negocio_meta', (parseMonto(_meta.text) ?? 0).toStringAsFixed(0));
       await db.setAjuste('negocio_logo', _logo);
@@ -419,11 +422,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
                   labelText: 'Dirección',
                   hintText: 'Ej.: Cra 20 # 10-15, Yopal')),
           const SizedBox(height: 12),
-          TextField(
-              controller: _tel,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                  labelText: 'WhatsApp del negocio', hintText: '300 123 4567')),
+          CampoTelefono(ctrl: _tel, etiqueta: 'WhatsApp del negocio'),
           const SizedBox(height: 12),
           TextField(
               controller: _meta,
@@ -441,12 +440,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
                 borderRadius: BorderRadius.circular(14),
               ),
               clipBehavior: Clip.antiAlias,
-              child: _logo.isEmpty || kIsWeb
-                  ? const Icon(Icons.image_outlined)
-                  : Image.file(File(_logo),
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) =>
-                          const Icon(Icons.broken_image_outlined)),
+              child: VistaLogo(logo: _logo),
             ),
             const SizedBox(width: 12),
             Expanded(

@@ -5,6 +5,7 @@ import '../data/sync_service.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
+import 'campo_telefono.dart';
 import 'comun.dart';
 import 'escaner.dart';
 import '../pdf/archivo.dart';
@@ -583,7 +584,7 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
 
   Future<void> _nuevoProveedor() async {
     final nombre = TextEditingController();
-    final tel = TextEditingController();
+    final tel = TelefonoCtrl();
     final ok = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
@@ -594,11 +595,7 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(labelText: 'Nombre o empresa')),
           const SizedBox(height: 12),
-          TextField(
-              controller: tel,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                  labelText: 'Celular (WhatsApp)', hintText: '300 123 4567')),
+          CampoTelefono(ctrl: tel, etiqueta: 'Celular (WhatsApp)'),
         ]),
         actions: [
           TextButton(
@@ -611,7 +608,7 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       ),
     );
     final n = nombre.text.trim();
-    final t = normalizarTelefono(tel.text);
+    final t = tel.valor;
     nombre.dispose();
     tel.dispose();
     if (ok != true) return;
@@ -620,7 +617,7 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       return;
     }
     if (t == null) {
-      avisar('Celular colombiano de 10 dígitos que empiece por 3');
+      avisar('Revisa el celular del proveedor (toca la bandera si es de otro país)');
       return;
     }
     final id = await LocalDb.instance.saveProveedor(n, t);

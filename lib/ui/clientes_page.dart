@@ -3,6 +3,7 @@ import '../data/local_db.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import 'cliente_detalle_page.dart';
+import 'campo_telefono.dart';
 import 'comun.dart';
 import 'legal_page.dart';
 import 'ilustraciones.dart';
@@ -189,8 +190,7 @@ class _FormClienteState extends State<_FormCliente> {
   final _form = GlobalKey<FormState>();
   late final _nombre =
       TextEditingController(text: widget.cliente?['nombre'] as String? ?? '');
-  late final _tel = TextEditingController(
-      text: mostrarTelefono(widget.cliente?['telefono'] as String? ?? ''));
+  late final _tel = TelefonoCtrl(widget.cliente?['telefono'] as String? ?? '');
 
   /// Autorización del cliente (Ley 1581): casilla SIN premarcar,
   /// obligatoria para registrar un cliente nuevo.
@@ -217,7 +217,7 @@ class _FormClienteState extends State<_FormCliente> {
         : null);
     if (!_form.currentState!.validate() || _errorAutoriza != null) return;
     final nombre = _nombre.text.trim().replaceAll(RegExp(r'\s+'), ' ');
-    final tel = normalizarTelefono(_tel.text) ?? '';
+    final tel = _tel.valor ?? '';
     Navigator.pop(context, (nombre, tel));
   }
 
@@ -264,18 +264,7 @@ class _FormClienteState extends State<_FormCliente> {
               },
             ),
             const SizedBox(height: 4),
-            TextFormField(
-              controller: _tel,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                  labelText: 'Celular para WhatsApp (opcional)',
-                  hintText: '300 123 4567',
-                  prefixIcon: Icon(Icons.phone_android)),
-              validator: (v) => normalizarTelefono(v ?? '') == null
-                  ? 'Celular colombiano de 10 dígitos que empiece por 3'
-                  : null,
-              onFieldSubmitted: (_) => _guardar(),
-            ),
+            CampoTelefono(ctrl: _tel, alEnviar: (_) => _guardar()),
             const SizedBox(height: 12),
             if (widget.cliente == null) ...[
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

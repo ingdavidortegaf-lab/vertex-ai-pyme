@@ -1,6 +1,8 @@
 /// Formatos y validaciones colombianas. Sin dependencias: fáciles de probar.
 library;
 
+import 'paises.dart';
+
 /// 1234567 -> "$1.234.567"
 String cop(double v) {
   final neg = v < 0;
@@ -27,23 +29,77 @@ double? parseMonto(String s) {
   return v;
 }
 
-/// Celular colombiano -> "57XXXXXXXXXX" (el formato que usa wa.me).
-/// Devuelve '' si viene vacío (el teléfono es opcional) y null si no es un
-/// celular válido de Colombia (10 dígitos que empiezan por 3).
-String? normalizarTelefono(String s) {
-  var d = s.replaceAll(RegExp(r'[^0-9]'), '');
+/// Celular -> número completo con indicativo y sin «+» (el formato que usa
+/// wa.me), por ejemplo "573001234567" o "13051234567".
+/// - [pais]: indicativo elegido en el formulario (Colombia por defecto).
+/// - Si se escribe con «+» o «00», se toma como número internacional
+///   completo, de cualquier país.
+/// Devuelve '' si viene vacío (el teléfono es opcional) y null si no es
+/// válido. En Colombia solo se aceptan celulares (10 dígitos que empiezan
+/// por 3), porque WhatsApp no funciona con fijos.
+String? normalizarTelefono(String s, {String pais = '57'}) {
+  final crudo = s.trim();
+  var d = crudo.replaceAll(RegExp(r'[^0-9]'), '');
   if (d.isEmpty) return '';
-  if (d.startsWith('0057')) d = d.substring(4);
-  if (d.length == 12 && d.startsWith('57')) d = d.substring(2);
-  if (d.length == 10 && d.startsWith('3')) return '57$d';
+  final internacional = crudo.startsWith('+') || d.startsWith('00');
+  if (d.startsWith('00')) d = d.substring(2);
+  if (internacional) return _completoValido(d) ? d : null;
+  if (pais == '57') {
+    if (d.length == 12 && d.startsWith('57')) d = d.substring(2);
+    if (d.length == 10 && d.startsWith('3')) return '57$d';
+    return null;
+  }
+  final opciones = paises.where((p) => p.codigo == pais);
+  final min = opciones.isEmpty ? 6 : opciones.map((p) => p.min).reduce((a, b) => a < b ? a : b);
+  final max = opciones.isEmpty ? 12 : opciones.map((p) => p.max).reduce((a, b) => a > b ? a : b);
+  // Ya trae el indicativo: "1 305 123 4567" con Estados Unidos elegido.
+  if (d.startsWith(pais) && d.length - pais.length >= min && d.length - pais.length <= max) {
+    return d;
+  }
+  if (d.length >= min && d.length <= max) return '$pais$d';
   return null;
 }
 
-/// "573001234567" -> "300 123 4567"
+/// Número completo (con indicativo) entre 8 y 15 dígitos (norma E.164).
+bool _completoValido(String d) {
+  if (d.length < 8 || d.length > 15) return false;
+  if (d.startsWith('57')) return d.length == 12 && d[2] == '3';
+  return paisDeNumero(d) != null || d.length >= 10;
+}
+
+/// "573001234567" -> "300 123 4567" (Colombia, sin indicativo);
+/// "13051234567" -> "+1 305 123 4567"; otros países con su indicativo.
 String mostrarTelefono(String t) {
-  final d = t.startsWith('57') && t.length == 12 ? t.substring(2) : t;
-  if (d.length != 10) return d;
-  return '${d.substring(0, 3)} ${d.substring(3, 6)} ${d.substring(6)}';
+  if (t.startsWith('57') && t.length == 12) {
+    final d = t.substring(2);
+    return '${d.substring(0, 3)} ${d.substring(3, 6)} ${d.substring(6)}';
+  }
+  if (t.length == 10 && t.startsWith('3')) {
+    return '${t.substring(0, 3)} ${t.substring(3, 6)} ${t.substring(6)}';
+  }
+  final p = t.length > 10 ? paisDeNumero(t) : null;
+  if (p == null) return t;
+  final n = t.substring(p.codigo.length);
+  return '+${p.codigo} ${_agrupar(n)}';
+}
+
+/// Parte un número nacional para que se lea fácil: 305 123 4567 / 6123 4567.
+String _agrupar(String n) {
+  if (n.length == 10) return '${n.substring(0, 3)} ${n.substring(3, 6)} ${n.substring(6)}';
+  if (n.length == 9) return '${n.substring(0, 3)} ${n.substring(3, 6)} ${n.substring(6)}';
+  if (n.length == 8) return '${n.substring(0, 4)} ${n.substring(4)}';
+  return n;
+}
+
+/// Separa un número guardado en (indicativo, número nacional) para
+/// mostrarlo en un formulario con el selector de país.
+(String pais, String nacional) separarTelefono(String t) {
+  if (t.isEmpty) return ('57', '');
+  if (t.startsWith('57') && t.length == 12) return ('57', t.substring(2));
+  if (t.length == 10 && t.startsWith('3')) return ('57', t);
+  final p = paisDeNumero(t);
+  if (p == null || t.length <= 10) return ('57', t);
+  return (p.codigo, t.substring(p.codigo.length));
 }
 
 /// Minúsculas, sin tildes ni signos: para comparar texto escrito a mano.

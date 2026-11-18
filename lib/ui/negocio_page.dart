@@ -2,11 +2,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import '../data/local_db.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
+import 'campo_telefono.dart';
 import 'comun.dart';
 import 'tema.dart';
 
@@ -62,22 +62,38 @@ Future<void> mostrarMiNegocio(BuildContext context) async {
   avisar('Datos del negocio guardados');
 }
 
+/// Muestra el logo del negocio, guardado en la base o (logos viejos) como
+/// archivo en el celular o el PC.
+class VistaLogo extends StatelessWidget {
+  final String logo;
+  final BoxFit ajuste;
+  const VistaLogo({super.key, required this.logo, this.ajuste = BoxFit.cover});
+  @override
+  Widget build(BuildContext context) {
+    final vacio = Icon(Icons.image_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant);
+    if (logo.isEmpty) return vacio;
+    final b = bytesDeLogo(logo);
+    if (b != null) {
+      return Image.memory(b, fit: ajuste, errorBuilder: (c, e, s) => const Icon(Icons.broken_image_outlined));
+    }
+    if (kIsWeb || !File(logo).existsSync()) return vacio;
+    return Image.file(File(logo), fit: ajuste, errorBuilder: (c, e, s) => const Icon(Icons.broken_image_outlined));
+  }
+}
+
 /// Elige una imagen de la galería y la copia a la carpeta privada de la
 /// app; devuelve la ruta (o null si se cancela o falla).
 Future<String?> elegirLogoNegocio() async {
   try {
-    final img = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
+    final img = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxWidth: 600, maxHeight: 600, imageQuality: 85);
     if (img == null) return null;
     final bytes = await img.readAsBytes();
-    if (bytes.length > 2 * 1024 * 1024) {
-      avisar('La imagen pesa más de 2 MB; elige una más liviana');
+    if (bytes.length > 1024 * 1024) {
+      avisar('La imagen pesa más de 1 MB; elige una más liviana');
       return null;
     }
-    final dir = await getApplicationDocumentsDirectory();
-    final f = File('${dir.path}/logo_${DateTime.now().millisecondsSinceEpoch}.img');
-    await f.writeAsBytes(bytes, flush: true);
-    return f.path;
+    return logoComoTexto(bytes);
   } catch (_) {
     avisar('No se pudo cargar la imagen');
     return null;
@@ -99,7 +115,7 @@ class _FormNegocioState extends State<_FormNegocio> {
       text: widget.actual.meta > 0 ? cop(widget.actual.meta).substring(1) : '');
   late final _nit = TextEditingController(text: widget.actual.nit);
   late final _dir = TextEditingController(text: widget.actual.direccion);
-  late final _tel = TextEditingController(text: mostrarTelefono(widget.actual.telefono));
+  late final _tel = TelefonoCtrl(widget.actual.telefono);
   late String _logo = widget.actual.logo;
 
   Future<void> _elegirLogo() async {
@@ -109,9 +125,10 @@ class _FormNegocioState extends State<_FormNegocio> {
 
   @override
   void dispose() {
-    for (final c in [_nombre, _meta, _nit, _dir, _tel]) {
+    for (final c in [_nombre, _meta, _nit, _dir]) {
       c.dispose();
     }
+    _tel.dispose();
     super.dispose();
   }
 
@@ -125,7 +142,7 @@ class _FormNegocioState extends State<_FormNegocio> {
           meta: _meta.text.trim().isEmpty ? 0 : (parseMonto(_meta.text) ?? 0),
           nit: _nit.text.trim(),
           direccion: _dir.text.trim().replaceAll(RegExp(r'\s+'), ' '),
-          telefono: normalizarTelefono(_tel.text) ?? '',
+          telefono: _tel.valor ?? '',
           logo: _logo,
         ));
   }
@@ -202,10 +219,7 @@ class _FormNegocioState extends State<_FormNegocio> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                 ),
-                child: !kIsWeb && _logo.isNotEmpty && File(_logo).existsSync()
-                    ? Image.file(File(_logo), fit: BoxFit.contain)
-                    : Icon(Icons.image_outlined,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
+                child: VistaLogo(logo: _logo, ajuste: BoxFit.contain),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -247,15 +261,7 @@ class _FormNegocioState extends State<_FormNegocio> {
                   counterText: ''),
             ),
             const SizedBox(height: 10),
-            TextFormField(
-              controller: _tel,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                  labelText: 'WhatsApp del negocio', hintText: '300 123 4567'),
-              validator: (v) => normalizarTelefono(v ?? '') == null
-                  ? 'Celular colombiano de 10 dígitos que empiece por 3'
-                  : null,
-            ),
+            CampoTelefono(ctrl: _tel, etiqueta: 'WhatsApp del negocio'),
             const SizedBox(height: 20),
             FilledButton(onPressed: _guardar, child: const Text('Guardar')),
           ]),

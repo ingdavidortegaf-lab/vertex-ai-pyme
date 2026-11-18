@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -44,6 +45,9 @@ class DocImprimible {
 /// Logo del negocio para los PDF (null si no hay o no se puede leer).
 Future<pw.MemoryImage?> cargarLogo(String ruta) async {
   if (ruta.isEmpty) return null;
+  final guardado = bytesDeLogo(ruta);
+  if (guardado != null) return pw.MemoryImage(guardado);
+  if (kIsWeb) return null;
   try {
     final f = File(ruta);
     if (!await f.exists()) return null;

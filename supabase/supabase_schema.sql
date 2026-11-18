@@ -68,7 +68,7 @@ create table if not exists public.clientes(
   empresa_id uuid not null default privado.mi_empresa() references public.empresas(id),
   nombre text not null check (char_length(nombre) between 1 and 80),
   nombre_ts timestamptz not null,
-  telefono text not null default '' check (telefono ~ '^(57[0-9]{10})?$'),
+  telefono text not null default '' check (telefono ~ '^([0-9]{8,15})?$'),
   telefono_ts timestamptz not null,
   deleted boolean not null default false,
   deleted_ts timestamptz not null,
