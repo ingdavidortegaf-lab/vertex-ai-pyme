@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "co.vertextech.vertex_ai_pyme"
-    compileSdk = flutter.compileSdkVersion
+    // 37: lo pide flutter_local_notifications (no cambia el Android mínimo, que sigue en 12).
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
