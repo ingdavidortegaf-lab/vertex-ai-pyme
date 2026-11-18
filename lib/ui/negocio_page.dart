@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -186,7 +187,7 @@ class _FormNegocioState extends State<_FormNegocio> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                 ),
-                child: _logo.isNotEmpty && File(_logo).existsSync()
+                child: !kIsWeb && _logo.isNotEmpty && File(_logo).existsSync()
                     ? Image.file(File(_logo), fit: BoxFit.contain)
                     : Icon(Icons.image_outlined,
                         color: Theme.of(context).colorScheme.onSurfaceVariant),

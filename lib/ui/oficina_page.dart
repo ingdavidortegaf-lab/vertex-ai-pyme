@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
@@ -454,7 +455,7 @@ class _DocumentosPageState extends State<DocumentosPage> {
               Printing.layoutPdf(name: nombre, onLayout: (_) async => bytes);
             },
           ),
-          if (Platform.isWindows)
+          if (!kIsWeb && Platform.isWindows)
             ListTile(
               leading: const Icon(Icons.folder_outlined),
               title: const Text('Abrir la carpeta de documentos'),

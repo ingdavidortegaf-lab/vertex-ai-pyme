@@ -1,4 +1,4 @@
-import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -47,7 +47,11 @@ class _EscanerPageState extends State<_EscanerPage> {
   }
 
   /// La cámara solo se usa en el celular; en el PC se usa un lector USB.
-  static final _conCamara = Platform.isAndroid || Platform.isIOS;
+  // Cámara en el celular y en el navegador (iPhone con Safari); en el PC,
+  // lector USB o escribir el código.
+  static final _conCamara = kIsWeb ||
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
 
   @override
   Widget build(BuildContext context) {

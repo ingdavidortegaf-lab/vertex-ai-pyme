@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../data/local_db.dart';
 import '../domain/avisos.dart';
@@ -28,11 +28,7 @@ class Avisos {
   };
 
   bool get _soportado =>
-      Platform.isAndroid ||
-      Platform.isIOS ||
-      Platform.isWindows ||
-      Platform.isLinux ||
-      Platform.isMacOS;
+      !kIsWeb; // en la versión web no hay avisos del sistema
 
   Future<void> iniciar() async {
     if (_iniciado || !_soportado) return;

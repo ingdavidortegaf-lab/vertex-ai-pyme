@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import '../domain/formato.dart';
@@ -389,6 +390,8 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
                 (v) => _modo = _modo.copia(pedidos: v),
                 Icons.local_shipping_outlined),
           ],
+          // En la versión web (Safari) no hay avisos del sistema.
+          if (!kIsWeb)
           _interruptor(
               'Avisos en el celular',
               'Se agotó un producto, cobros vencidos, meta cumplida',
@@ -438,7 +441,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
                 borderRadius: BorderRadius.circular(14),
               ),
               clipBehavior: Clip.antiAlias,
-              child: _logo.isEmpty
+              child: _logo.isEmpty || kIsWeb
                   ? const Icon(Icons.image_outlined)
                   : Image.file(File(_logo),
                       fit: BoxFit.cover,
@@ -488,7 +491,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
         (Icons.qr_code_scanner, 'Lector de códigos de barras'),
       if (m.vendeProductos && m.pedidos)
         (Icons.local_shipping_outlined, 'Pedidos al proveedor en PDF'),
-      if (m.avisos)
+      if (m.avisos && !kIsWeb)
         (Icons.notifications_active_outlined, 'Avisos en el celular'),
       (
         Icons.insert_chart_outlined,
