@@ -931,7 +931,24 @@ class LocalDb {
     'cobro': 'CC',
     'pedido': 'PD',
     'informe': 'IN',
+    'autorizacion': 'AU', // autorización de datos de un cliente (Anexo 3)
   };
+
+  /// Autorización de tratamiento de datos de un cliente (Ley 1581): fecha,
+  /// medio (en la tienda, por WhatsApp, firmada) y versión del texto.
+  Future<void> registrarAutorizacionCliente(String clienteId, String medio) =>
+      setAjuste('aut_cli_$clienteId',
+          jsonEncode({'fecha': _ahora(), 'medio': medio, 'version': 'Anexo 3 CreaTIC 2026'}));
+
+  Future<Map<String, dynamic>?> autorizacionCliente(String clienteId) async {
+    final v = await ajuste('aut_cli_$clienteId');
+    if (v == null) return null;
+    try {
+      return jsonDecode(v) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Código corto de este dispositivo (4 caracteres) para que los números
   /// de documento no choquen entre celulares de la misma empresa.

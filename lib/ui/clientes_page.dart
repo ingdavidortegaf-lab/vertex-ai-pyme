@@ -4,6 +4,7 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import 'cliente_detalle_page.dart';
 import 'comun.dart';
+import 'legal_page.dart';
 import 'ilustraciones.dart';
 import 'tema.dart';
 
@@ -169,6 +170,9 @@ Future<String?> mostrarFormCliente(BuildContext context,
   final (nombre, tel) = r;
   final id = await LocalDb.instance
       .saveCliente(nombre, tel, id: cliente?['id'] as String?);
+  if (cliente == null) {
+    await LocalDb.instance.registrarAutorizacionCliente(id, 'en la tienda');
+  }
   SyncService.instance.sync();
   avisar(cliente == null ? 'Cliente guardado' : 'Cliente actualizado');
   return id;
@@ -188,6 +192,11 @@ class _FormClienteState extends State<_FormCliente> {
   late final _tel = TextEditingController(
       text: mostrarTelefono(widget.cliente?['telefono'] as String? ?? ''));
 
+  /// Autorización del cliente (Ley 1581): casilla SIN premarcar,
+  /// obligatoria para registrar un cliente nuevo.
+  bool _autoriza = false;
+  String? _errorAutoriza;
+
   @override
   void initState() {
     super.initState();
@@ -202,7 +211,11 @@ class _FormClienteState extends State<_FormCliente> {
   }
 
   void _guardar() {
-    if (!_form.currentState!.validate()) return;
+    final nuevo = widget.cliente == null;
+    setState(() => _errorAutoriza = nuevo && !_autoriza
+        ? 'Para registrar al cliente necesitas su autorización'
+        : null);
+    if (!_form.currentState!.validate() || _errorAutoriza != null) return;
     final nombre = _nombre.text.trim().replaceAll(RegExp(r'\s+'), ' ');
     final tel = normalizarTelefono(_tel.text) ?? '';
     Navigator.pop(context, (nombre, tel));
@@ -264,14 +277,36 @@ class _FormClienteState extends State<_FormCliente> {
               onFieldSubmitted: (_) => _guardar(),
             ),
             const SizedBox(height: 12),
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(Icons.info_outline, size: 18, color: esquema.onSurfaceVariant),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text('Pide autorización al cliente para guardar sus datos.',
-                    style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
-              ),
-            ]),
+            if (widget.cliente == null) ...[
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Checkbox(
+                    value: _autoriza,
+                    onChanged: (v) => setState(() {
+                          _autoriza = v ?? false;
+                          if (_autoriza) _errorAutoriza = null;
+                        })),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text.rich(TextSpan(style: t.bodyMedium, children: [
+                      const TextSpan(
+                          text: 'El cliente me autorizó, de manera previa, expresa e '
+                              'informada, a guardar sus datos conforme a la '),
+                      enlace(context, 'Política de Tratamiento de Datos', () => verPolitica(context)),
+                      const TextSpan(
+                          text: '. Después puedes imprimir o enviarle el formato de '
+                              'autorización desde su ficha.'),
+                    ])),
+                  ),
+                ),
+              ]),
+              if (_errorAutoriza != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(_errorAutoriza!,
+                      style: t.bodySmall?.copyWith(color: esquema.error)),
+                ),
+            ],
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _guardar,

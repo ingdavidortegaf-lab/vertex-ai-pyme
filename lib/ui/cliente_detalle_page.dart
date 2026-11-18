@@ -10,6 +10,7 @@ import '../domain/resumen.dart';
 import 'clientes_page.dart';
 import 'comun.dart';
 import 'oficina_page.dart';
+import 'legal_page.dart';
 import 'tema.dart';
 import 'ventas_page.dart';
 
@@ -228,6 +229,12 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
               label: Text(debe
                   ? 'Cuenta de cobro en PDF (desde cuándo debe)'
                   : 'Estado de cuenta en PDF (paz y salvo)'),
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () => generarAutorizacionCliente(context, widget.clienteId),
+              icon: const Icon(Icons.verified_user_outlined),
+              label: const Text('Formato de autorización de datos (Ley 1581)'),
             ),
             const TituloSeccion('Historial'),
             if (_movs.isEmpty)

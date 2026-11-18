@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'legal_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config.dart';
 import '../data/local_db.dart';
@@ -110,6 +111,14 @@ class PrivacidadPage extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('Privacidad y datos')),
         body: ListView(padding: const EdgeInsets.all(16), children: [
+          const AvisoOficial(),
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            onPressed: () => verPolitica(context),
+            icon: const Icon(Icons.gavel_outlined),
+            label: const Text('Política de Tratamiento de Datos (completa)'),
+          ),
+          const SizedBox(height: 16),
           const TextoAvisoPrivacidad(),
           const SizedBox(height: 20),
           FilledButton.tonalIcon(

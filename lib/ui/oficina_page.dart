@@ -376,6 +376,7 @@ const nombresTipoDoc = {
   'cobro': 'Cuentas de cobro',
   'pedido': 'Pedidos',
   'informe': 'Informes',
+  'autorizacion': 'Autorizaciones',
 };
 
 const _iconosTipoDoc = {
@@ -384,6 +385,7 @@ const _iconosTipoDoc = {
   'cobro': Icons.account_balance_wallet_outlined,
   'pedido': Icons.local_shipping_outlined,
   'informe': Icons.insert_chart_outlined,
+  'autorizacion': Icons.verified_user_outlined,
 };
 
 class DocumentosPage extends StatefulWidget {

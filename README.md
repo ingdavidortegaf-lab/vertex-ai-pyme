@@ -137,4 +137,4 @@ Pendiente, con el detalle en [`docs/AUDITORIA.md`](docs/AUDITORIA.md):
 
 Según las bases de CreaTIC Casanare 2026, la Gobernación de Casanare recibe una licencia de uso gratuita e indefinida, y el equipo conserva la propiedad intelectual. Ver la licencia de cada componente de terceros, todos de código abierto, en [`docs/LICENCIAS.md`](docs/LICENCIAS.md).
 
-Contacto: contacto@vertextech.online
+Contacto: contacto@vertextechco.online

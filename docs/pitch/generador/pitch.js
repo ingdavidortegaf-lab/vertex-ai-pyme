@@ -538,7 +538,7 @@ function palotes(s, x, y, color, nombre) {
     { text: 'Lo que pedimos: ', options: { bold: true, color: C.accent2 } },
     { text: '15 tiendas para el piloto y el acompañamiento de la Gobernación para llegar a todas las MiPymes del departamento.' },
   ], { x: 0.7, y: 4.5, w: 7.2, h: 1.2, fontSize: 18, color: C.background1, objectName: 'c3' });
-  texto(s, 'contacto@vertextech.online', { x: 0.7, y: 6.3, w: 6, h: 0.45, fontSize: 18, bold: true, color: C.accent5 });
+  texto(s, 'contacto@vertextechco.online', { x: 0.7, y: 6.3, w: 6, h: 0.45, fontSize: 18, bold: true, color: C.accent5 });
   telefono(s, 'comprobante', 9.45, 0.95, 5.85, 5, 'c_tel2');
   telefono(s, 'informes', 8.0, 0.7, 6.05, -4, 'c_tel1');
   animar.push({ slide: nSlide, grupos: [['c1'], ['c2'], ['c3']] });

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
 import 'ilustraciones.dart';
+import '../domain/legal.dart';
+import 'legal_page.dart';
 import 'privacidad_page.dart';
 import 'tema.dart';
 
@@ -11,7 +13,9 @@ class ConsentGate extends StatefulWidget {
   final Widget child;
   const ConsentGate({super.key, required this.child});
 
-  static const claveConsentimiento = 'consentimiento_v1';
+  /// v2: texto modelo oficial de la convocatoria (sección A). Al cambiar la
+  /// versión, la app vuelve a pedir la autorización.
+  static const claveConsentimiento = 'consentimiento_v2';
 
   /// Al revocar, la pantalla vuelve a pedir la autorización.
   static final revocado = ValueNotifier<int>(0);
@@ -48,8 +52,11 @@ class _ConsentGateState extends State<ConsentGate> {
   }
 
   Future<void> _aceptar() async {
+    // Prueba de la autorización (art. 9, Ley 1581): fecha, texto y versión.
     await LocalDb.instance.setAjuste(ConsentGate.claveConsentimiento,
         DateTime.now().toUtc().toIso8601String());
+    await LocalDb.instance.setAjuste('consentimiento_detalle',
+        '$versionAviso · casilla sin premarcar · ${DateTime.now().toUtc().toIso8601String()}');
     if (mounted) setState(() => _ok = true);
   }
 
@@ -95,7 +102,12 @@ class _ConsentGateState extends State<ConsentGate> {
         const Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
-            child: TextoAvisoPrivacidad(),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              AvisoOficial(),
+              SizedBox(height: 16),
+              Text('En palabras sencillas', style: TextStyle(fontWeight: FontWeight.w700)),
+              TextoAvisoPrivacidad(),
+            ]),
           ),
         ),
         Material(
@@ -108,13 +120,9 @@ class _ConsentGateState extends State<ConsentGate> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 20, 16),
                 child: Column(children: [
-                  CheckboxListTile(
-                    value: _check,
-                    onChanged: (v) => setState(() => _check = v ?? false),
-                    title: const Text('Leí el aviso de privacidad y autorizo el '
-                        'tratamiento de mis datos'),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
+                  CasillaAutorizacion(
+                    valor: _check,
+                    alCambiar: (v) => setState(() => _check = v),
                   ),
                   const SizedBox(height: 4),
                   Padding(
