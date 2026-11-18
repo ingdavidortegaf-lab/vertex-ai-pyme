@@ -71,6 +71,18 @@ class SyncService {
 
   bool _syncing = false;
   bool _otraVez = false;
+  bool _porTiempo = false;
+
+  /// Descarga adaptativa (para que muchas tiendas no saturen la nube): si no
+  /// llega nada nuevo de otros celulares, la siguiente consulta automática
+  /// espera el doble (30 s, 1, 2, 4… hasta 5 min). Cuando llega algo, vuelve
+  /// a 30 s. Lo que el tendero guarda se sube siempre de inmediato, y al
+  /// volver la señal o abrir la app se descarga enseguida.
+  static const pullMin = Duration(seconds: 30);
+  static const pullMax = Duration(minutes: 5);
+  Duration pullCada = pullMin;
+  DateTime _proximoPull = DateTime.fromMillisecondsSinceEpoch(0);
+  DateTime Function() reloj = DateTime.now;
   Timer? _timer;
   StreamSubscription<List<ConnectivityResult>>? _sub;
 
@@ -83,7 +95,7 @@ class SyncService {
     _sub?.cancel();
     _sub = Connectivity().onConnectivityChanged.listen((_) => sync());
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) => sync());
+    _timer = Timer.periodic(pullMin, (_) => sync(porTiempo: true));
     sync();
   }
 
@@ -99,16 +111,19 @@ class SyncService {
 
   /// Si ya hay una sincronización corriendo, se repite al terminar (así un
   /// registro guardado durante el envío no espera al siguiente ciclo).
-  Future<void> sync() async {
+  /// [porTiempo]: llamada del reloj de 30 s; solo descarga si ya toca.
+  Future<void> sync({bool porTiempo = false}) async {
     if (_syncing) {
       _otraVez = true;
       return;
     }
     _syncing = true;
     try {
+      _porTiempo = porTiempo;
       do {
         _otraVez = false;
         await _ciclo();
+        _porTiempo = false;
       } while (_otraVez);
     } finally {
       _syncing = false;
@@ -160,7 +175,13 @@ class SyncService {
         }
         await _contar();
       }
-      await _descargar(api);
+      if (!_porTiempo || !reloj().isBefore(_proximoPull)) {
+        final llegaron = await _descargar(api);
+        pullCada = llegaron > 0
+            ? pullMin
+            : Duration(seconds: (pullCada.inSeconds * 2).clamp(pullMin.inSeconds, pullMax.inSeconds));
+        _proximoPull = reloj().add(pullCada);
+      }
       await _contar();
       if (errores.value > 0) {
         estado.value = EstadoSync.conErrores;
@@ -184,12 +205,15 @@ class SyncService {
 
   static const _lote = 500;
 
-  Future<void> _descargar(RemoteApi api) async {
+  /// Devuelve cuántos registros nuevos llegaron.
+  Future<int> _descargar(RemoteApi api) async {
+    var total = 0;
     for (final tabla in const ['clientes', 'ventas', 'productos', 'inventario']) {
       var cursor = await db.ajuste('pull_$tabla');
       while (true) {
         final filas = await api.descargar(tabla, cursor, _lote);
         if (filas.isEmpty) break;
+        total += filas.length;
         switch (tabla) {
           case 'clientes':
             await db.aplicarClientesRemotos(filas);
@@ -207,5 +231,6 @@ class SyncService {
         if (filas.length < _lote) break;
       }
     }
+    return total;
   }
 }

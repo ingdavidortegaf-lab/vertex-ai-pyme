@@ -684,7 +684,7 @@ class _CierreCajaPageState extends State<CierreCajaPage> {
                   child: TextField(
                     controller: _base,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Base con la que abrió', prefixText: r'$ '),
+                    decoration: const InputDecoration(labelText: 'Base inicial', prefixText: r'$ '),
                     onChanged: (v) {
                       setState(() {});
                       LocalDb.instance.setAjuste('caja_base', (parseMonto(v) ?? 0).toStringAsFixed(0));
@@ -696,7 +696,7 @@ class _CierreCajaPageState extends State<CierreCajaPage> {
                   child: TextField(
                     controller: _contado,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Efectivo que contó', prefixText: r'$ '),
+                    decoration: const InputDecoration(labelText: 'Efectivo contado', prefixText: r'$ '),
                     onChanged: (_) => setState(() {}),
                   ),
                 ),

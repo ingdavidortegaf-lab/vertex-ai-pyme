@@ -28,6 +28,9 @@ class ServidorFalso implements RemoteApi {
     'inventario': {},
   };
   int envios = 0;
+
+  /// Consultas de descarga recibidas (para medir la carga sobre la nube).
+  int consultas = 0;
   int _reloj = 0;
 
   /// Falla con error de red al llegar a este número de envío (1 = el primero).
@@ -75,6 +78,7 @@ class ServidorFalso implements RemoteApi {
   @override
   Future<List<Map<String, dynamic>>> descargar(
       String tabla, String? desde, int limite) async {
+    consultas++;
     final filas = tablas[tabla]!
         .values
         .where((f) => desde == null || (f['recibido_at'] as String).compareTo(desde) > 0)

@@ -364,4 +364,31 @@ void main() {
     await _esperar(tester);
     await captura(tester, 'phone-cartera');
   });
+
+  testWidgets('cobro dividido', (tester) async {
+    await tam(tester, 1250);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const HomePage()));
+    });
+    await _esperar(tester);
+    await tester.tap(find.text('Venta').first);
+    await _esperar(tester);
+    await tester.enterText(find.byType(TextFormField).first, '25000');
+    await _esperar(tester);
+    await tester.tap(find.text('Dividir el pago'));
+    await _esperar(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'Valor').first, '20000');
+    await tester.enterText(find.widgetWithText(TextField, 'Valor').last, '5000');
+    await _esperar(tester);
+    await captura(tester, 'phone-cobro-dividido');
+  });
+
+  testWidgets('cierre de caja', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const CierreCajaPage()));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-cierre-caja');
+  });
 }
