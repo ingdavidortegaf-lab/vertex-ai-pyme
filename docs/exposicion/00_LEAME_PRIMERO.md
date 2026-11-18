@@ -6,7 +6,7 @@
 ---
 
 ## La app en 3 frases (apréndetelas)
-1. **Qué es:** un cuaderno de ventas, fiados, inventario y documentos para la tienda de barrio, que **funciona sin internet**.
+1. **Qué es:** un cuaderno de ventas, fiados, inventario y documentos para la tienda de barrio (y 21 tipos de negocio más), que **funciona sin internet**. También lleva lo que se le debe al proveedor, hace promociones con IA y dice a qué clientes escribirles.
 2. **Cómo está hecha:** una sola app escrita en **Dart con Flutter** (sirve para Android, Windows e iPhone). Guarda todo en una **base de datos dentro del celular**. Cuando hay internet, la copia a la nube (**Supabase**).
 3. **Lo que la hace distinta:** nada se pierde ni se duplica sin señal, cada tienda solo ve lo suyo, y genera PDF de facturas, cobros e informes para el contador.
 
@@ -71,7 +71,8 @@ En **cada carpeta** hay un archivo **`EXPLICACION.md`** que dice, en palabras se
 | Framework | **Flutter 3.50** (de Google) | Una "caja de herramientas" para hacer apps que sirven en Android, Windows e iPhone con un solo código |
 | Base de datos del celular | **SQLite** cifrada con **SQLCipher** (AES-256) | Un archivo tipo Excel dentro del celular, con candado |
 | Backend (la nube) | **Supabase**: **PostgreSQL** + Auth + Edge Functions | El servidor en internet: guarda la copia, maneja los usuarios y corre la función de IA |
-| Inteligencia artificial | **Google Gemini** (API REST), llamada desde una **Edge Function en TypeScript** | La IA da consejos con los totales del mes; nunca ve nombres |
+| Inteligencia artificial | **Google Gemini** (API REST), llamada desde una **Edge Function en TypeScript** | La IA da consejos con los totales del mes y redacta promociones con productos y precios; nunca ve nombres de personas. Sin señal, el celular redacta solo |
+| Compartir foto o video | **`share_plus`** | Manda la imagen de la promoción con su texto a WhatsApp, Facebook o Instagram |
 | PDF | Paquetes **`pdf`** y **`printing`** (Dart) | Dibujan la factura con código y la mandan a imprimir o a compartir |
 | WhatsApp | Enlaces **`wa.me`** (con `url_launcher`) | Abre WhatsApp con el mensaje ya escrito; no usa una API de pago |
 | Código de barras | **`mobile_scanner`** | Lee códigos con la cámara |

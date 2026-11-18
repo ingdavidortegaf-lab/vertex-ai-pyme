@@ -27,8 +27,9 @@
  clientes ──< ventas          (fiados, abonos)      empresas ──< miembros >── usuarios (Auth)
  productos ──< inventario     (entradas, ventas)        │
  cola_sync   (lo que falta subir)                       ├──< clientes
- documentos  (CV, CT, CC, PD, IN con su número)         ├──< ventas      (con pagos jsonb)
- cotizaciones · proveedores · ajustes                   ├──< productos
+ documentos  (CV, CT, CC, PD, IN, AU con su número)     ├──< ventas      (con pagos jsonb)
+ proveedores ──< cuentas_pagar ──< pagos_proveedor      ├──< productos
+ cotizaciones · ajustes (autorizaciones aut_cli_…)      │
  preguntas_ia                                           └──< inventario
                                                         Cada fila lleva empresa_id → RLS
 ```
@@ -41,7 +42,10 @@
 | `inventario` | Cada entrada y salida de mercancía | `cantidad` (+ entra, − sale), `motivo`, `precio_unit`, `costo_unit` |
 | `cola_sync` | Lo que falta subir a la nube | `tabla`, `payload`, `estado`, `intentos` |
 | `documentos` | Comprobantes, cotizaciones, cobros, pedidos e informes | `numero` (ej. CC-A3F1-000017), `archivo` (ruta del PDF) |
-| `ajustes` | Datos del negocio y preferencias | `clave`, `valor` |
+| `ajustes` | Datos del negocio, preferencias y **autorizaciones de clientes** (`aut_cli_<id>`, Ley 1581) | `clave`, `valor` |
+| `proveedores` | Proveedores con su WhatsApp | `nombre`, `telefono` |
+| `cuentas_pagar` | **Lo que se le debe a un proveedor** (pedido pagado en parte o fiado) | `proveedor_nombre`, `total`, `vence` |
+| `pagos_proveedor` | Cada **abono** a una cuenta, unido al gasto que generó | `cuenta_id` (llave foránea), `monto`, `egreso_id` |
 
 ### Decisiones de diseño (lo que más le gusta a un ingeniero)
 1. **Llaves primarias UUID**, creadas en el celular. Dos celulares sin señal nunca generan el mismo id, y el envío a la nube es **upsert por id**: así no se duplica nada.
@@ -55,6 +59,7 @@
    - **Entre venta y cliente no hay llave foránea, y es a propósito:** como el sistema funciona sin conexión, una venta puede llegar a la nube antes que el cliente que se creó en otro celular. Con la llave foránea, esa venta se rechazaría. La integridad la cuidan la app y los triggers.
 7. **Índices** por fecha y por empresa: las consultas de una tienda no recorren los datos de las demás.
 8. **Transacciones:** cada venta y su entrada en `cola_sync` se guardan juntas: o las dos o ninguna.
+9. **El saldo con el proveedor tampoco se guarda: se calcula** (total de la cuenta − suma de abonos), igual que la existencia. `pagos_proveedor.cuenta_id` sí tiene **llave foránea** a `cuentas_pagar`, porque las dos tablas viven solo en el celular (no hay problema de orden de llegada). Esquema local: **versión 7**.
 
 ---
 
@@ -124,7 +129,9 @@ Eso crea la base `vertex_practica` con las tablas y los datos de ejemplo. Al fin
 2. *"Cada venta queda en la tabla ventas, con su medio de pago en JSON."* → Corre la **consulta 3** (últimas ventas) y la **5** (por medio de pago).
 3. *"La existencia no se guarda: se calcula sumando movimientos."* → **Consulta 8** (inventario).
 4. *"Lo que falta subir a la nube está en la cola."* → **Consulta 12**.
-5. *"En la nube, cada tienda solo ve lo suyo y no hay duplicados."* → En Supabase, **consultas 5 y 7**.
+5. *"El tendero paga la mitad al proveedor y el resto queda fiado: el saldo también se calcula."* → **Consulta 16** (lo que debo) y **17** (abonos unidos a su gasto con un JOIN).
+6. *"Solo le escribimos a quien autorizó."* → **Consulta 18** (seguimiento con la columna `autorizo`).
+7. *"En la nube, cada tienda solo ve lo suyo y no hay duplicados."* → En Supabase, **consultas 5 y 7**.
 
 ---
 
@@ -133,7 +140,7 @@ Eso crea la base `vertex_practica` con las tablas y los datos de ejemplo. Al fin
 | Archivo | Para qué |
 |---|---|
 | `vertex_demo.db` | Base SQLite de ejemplo (Tienda Doña Marta): clientes, productos, unas 90 ventas con distintos medios de pago, fiados, abonos y documentos |
-| `1_consultas_base_local_SQLite.sql` | 15 consultas para la base local (probadas) |
+| `1_consultas_base_local_SQLite.sql` | 18 consultas para la base local (probadas), incluidas **lo que se debe a proveedores** (16 y 17) y el **seguimiento de clientes con su autorización** (18) |
 | `2_consultas_nube_PostgreSQL.sql` | 13 consultas para Supabase (probadas en el proyecto real; solo leen) |
 | `3_practica_MySQL_Workbench.sql` | Las tablas, los datos de ejemplo y las consultas en MySQL, para practicar |
 

@@ -44,4 +44,13 @@ Si el jurado usa una de estas palabras, ya sabes qué significa y cómo responde
 | **Prompt** | Las instrucciones que se le dan a la IA | Se arman en la Edge Function solo con totales |
 | **Notificación local** | Aviso que el celular se manda a sí mismo, sin servidor | "Se agotó el arroz" |
 | **Ley 1581** | Ley colombiana de protección de datos personales (Habeas Data) | Autorización, aviso de privacidad y derechos |
+| **Responsable / Encargado del tratamiento** | Quien decide qué datos se recogen y para qué (Responsable) y quien los procesa por cuenta de él (Encargado) | La tienda es Responsable de los datos de sus clientes; la Gobernación es Encargada |
+| **Anexo 3** | El formato oficial de autorización de la convocatoria, que firma o acepta cada cliente | La app lo llena, le pone número `AU-` y lo manda por WhatsApp |
+| **Casilla sin premarcar** | La casilla de autorización aparece vacía: la persona debe marcarla ella misma | Así lo exige la convocatoria (consentimiento expreso) |
+| **Minimización** | Usar solo los datos necesarios | A la IA solo van totales o productos y precios, nunca nombres de personas |
+| **CRM** | Herramienta para cuidar la relación con los clientes | «Seguimiento»: a quién escribirle hoy |
+| **Cuentas por pagar** | Lo que el negocio le debe a sus proveedores | «Lo que debo»: pago del 50 % y el resto fiado |
+| **IA generativa** | Inteligencia artificial que escribe textos nuevos | Redacta las promociones; sin señal lo hace el celular con plantillas |
+| **PWA / versión web** | Página web que se instala como app desde el navegador | La versión para iPhone con Safari |
+| **WebAssembly** | Forma de correr programas rápidos dentro del navegador | Así funciona SQLite en la versión web |
 | **OWASP** | Guía mundial de seguridad para apps | Cifrado, HTTPS, bloqueo de intentos, cierre por inactividad |

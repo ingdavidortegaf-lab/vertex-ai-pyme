@@ -1,6 +1,6 @@
 # Relacion de licencias - VERTEX AI Pyme
 
-Generado automaticamente el 2026-11-17 con `scripts/generar_licencias.ps1`
+Generado automaticamente el 2026-11-18 con `scripts/generar_licencias.ps1`
 a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 
 ## Componentes principales
@@ -16,7 +16,7 @@ a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 
 Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apache-2.0, incluidos en Flutter).
 
-## Paquetes Dart/Flutter (149)
+## Paquetes Dart/Flutter (155)
 
 | Paquete | Version | Licencia |
 |---|---|---|
@@ -41,6 +41,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | crypto | 3.0.8 | BSD-3-Clause |
 | dart_jsonwebtoken | 3.4.1 | MIT |
 | dbus | 0.7.15 | MPL-2.0 |
+| dev_build | 1.2.2+1 | BSD-2-Clause |
 | fake_async | 1.3.3 | Apache-2.0 |
 | ffi | 2.2.0 | BSD-3-Clause |
 | file | 7.0.1 | BSD-3-Clause |
@@ -51,7 +52,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | fixnum | 1.1.1 | BSD-3-Clause |
 | flutter | SDK | BSD-3-Clause |
 | flutter_lints | 5.0.0 | BSD-3-Clause |
-| flutter_local_notifications | 23.0.2 | BSD-3-Clause |
+| flutter_local_notifications | 23.0.3 | BSD-3-Clause |
 | flutter_local_notifications_linux | 9.0.0 | BSD-3-Clause |
 | flutter_local_notifications_platform_interface | 13.0.0 | BSD-3-Clause |
 | flutter_local_notifications_web | 2.0.0 | BSD-3-Clause |
@@ -117,14 +118,18 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | platform | 3.2.0 | BSD-3-Clause |
 | plugin_platform_interface | 2.1.8 | BSD-3-Clause |
 | pointycastle | 4.0.0 | MIT |
+| pool | 1.5.3 | BSD-3-Clause |
 | posix | 6.5.4 | MIT |
 | postgrest | 2.9.1 | MIT |
 | printing | 5.15.1 | Apache-2.0 |
 | process | 5.0.6 | BSD-3-Clause |
+| process_run | 1.4.4+1 | BSD-2-Clause |
 | pub_semver | 2.2.1 | BSD-3-Clause |
 | qr | 3.0.3 | BSD-3-Clause |
 | realtime_client | 2.13.2 | MIT |
 | record_use | 1.1.1 | BSD-3-Clause |
+| share_plus | 12.0.2 | BSD-3-Clause |
+| share_plus_platform_interface | 6.1.0 | BSD-3-Clause |
 | shared_preferences | 2.5.6 | BSD-3-Clause |
 | shared_preferences_android | 2.5.5 | BSD-3-Clause |
 | shared_preferences_foundation | 2.6.2 | BSD-3-Clause |
@@ -136,6 +141,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | source_span | 1.10.2 | BSD-3-Clause |
 | sqflite_common | 2.5.17 | BSD-2-Clause |
 | sqflite_common_ffi | 2.4.7 | BSD-2-Clause |
+| sqflite_common_ffi_web | 1.2.2 | BSD-2-Clause |
 | sqflite_sqlcipher | 3.4.1 | MIT |
 | sqlite3 | 3.9.1 | MIT |
 | stack_trace | 1.12.2 | BSD-3-Clause |
@@ -148,7 +154,7 @@ Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apach
 | synchronized | 3.6.1+1 | MIT |
 | term_glyph | 1.2.2 | BSD-3-Clause |
 | test_api | 0.7.14 | BSD-3-Clause |
-| timezone | 0.11.2 | BSD-3-Clause |
+| timezone | 0.11.2 | BSD-2-Clause |
 | typed_data | 1.4.0 | BSD-3-Clause |
 | url_launcher | 6.3.3 | BSD-3-Clause |
 | url_launcher_android | 6.3.35 | BSD-3-Clause |

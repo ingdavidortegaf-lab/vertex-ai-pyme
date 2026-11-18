@@ -17,6 +17,7 @@ Cada documento que la app genera recibe un **número único** y su **PDF queda g
 | Cuenta de cobro | CC | `CC-A3F1-000002` |
 | Pedido al proveedor | PD | `PD-A3F1-000007` |
 | Informe (semanal, quincenal, mensual) | IN | `IN-A3F1-000001` |
+| Autorización de datos del cliente (Anexo 3) | AU | `AU-A3F1-000003` |
 
 El número tiene tres partes: **tipo**, **código del equipo** (4 letras al azar, distinto en cada celular o PC) y **consecutivo** de 6 cifras.
 
@@ -99,6 +100,15 @@ El abono paga parte del fiado de agosto, que queda con $20.000 pendientes y 109 
 ## 4. Pedido al proveedor en PDF
 En **Pedir mercancía**, el botón de enviar arma el texto para WhatsApp **y** un PDF numerado (`PD-…`). El PDF trae el proveedor, los productos, las cantidades, el costo aproximado (el último costo registrado) y el total estimado. Queda archivado en **Documentos**.
 
+### Cuando llega el pedido: pago todo, una parte o fiado
+En la tienda de barrio es común pagarle al proveedor la mitad y sacar la otra mitad fiada. Al tocar **Llegó el pedido**:
+- se elige **Todo**, **Una parte** (botones 30 %, 50 % y 70 %, o el valor exacto) o **Todo fiado**, y la **fecha límite** del saldo (15 días por defecto);
+- **todo** entra al inventario;
+- el **gasto** del día es **solo lo pagado**, con su medio de pago (efectivo, Nequi…);
+- el **saldo** queda en **Inicio → Herramientas → Lo que debo**: total por pagar, lo ya vencido, cada proveedor con su saldo, lo abonado y cuántos días faltan.
+
+**Abonar:** se toca **Abonar**, se escribe el valor y el medio de pago. El abono queda como gasto del día (así el cierre de caja y el informe cuadran) y baja el saldo. La app avisa cuando un pago vence en 3 días o menos, y el Inicio muestra el total que se les debe a los proveedores.
+
 ---
 
 ## 5. Negocios de servicios (no solo productos)
@@ -120,7 +130,7 @@ Además de **Unidad, Kilo y Libra**, un ítem del catálogo puede ser **Servicio
 
 ### Qué hace
 La primera vez, después de aceptar el aviso de privacidad, la app **pregunta** en 5 pasos:
-1. **Nombre y tipo de negocio** (tienda, droguería, agro, restaurante, peluquería, taller, servicios profesionales…).
+1. **Nombre y tipo de negocio**: 22 tipos con su emoji (tienda de todo un poco, minimercado, panadería, frutas y verduras, carnicería, droguería, ferretería, agro, licorera, restaurante, comidas rápidas, ropa y calzado, papelería, celulares, artesanías, peluquería, taller, lavadero, transporte, hospedaje, servicios profesionales y otro).
 2. **¿Qué vendes?** Productos, servicios o las dos cosas.
 3. **¿Cómo trabajas?** ¿Fías? ¿Usas gramera? ¿Usas códigos de barras? ¿Le haces pedidos a proveedores? ¿Quieres avisos?
 4. **Datos para los documentos:** NIT o cédula, dirección, WhatsApp, meta del mes y logo.
@@ -159,6 +169,7 @@ La app es **primero sin internet**: se usa sin cuenta y el registro del negocio 
 | **Se agotó X** (o "Se agotaron N productos") | Cuando un producto llega a 0, después de una venta, un ajuste o algo que llegó de otro celular |
 | **Se está acabando X** | Cuando baja al mínimo que pusiste |
 | **N clientes deben hace más de 30 días** | Una vez al día (desde las 8 a. m.), con el total vencido |
+| **Tienes N pagos a proveedores por vencer** | Una vez al día (desde las 8 a. m.), si un saldo vence en 3 días o menos o ya venció |
 | **¡Cumpliste la meta del mes!** | Una vez por mes, al pasar la meta |
 | **Hay datos que no se pudieron subir** | Si aparece un error de sincronización nuevo |
 
@@ -174,12 +185,13 @@ La app es **primero sin internet**: se usa sin cuenta y el registro del negocio 
 ---
 
 ## 8. Pruebas que lo respaldan
-`flutter test` corre **88 pruebas**, todas en verde. Las nuevas son:
+`flutter test` corre **106 pruebas**, todas en verde. Las de este documento son:
 - `test/contabilidad_test.dart`: FIFO de abonos, días de mora, rangos de antigüedad, periodos (semana, quincena y mes) y numeración única con reimpresión.
 - `test/informes_test.dart`: gastos por concepto, variación frente al periodo anterior, y el informe y la cuenta de cobro generados en PDF con datos reales.
 - `test/avisos_test.dart`: avisos que no se repiten, meta del mes, cartera una vez al día, servicios sin inventario y el modo del negocio.
+- `test/proveedores_test.dart`: pedido pagado a medias o todo fiado, abonos hasta saldar y aviso de pagos por vencer.
 
-**Probado en este PC:** el análisis de código sin errores, las 88 pruebas, el PDF del informe y de la cuenta de cobro revisados a ojo, las capturas de las pantallas nuevas, el APK compilado, y la app de Windows abierta con su base actualizada a la versión 5.
+**Probado en este PC (17 nov.):** el análisis de código sin errores, las pruebas de entonces, el PDF del informe y de la cuenta de cobro revisados a ojo, las capturas de las pantallas nuevas, el APK compilado, y la app de Windows abierta con su base actualizada a la versión 5.
 **Falta probar en el celular real:** los avisos (permiso y sonido), los PDF compartidos por WhatsApp y el registro guiado tocado con el dedo.
 
 ## 9. Archivos nuevos
@@ -194,3 +206,4 @@ La app es **primero sin internet**: se usa sin cuenta y el registro del negocio 
 | `lib/ui/oficina_page.dart` | Pantallas de Informes, Cartera y Documentos emitidos |
 | `lib/ui/registro_negocio_page.dart` | Registro guiado en 5 pasos |
 | `lib/ui/notificaciones.dart` | Avisos en el celular |
+| `lib/ui/oficina_page.dart` → `CuentasPagarPage` | «Lo que debo» a proveedores (18 nov.) |

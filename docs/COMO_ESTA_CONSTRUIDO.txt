@@ -154,7 +154,8 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                           quincena 1-15 / 16-fin, mes) con su periodo
                           anterior; gastos por concepto; variacion en %.
   avisos.dart             REGLAS DE LOS AVISOS: que avisar (agotado, por
-                          acabarse, cartera vencida, meta, errores) y como
+                          acabarse, cartera vencida, pagos a proveedores
+                          por vencer, meta, errores) y como
                           no repetir un aviso (memoria de lo ya avisado).
   pagos.dart              MEDIOS DE PAGO: efectivo, Nequi, Daviplata,
                           Bancolombia, transferencia (Bre-B), tarjetas;
@@ -162,7 +163,20 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                           totales por medio y cuadre del efectivo.
   modo_negocio.dart       COMO TRABAJA EL NEGOCIO (respuestas del registro
                           guiado): productos/servicios/ambos, fia, gramera,
-                          codigos, pedidos, avisos. Sugerencias por tipo.
+                          codigos, pedidos, avisos. 22 tipos de negocio con
+                          su emoji y sugerencia.
+  legal.dart              TEXTOS OFICIALES LEY 1581: aviso (Seccion A),
+                          casilla con enlace, politica completa (8 puntos) y
+                          formato Anexo 3 de autorizacion del cliente.
+  promocion.dart          REDACTOR DE PROMOCIONES sin internet: 5 estilos,
+                          ocasion segun la fecha (quincena, fin de semana,
+                          viernes negro, Navidad...), descuento real, combo,
+                          etiquetas del municipio. Arma lo unico que viaja
+                          a la IA: productos, precios, estilo y ocasion.
+  seguimiento.dart        SEGUIMIENTO DE CLIENTES (CRM): grupos hace rato no
+                          vienen (21-90 dias), mejores (20 % que mas compra),
+                          nuevos (14 dias) y perdidos (+90 dias); mensaje
+                          sugerido; solo a quien autorizo y cada 7 dias.
 
   --- lib/data/  DATOS Y SINCRONIZACION ---
 
@@ -176,6 +190,13 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                           transaccion) y el modo del negocio. Tambien: reportes por
                           periodo, serie por dia, mas vendidos, recibir
                           pedidos, cotizaciones, aplicar cambios de la nube.
+                          Version 6: medios de pago. Version 7: cuentas por
+                          pagar a proveedores (cuentas_pagar, pagos_proveedor),
+                          pedido pagado en parte, abonos. Tambien: resumen de
+                          clientes para el seguimiento y autorizaciones.
+  abrir_base.dart         Abre la base segun el equipo: SQLCipher en el
+                          celular, SQLite en Windows, SQLite WebAssembly en
+                          el navegador (version web para iPhone).
   sync_service.dart (195) El MOTOR DE SINCRONIZACION: cada 30 s, al cambiar
                           la red o al guardar, envia la cola en orden, marca
                           lo enviado, reintenta con espera creciente, aparta
@@ -186,13 +207,15 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                           Traduce errores (sesion vencida, rechazo, red).
   asistente_service.dart (119)  Decide si responde el asistente local o la
                           IA del servidor; deja en cola las preguntas sin
-                          senal; arma lo unico que viaja a la IA (totales).
+                          senal; arma lo unico que viaja a la IA (totales,
+                          o productos y precios para las promociones).
 
   --- lib/ui/  PANTALLAS ---
 
   tema.dart (414)          Colores "pizarra del mercado", letras, botones,
                            avatares de clientes, titulos y estados vacios.
-  ilustraciones.dart (337) Dibujos hechos en codigo: logo, palotes de tiza,
+  ilustraciones.dart (337) Dibujos hechos en codigo: logo (vertice de dos
+                           caras con la chispa de la IA, brillo animado), palotes de tiza,
                            pizarra, nube, escudo (sin imagenes externas).
   graficas.dart (342)      Graficas dibujadas en codigo: barras de ventas y
                            gastos, contado vs fiado, ranking de productos.
@@ -210,9 +233,19 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                            por WhatsApp, historial.
   inventario_page.dart (527)  Productos, stock, por reponer, llego
                            mercancia, conteo, formulario (codigo y unidad).
-  herramientas_page.dart (1070)  Comprobantes, cotizaciones, pedir
-                           mercancia (proveedores) y promociones; vista
-                           previa con WhatsApp, Imprimir y PDF.
+  herramientas_page.dart   Comprobantes, cotizaciones y pedir mercancia;
+                           al llegar el pedido: pague todo, una parte
+                           (30/50/70 %) o todo fiado, con fecha limite;
+                           vista previa con WhatsApp, Imprimir y PDF.
+  promocion_page.dart      PROMOCIONES: productos y precio de oferta, foto o
+                           video (camara o galeria), estilos, "Redactar con
+                           IA", imagen 1080x1080 para el estado (logo y
+                           precios) y compartir con share_plus.
+  seguimiento_page.dart    SEGUIMIENTO: grupos de clientes y mensaje de
+                           WhatsApp sugerido; "Pedir autorizacion" si falta.
+  legal_page.dart          Aviso oficial, casilla con enlace visible,
+                           politica sin internet, enlace a casanare.gov.co,
+                           Anexo 3 en PDF (numero AU-) y registro de AUTORIZO.
   --- lib/pdf/  PDF Y DOCUMENTOS ---
 
   pdf_factura.dart (174)   Genera el comprobante/cotizacion/pedido en PDF
@@ -224,7 +257,9 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                            con los datos de la base del celular.
   archivo.dart             Guarda el PDF de cada documento en la carpeta
                            VERTEX_documentos y lo vuelve a abrir.
-  oficina_page.dart        Pantallas Informes, Cartera y Documentos.
+  oficina_page.dart        Pantallas Informes, Cartera, Documentos, Cierre de
+                           caja y "Lo que debo" (cuentas por pagar con
+                           vencimientos, abonos y WhatsApp al proveedor).
   registro_negocio_page.dart  Registro guiado en 5 pasos; la app se adapta.
   notificaciones.dart      Avisos en el celular (notificaciones locales).
   escaner.dart (118)       Pantalla de camara para leer codigos de barras
@@ -234,7 +269,8 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                            direccion, WhatsApp y logo.
   login_page.dart (505)    Cuenta: entrar, crear cuenta (clave robusta),
                            bloqueo tras 5 intentos, perfil, cerrar sesion.
-  consent_gate.dart (128)  Pide la autorizacion de datos al primer uso.
+  consent_gate.dart (128)  Pide la autorizacion de datos al primer uso con
+                           la casilla SIN premarcar (version 2 del aviso).
   privacidad_page.dart (128)  Aviso de privacidad, derechos, revocar y
                            borrar datos del celular.
   inactividad.dart (62)    Cierra la sesion tras 30 minutos sin uso.
@@ -384,6 +420,26 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 
   Explicacion completa: docs/CONTABILIDAD_DOCUMENTOS_Y_ADAPTACION.md
 
+4.15 PROVEEDORES: PAGO PARCIAL Y CUENTAS POR PAGAR
+  recibirPedido suma TODO al inventario. Si se pago una parte, el gasto
+  (egreso, con su medio de pago) es solo lo pagado y el saldo va a
+  cuentas_pagar con su vencimiento (15 dias por defecto). pagarProveedor
+  registra el abono en pagos_proveedor y un gasto "Abono a <proveedor>".
+  El saldo = total - suma de abonos. Aviso cuando vence en 3 dias o menos.
+
+4.16 PROMOCIONES CON IA
+  Sin senal: redactarPromocion arma gancho + descuento + lista + llamado a
+  la accion + etiquetas (#Tienda #Yopal #Casanare). Con senal y sesion: la
+  Edge Function (modo "promocion") pide el texto a Gemini con productos y
+  precios. La imagen del estado es un widget (CartelPromo) capturado a PNG
+  con RepaintBoundary.toImage y compartido con share_plus.
+
+4.17 SEGUIMIENTO DE CLIENTES
+  resumenClientes: por cliente, compras, total, primera y ultima compra,
+  saldo, si autorizo (ajuste aut_cli_<id>) y ultimo contacto. agruparClientes
+  los reparte en grupos; puedeEscribir exige autorizacion, celular y 7 dias
+  desde el ultimo mensaje.
+
 
 -------------------------------------------------------------------------------
 5. SEGURIDAD Y DATOS PERSONALES (bases 4.4 y 4.5)
@@ -398,8 +454,12 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
     sin sesion no se lee nada.
   - Secretos fuera del codigo: --dart-define y secretos de Supabase.
   - La IA nunca recibe nombres, celulares ni correos.
-  - Ley 1581: autorizacion al primer uso, aviso visible, derechos, revocar
-    y borrar. MiPyme = responsable; Gobernacion = encargada.
+  - Ley 1581: formatos oficiales de la convocatoria. Aviso (Seccion A),
+    casilla SIN premarcar con enlace visible a la politica (se abre sin
+    internet), enlace a www.casanare.gov.co, Anexo 3 para cada cliente
+    (PDF o WhatsApp "AUTORIZO", guardado con fecha y medio). Derechos,
+    revocar y borrar. MiPyme = responsable; Gobernacion = encargada.
+  - Mensajes comerciales de seguimiento solo a clientes que autorizaron.
 
 
 -------------------------------------------------------------------------------
@@ -454,7 +514,12 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   servicios, registro guiado y avisos: probados con pruebas automaticas,
   PDF revisados y capturas en PC. Falta probarlos en el celular (permiso y
   sonido de los avisos, compartir PDF por WhatsApp).
-  Pendiente: respuesta real de la IA (falta la clave de Gemini), version
-  para iPhone (requiere Mac), cifrado de la base en Windows, factura
+  Bloque del 18 nov.: proveedores 50/50, promociones con foto/video e IA,
+  seguimiento de clientes, 22 tipos de negocio, logo nuevo y formatos
+  oficiales de la Ley 1581: 106 pruebas, capturas en PC, version web
+  publicada y probada en el navegador, Windows abre y migro la base a la
+  version 7. Falta probarlo en el celular y en un iPhone real.
+  Pendiente: respuesta real de la IA (la funcion esta desplegada, version 2;
+  falta el secreto GEMINI_API_KEY), version nativa para iPhone (requiere Mac), cifrado de la base en Windows, factura
   electronica DIAN (requiere proveedor autorizado), roles vendedor/admin.
 ===============================================================================

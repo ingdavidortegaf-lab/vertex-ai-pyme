@@ -16,6 +16,7 @@ Cada venta, abono o gasto guarda **cómo se pagó**:
 - **Pago dividido:** un cliente puede pagar **una parte por Nequi y otra en efectivo**, o con tres medios. La app avisa *"Faltan $X"* o *"Sobran $X"* hasta que la suma cuadre con el total, y el botón *"Poner lo que falta"* llena el último valor solo.
 - La **venta fiada no lleva medio de pago**: queda por cobrar. Cuando el cliente abona, el abono sí dice cómo pagó.
 - También se pregunta el medio al **vender una cotización** y al **pagarle un pedido al proveedor**.
+- **Pago parcial al proveedor:** al llegar el pedido se elige si se pagó **todo**, **una parte** (30, 50 o 70 %) o **todo fiado**. El gasto es solo lo pagado, con su medio; el saldo queda en **Lo que debo** con fecha límite, y cada abono pregunta otra vez el medio (efectivo, Nequi…). Así el cierre de caja cuadra aunque se le pague al proveedor por partes.
 
 ### Dónde se ve
 - **Caja:** cada movimiento muestra su medio ("Venta · Nequi + Efectivo").

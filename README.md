@@ -2,7 +2,7 @@
 
 **El cuaderno de la tienda, ahora en el celular. Funciona sin señal.**
 
-App para las MiPymes de Casanare (tiendas de barrio y de pueblo, agro, droguerías, ferreterías y negocios de servicios), presentada en **CreaTIC Casanare 2026** por el equipo **VERTEX TECH**.
+App para las MiPymes de Casanare: tiendas de barrio y de pueblo y **22 tipos de negocio** (panadería, frutas, carnicería, droguería, ferretería, agro, ropa, celulares, restaurante, peluquería, taller, transporte, hospedaje y más), presentada en **CreaTIC Casanare 2026** por el equipo **VERTEX TECH**.
 
 **Pruébala ya (iPhone, Android o PC, en el navegador):** https://ingdavidortegaf-lab.github.io/vertex-ai-pyme/. Para instalarla en iPhone o Android, ver [docs/INSTALAR_EN_IPHONE_Y_ANDROID.md](docs/INSTALAR_EN_IPHONE_Y_ANDROID.md).
 
@@ -17,12 +17,15 @@ Lleva ventas, fiados, inventario, cobros, documentos e informes para el contador
 | **Caja** | Ventas de contado y fiadas, gastos y abonos; venta con productos, **código de barras** (cámara o lector USB) y **gramera** (kilos y libras) |
 | **Medios de pago** | Efectivo, Nequi, Daviplata, Bancolombia, Bre-B y tarjetas; **pago dividido** (parte Nequi, parte efectivo); **cierre de caja** con cuadre del efectivo |
 | **Clientes y cartera** | Saldo de cada cliente, **cuenta de cobro en PDF** con días de mora y antigüedad (0-30, 31-60, 61-90, +90) y cobro por WhatsApp |
+| **Seguimiento (CRM)** | Clientes que hace rato no vienen, mejores clientes, nuevos y perdidos, con mensaje de WhatsApp sugerido; solo a quien autorizó (Ley 1581) |
+| **Proveedores** | Pedido pagado **todo, en parte (30/50/70 %) o fiado**; **Lo que debo** con vencimientos, abonos por medio de pago y aviso 3 días antes |
+| **Promociones** | **Foto o video**, **imagen lista para el estado** (logo y precios) y **texto redactado con IA**: 5 estilos y temporada (quincena, viernes negro, Navidad); funciona sin señal |
 | **Inventario y servicios** | Existencias calculadas a partir de los movimientos, productos por reponer, pedido sugerido al proveedor y **servicios sin inventario** |
-| **Documentos** | Comprobantes, cotizaciones, cuentas de cobro, pedidos e informes en **PDF con logo y número único** (`CV-`, `CT-`, `CC-`, `PD-`, `IN-`), archivados en el equipo |
+| **Documentos** | Comprobantes, cotizaciones, cuentas de cobro, pedidos e informes en **PDF con logo y número único** (`CV-`, `CT-`, `CC-`, `PD-`, `IN-`, `AU-` para autorizaciones), archivados en el equipo |
 | **Informes para el contador** | Semanal, quincenal y mensual: estado de resultados, flujo de caja, gastos por concepto, cartera, inventario y libro de movimientos |
 | **A la medida del negocio** | Registro guiado al empezar; la app se adapta (productos, servicios, fiado, gramera, códigos de barras, pedidos) |
-| **Avisos** | Notificaciones en el celular: producto agotado o por acabarse, cobros vencidos, meta cumplida |
-| **Asistente** | Responde sin señal con los datos del celular; con señal, la IA (Gemini) da consejos usando solo totales, nunca nombres |
+| **Avisos** | Notificaciones en el celular: producto agotado o por acabarse, cobros vencidos, pagos a proveedores por vencer, meta cumplida |
+| **Asistente** | Responde sin señal con los datos del celular; con señal, la IA (Gemini) da consejos y redacta promociones usando solo totales o productos y precios, nunca nombres de personas |
 
 > No es factura electrónica DIAN, y cada documento lo dice. Los datos quedan estructurados para conectarse con un proveedor tecnológico autorizado.
 
@@ -61,7 +64,7 @@ flowchart TB
 | Carpeta | Qué contiene |
 |---|---|
 | `lib/ui/` | Pantallas |
-| `lib/domain/` | Reglas del negocio (lógica pura): cuenta de cobro FIFO, conflictos, códigos de barras, avisos |
+| `lib/domain/` | Reglas del negocio (lógica pura): cuenta de cobro FIFO, conflictos, códigos de barras, avisos, pagos, textos legales, promociones y seguimiento de clientes |
 | `lib/data/` | Base local cifrada, cola y sincronización, conexión con Supabase |
 | `lib/pdf/` | Generación y archivo de PDF, informes contables |
 | `supabase/` | `supabase_schema.sql` (tablas, RLS, triggers) y `functions/asistente` (IA) |
@@ -118,19 +121,21 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 - Bloqueo tras 5 intentos fallidos y cierre de sesión a los 30 minutos sin uso.
 - RLS en PostgreSQL: cada empresa ve solo sus datos.
 - Claves fuera del código.
-- **Ley 1581 de 2012:** autorización al primer uso, aviso de privacidad y canal de derechos. La MiPyme es responsable de los datos; la Gobernación de Casanare es encargada. Ver [`docs/POLITICA_TRATAMIENTO_DATOS.md`](docs/POLITICA_TRATAMIENTO_DATOS.md).
+- **Ley 1581 de 2012:** formatos oficiales de la convocatoria: aviso de privacidad, casilla **sin premarcar** con **enlace visible** a la política (se abre sin internet), enlace a www.casanare.gov.co y **Anexo 3** de autorización para cada cliente, en PDF o por WhatsApp. Ver [`docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md`](docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md). La MiPyme es responsable de los datos; la Gobernación de Casanare es encargada. Ver [`docs/POLITICA_TRATAMIENTO_DATOS.md`](docs/POLITICA_TRATAMIENTO_DATOS.md).
 
 ## Estado y pendientes
 Probado:
 - 106 pruebas automáticas;
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
-- versión de Windows compilada y ejecutada.
+- versión de Windows compilada y ejecutada;
+- versión web publicada y probada en el navegador del computador.
 
 Pendiente, con el detalle en [`docs/AUDITORIA.md`](docs/AUDITORIA.md):
 - factura electrónica DIAN con un proveedor autorizado;
 - cifrado de la base en Windows;
 - roles de vendedor y administrador;
-- versión de iPhone.
+- probar la versión web en un iPhone real;
+- activar la IA en la nube (secreto `GEMINI_API_KEY` en Supabase).
 
 ## Propiedad intelectual y licencias
 © 2026 Equipo VERTEX TECH (José David, Carlos Andrés y Ángel Elías Ortega Fuentes). **Todos los derechos reservados.**

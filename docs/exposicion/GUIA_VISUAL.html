@@ -81,6 +81,7 @@
   <a href="#venta">Una venta sin señal</a>
   <a href="#backend">El backend</a>
   <a href="#pdf">Cómo nace un PDF</a>
+  <a href="#nuevo">Lo nuevo</a>
   <a href="#carpetas">Las carpetas</a>
   <a href="#preguntas">Preguntas del jurado</a>
 </div></nav>
@@ -92,7 +93,7 @@
   <p class="bajada">Tres frases que tienes que saber de memoria.</p>
   <div class="tarjetas">
     <div class="t"><span class="eti" style="background:var(--verde-c);color:var(--verde)">Qué es</span>
-      <b>El cuaderno de la tienda, en el celular</b><small>Ventas, fiados, inventario, cobros e informes para el contador.</small></div>
+      <b>El cuaderno de la tienda, en el celular</b><small>Ventas, fiados, inventario, cobros, proveedores, promociones e informes para el contador. Sirve para 22 tipos de negocio.</small></div>
     <div class="t"><span class="eti" style="background:var(--azul-c);color:var(--azul)">Cómo está hecha</span>
       <b>Flutter + Dart, con Supabase</b><small>Un solo código para Android, Windows e iPhone; backend en la nube.</small></div>
     <div class="t"><span class="eti" style="background:var(--ambar-c);color:var(--ambar)">Por qué es distinta</span>
@@ -109,7 +110,9 @@
     <tr><td>Framework</td><td><b>Flutter 3.50</b> (Google)</td><td>Caja de herramientas: un código, varias plataformas</td></tr>
     <tr><td>Base del celular</td><td><b>SQLite</b> + <b>SQLCipher</b> (AES-256)</td><td>Un "Excel" dentro del celular, con candado</td></tr>
     <tr><td>Backend</td><td><b>Supabase</b>: PostgreSQL 17, Auth, Edge Functions</td><td>El servidor en internet</td></tr>
-    <tr><td>Función de IA</td><td><b>TypeScript</b> (Deno) → API de <b>Google Gemini</b></td><td>Consejos con totales; nunca ve nombres</td></tr>
+    <tr><td>Función de IA</td><td><b>TypeScript</b> (Deno) → API de <b>Google Gemini</b></td><td>Consejos con totales y promociones con productos y precios; nunca ve nombres de personas</td></tr>
+    <tr><td>Fotos y videos</td><td><b>image_picker</b> y <b>share_plus</b></td><td>Toma la foto de la oferta y la comparte con su texto</td></tr>
+    <tr><td>Versión web (iPhone)</td><td><b>SQLite en WebAssembly</b>, publicada en GitHub Pages</td><td>La misma app en el navegador, con su base local</td></tr>
     <tr><td>Base de la nube</td><td><b>SQL</b> (PostgreSQL)</td><td>Tablas, seguridad por fila y reglas automáticas</td></tr>
     <tr><td>PDF</td><td>Paquetes <b>pdf</b> y <b>printing</b></td><td>Se dibujan en el celular, sin internet</td></tr>
     <tr><td>WhatsApp</td><td>Enlaces <b>wa.me</b></td><td>Abre WhatsApp con el mensaje listo, sin API de pago</td></tr>
@@ -288,13 +291,29 @@
     <tr><th>Prefijo</th><th>Documento</th><th>Prefijo</th><th>Documento</th></tr>
     <tr><td><code>CV</code></td><td>Comprobante de venta</td><td><code>PD</code></td><td>Pedido al proveedor</td></tr>
     <tr><td><code>CT</code></td><td>Cotización</td><td><code>IN</code></td><td>Informe semanal, quincenal o mensual</td></tr>
-    <tr><td><code>CC</code></td><td>Cuenta de cobro</td><td></td><td></td></tr>
+    <tr><td><code>CC</code></td><td>Cuenta de cobro</td><td><code>AU</code></td><td>Autorización de datos del cliente (Anexo 3)</td></tr>
   </table>
   <div class="frase">"Los PDF se dibujan en el mismo celular con el paquete pdf de Dart: llevan logo, número único y la aclaración de que no es factura electrónica DIAN. Se imprimen en tirilla de 80 mm o carta, o se comparten por WhatsApp, y quedan archivados para el contador."</div>
 </section>
 
+<section id="nuevo">
+  <h2><span class="n">7</span>Lo nuevo (18 de noviembre)</h2>
+  <p class="bajada">Cuatro mejoras pensadas en cómo trabaja de verdad la tienda de barrio.</p>
+  <div class="tarjetas">
+    <div class="t"><span class="eti" style="background:var(--ambar-c);color:var(--ambar)">Proveedores</span>
+      <b>Pago la mitad, el resto fiado</b><small>Al llegar el pedido: todo, una parte (30/50/70 %) o fiado. «Lo que debo» muestra saldos, vencimientos y abonos, y avisa 3 días antes.</small></div>
+    <div class="t"><span class="eti" style="background:var(--verde-c);color:var(--verde)">Promociones</span>
+      <b>Foto, video e IA</b><small>La IA redacta el anuncio (5 estilos y la temporada) y la app arma la imagen para el estado con logo y precios. Sin señal, redacta el celular.</small></div>
+    <div class="t"><span class="eti" style="background:var(--azul-c);color:var(--azul)">Seguimiento</span>
+      <b>A quién escribirle hoy</b><small>Clientes que hace rato no vienen, mejores, nuevos y perdidos, con el mensaje de WhatsApp listo. Solo a quien autorizó.</small></div>
+    <div class="t"><span class="eti" style="background:var(--verde-c);color:var(--verde)">Jurídico</span>
+      <b>Formatos oficiales</b><small>Casilla sin marcar con enlace visible a la política (sin internet), enlace a www.casanare.gov.co y Anexo 3 para cada cliente.</small></div>
+  </div>
+  <div class="frase">"El tendero le paga la mitad al proveedor y la otra mitad la saca fiada: la app lleva las dos cuentas, lo que le deben y lo que debe. Y para vender más, la IA le escribe la promoción y le dice a qué clientes escribirles, siempre con su autorización."</div>
+</section>
+
 <section id="carpetas">
-  <h2><span class="n">7</span>Para qué sirve cada carpeta</h2>
+  <h2><span class="n">8</span>Para qué sirve cada carpeta</h2>
   <p class="bajada">En cada una hay un archivo EXPLICACION.md con qué decir y qué pedazo de código mostrar.</p>
   <table>
     <tr><th>Carpeta</th><th>Qué hay</th><th>Responde a…</th></tr>
@@ -306,13 +325,14 @@
     <tr><td><code>6_pruebas</code></td><td>106 pruebas automáticas</td><td>"¿Cómo sabes que funciona?"</td></tr>
     <tr><td><code>7_configuracion</code></td><td>Paquetes, Android y Windows</td><td>"¿Qué librerías y cómo compilas?"</td></tr>
     <tr><td><code>8_seguridad</code></td><td>Mapa de protecciones y Ley 1581</td><td>"¿Es segura?"</td></tr>
-    <tr><td><code>9_documentos_convocatoria</code></td><td>Manual, licencias, política de datos</td><td>Lo que pide la convocatoria</td></tr>
+    <tr><td><code>9_documentos_convocatoria</code></td><td>Manual, licencias, política de datos, análisis de tendencias</td><td>Lo que pide la convocatoria</td></tr>
+    <tr><td><code>10_base_de_datos</code></td><td>Base de ejemplo y consultas SQL</td><td>"Muéstreme la base de datos"</td></tr>
   </table>
 </section>
 
 <section id="preguntas">
-  <h2><span class="n">8</span>Preguntas rápidas del jurado</h2>
-  <p class="bajada">Toca cada pregunta para ver la respuesta corta. La lista completa (33) está en PREGUNTAS_DEL_JURADO.md.</p>
+  <h2><span class="n">9</span>Preguntas rápidas del jurado</h2>
+  <p class="bajada">Toca cada pregunta para ver la respuesta corta. La lista completa (39) está en PREGUNTAS_DEL_JURADO.md.</p>
   <details><summary>¿En qué lenguaje la hiciste?</summary><p>En Dart con Flutter. TypeScript para la función de IA en el servidor y SQL para la base de datos de la nube.</p></details>
   <details><summary>¿Qué arquitectura usaste?</summary><p>En capas y offline-first: pantallas, reglas del negocio, datos locales con cola de sincronización y nube. Las pantallas nunca hablan con internet.</p></details>
   <details><summary>¿Qué backend tiene?</summary><p>Supabase: PostgreSQL 17 con seguridad por fila (RLS) por empresa, Auth para usuarios y una Edge Function en TypeScript para la IA.</p></details>
@@ -324,6 +344,9 @@
   <details><summary>¿Cómo resuelves conflictos entre celulares?</summary><p>Gana el cambio más reciente de cada campo (Last-Write-Wins por campo). Ventas e inventario solo se agregan, así que no tienen conflicto.</p></details>
   <details><summary>¿Cómo proteges los datos?</summary><p>Base cifrada AES-256, solo HTTPS, claves con hash, bloqueo tras 5 intentos, cierre a los 30 minutos, RLS por empresa y la IA sin datos personales (Ley 1581).</p></details>
   <details><summary>¿Cómo la probaste?</summary><p>106 pruebas automáticas (reglas, base de datos, sincronización con servidor simulado, caída de red, PDF) y prueba real en un Xiaomi 14T en modo avión.</p></details>
+  <details><summary>¿Cómo maneja lo que se le debe al proveedor?</summary><p>Al recibir el pedido se elige cuánto se pagó. Todo entra al inventario, el gasto es solo lo pagado y el saldo queda en «Lo que debo» con su fecha. Cada abono queda como gasto con su medio de pago.</p></details>
+  <details><summary>¿Qué hace la IA en las promociones?</summary><p>Redacta el anuncio con los productos, precios, estilo y ocasión. No recibe datos de personas. Sin señal, el celular lo redacta con plantillas de mercadeo.</p></details>
+  <details><summary>¿Dónde está el enlace a la política?</summary><p>En la casilla de autorización (sin marcar): «Política de Tratamiento de Datos Personales» va subrayado y abre la política completa sin internet.</p></details>
   <details><summary>¿Es factura electrónica?</summary><p>No, y cada PDF lo dice. La app ya guarda los datos estructurados para conectarse después con un proveedor autorizado por la DIAN.</p></details>
 </section>
 

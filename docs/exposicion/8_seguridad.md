@@ -24,12 +24,15 @@ La seguridad va en **tres lugares**: en el **celular** (base con candado, bloque
 
 | Exigencia | Dónde está |
 |---|---|
-| **Autorización** antes de usar la app | `1_pantallas/consent_gate.dart` |
+| **Aviso oficial** de la convocatoria y **casilla sin premarcar** antes de usar la app | `1_pantallas/consent_gate.dart` y `2_reglas_del_negocio/legal.dart` |
+| **Enlace visible** a la política, que se abre **sin internet**, y enlace a www.casanare.gov.co | `1_pantallas/legal_page.dart` → `CasillaAutorizacion` y `PoliticaPage` |
+| **Anexo 3**: autorización de cada cliente (PDF o WhatsApp «AUTORIZO»), guardada con fecha y medio | `1_pantallas/legal_page.dart` → `generarAutorizacionCliente` |
+| Mensajes comerciales **solo a quien autorizó** | `1_pantallas/seguimiento_page.dart` y `2_reglas_del_negocio/seguimiento.dart` → `puedeEscribir` |
 | **Aviso de privacidad**, derechos, revocar y borrar | `1_pantallas/privacidad_page.dart` |
 | MiPyme **responsable**, Gobernación **encargada** | `9_documentos_convocatoria/POLITICA_TRATAMIENTO_DATOS.md` |
 
 ## Frase para exponer
-*"Seguimos OWASP Mobile: cifrado en el celular, HTTPS, bloqueo de intentos, cierre por inactividad, aislamiento por empresa en el servidor y claves fuera del código. Y cumplimos la Ley 1581: autorización, aviso, derechos y minimización con la IA."*
+*"Seguimos OWASP Mobile: cifrado en el celular, HTTPS, bloqueo de intentos, cierre por inactividad, aislamiento por empresa en el servidor y claves fuera del código. Y cumplimos la Ley 1581 con los formatos oficiales de la convocatoria: casilla sin marcar con enlace a la política, Anexo 3 para cada cliente, derechos y minimización con la IA."*
 
 ## Lo que todavía falta (dilo con honestidad si preguntan)
 - La base del **PC (Windows)** no va cifrada todavía; la del celular sí.

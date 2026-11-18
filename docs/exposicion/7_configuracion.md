@@ -22,18 +22,21 @@ Aquí están los archivos que dicen **qué paquetes usa la app**, **qué permiso
 |---|---|
 | `sqflite_sqlcipher` | Base de datos del celular **cifrada** |
 | `sqflite_common_ffi` | Base de datos en **Windows** |
+| `sqflite_common_ffi_web` | Base de datos en el **navegador** (SQLite en WebAssembly), para la versión web en iPhone |
 | `flutter_secure_storage` | Guardar la clave del cifrado en el almacén seguro del celular |
 | `supabase_flutter` | Conexión con el backend (base, usuarios, funciones) |
 | `connectivity_plus` | Saber cuándo vuelve el internet |
 | `uuid` | Crear los números únicos de cada registro |
 | `pdf` y `printing` | Crear, imprimir y compartir PDF |
 | `mobile_scanner` | Leer códigos de barras con la cámara |
-| `image_picker` | Elegir el logo de la galería |
+| `image_picker` | Elegir el logo, y la **foto o el video** de una promoción (cámara o galería) |
+| `share_plus` | **Compartir** la imagen o el video de la promoción con su texto (WhatsApp, Facebook, Instagram) |
 | `url_launcher` | Abrir WhatsApp con el mensaje |
 | `flutter_local_notifications` | Avisos en el celular |
 | `intl` | Fechas y pesos en español de Colombia |
 
 ## Cómo se compila (un comando para cada sistema)
+- **Web (iPhone y cualquier navegador):** `flutter build web --release --dart-define-from-file=dart_defines.json --base-href /vertex-ai-pyme/` (desde PowerShell), y se publica en GitHub Pages
 - **Celular (APK):** `flutter build apk --release --dart-define-from-file=dart_defines.json`
 - **PC (Windows):** `flutter build windows --release --dart-define-from-file=dart_defines.json`
 

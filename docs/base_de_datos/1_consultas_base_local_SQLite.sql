@@ -137,3 +137,39 @@ SELECT clave, valor
 FROM ajustes
 WHERE clave LIKE 'negocio_%' OR clave LIKE 'pago_%' OR clave LIKE 'modo_%'
 ORDER BY clave;
+
+
+-- 16. Lo que le debo a cada proveedor (pedido pagado en parte o fiado)
+--     saldo = total de la cuenta - suma de los abonos
+SELECT c.proveedor_nombre,
+       c.concepto,
+       c.total,
+       COALESCE((SELECT SUM(p.monto) FROM pagos_proveedor p WHERE p.cuenta_id = c.id), 0)            AS abonado,
+       c.total - COALESCE((SELECT SUM(p.monto) FROM pagos_proveedor p WHERE p.cuenta_id = c.id), 0)  AS saldo,
+       date(c.vence, '-5 hours')                                                                    AS vence,
+       CAST(julianday(date(c.vence, '-5 hours')) - julianday(date('now', '-5 hours')) AS INTEGER)  AS dias_para_vencer
+FROM cuentas_pagar c
+ORDER BY c.vence;
+
+
+-- 17. Abonos a proveedores con el gasto que generaron (JOIN con ventas)
+SELECT c.proveedor_nombre, p.monto, datetime(p.fecha, '-5 hours') AS fecha_colombia,
+       v.concepto AS gasto_registrado, v.pagos AS medio_de_pago
+FROM pagos_proveedor p
+JOIN cuentas_pagar c ON c.id = p.cuenta_id
+LEFT JOIN ventas v ON v.id = p.egreso_id
+ORDER BY p.fecha;
+
+
+-- 18. Seguimiento de clientes: compras, última compra y si autorizó (Ley 1581)
+SELECT cl.nombre,
+       COUNT(v.id)                                                         AS compras,
+       COALESCE(SUM(v.monto), 0)                                           AS total_comprado,
+       CAST(julianday('now') - julianday(MAX(v.fecha)) AS INTEGER)         AS dias_sin_comprar,
+       CASE WHEN a.valor IS NULL THEN 'NO' ELSE 'SÍ' END                   AS autorizo
+FROM clientes cl
+LEFT JOIN ventas v  ON v.cliente_id = cl.id AND v.tipo = 'ingreso'
+LEFT JOIN ajustes a ON a.clave = 'aut_cli_' || cl.id
+WHERE cl.deleted = 0
+GROUP BY cl.id
+ORDER BY total_comprado DESC;

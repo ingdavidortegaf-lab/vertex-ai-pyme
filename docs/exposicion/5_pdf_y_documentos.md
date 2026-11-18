@@ -28,6 +28,7 @@ Los PDF se **dibujan con código dentro del celular**, sin internet, con el paqu
   | CC | Cuenta de cobro |
   | PD | Pedido al proveedor |
   | IN | Informe |
+  | AU | Autorización de datos del cliente (Anexo 3, Ley 1581) |
 
 - El consecutivo se suma **dentro de una transacción**, así que no se repite.
 - El código del equipo evita que dos celulares den el mismo número.
@@ -40,6 +41,8 @@ Los PDF se **dibujan con código dentro del celular**, sin internet, con el paqu
 | `pdf_factura.dart` | Dibuja el **comprobante, la cotización y el pedido**: logo, datos del negocio (NIT, dirección), cliente, tabla de productos, total, y la nota "No es factura electrónica DIAN". Se ajusta a tirilla de 80 mm o a carta |
 | `pdf_reportes.dart` | Dibuja PDF **de varias páginas** por bloques: tarjetas con cifras, tablas, barras y párrafos, con encabezado y "Página x de y". Lo usan los informes y la cuenta de cobro |
 | `reportes_contables.dart` | **Arma el contenido**: el informe semanal, quincenal o mensual (resultados, flujo de caja, gastos, cartera, inventario, libro de movimientos) y la cuenta de cobro |
+| `legal_page.dart` (en pantallas) | Dibuja el **formato de autorización Anexo 3** prellenado con el cliente, el comercio, el teléfono y la fecha, con líneas para firmar |
+| `promocion_page.dart` (en pantallas) | No es PDF: arma la **imagen de la promoción** (1080 × 1080, PNG) con el logo y los precios, para el estado de WhatsApp |
 | `archivo.dart` | **Guarda** el PDF en la carpeta, lo vuelve a leer, lo **imprime** o lo **comparte** |
 
 ## Muestra este pedazo

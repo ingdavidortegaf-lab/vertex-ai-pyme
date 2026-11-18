@@ -1,26 +1,40 @@
-# Aviso de privacidad y formato de autorización
+# Aviso de privacidad, casilla y formato de autorización (Ley 1581 de 2012)
 
-> Borrador para revisión jurídica (art. 4 y 9 de la Ley 1581 de 2012).
-> La app muestra este aviso en el primer uso y desde «Privacidad y datos»;
-> sin aceptarlo no se puede continuar, y la aceptación queda guardada con
-> fecha en el celular.
+> Textos **oficiales** de la convocatoria CreaTIC Casanare 2026 («Formatos Modelo de Protección de Datos»), tal como los muestra la app. Código: `lib/domain/legal.dart` y `lib/ui/legal_page.dart`. Versión: **Aviso v2 · noviembre de 2026**. Como el texto cambió, la app vuelve a pedir la autorización una vez.
 
-## Aviso de privacidad (en la app)
-VERTEX AI Pyme ayuda a llevar los clientes, ventas, gastos, cobros e inventario de tu negocio, aunque no haya señal.
+## Sección A: aviso en la pantalla de registro (primer uso)
 
-- **Qué datos:** de tus clientes, solo nombre y celular (opcional); de tu negocio, ventas, gastos, abonos, cobros e inventario; de tu cuenta, el correo.
-- **Para qué:** registrar y consultar tu negocio, mostrar reportes, sugerir mensajes por WhatsApp y respaldar en la nube.
-- **Quién es responsable:** tu negocio, respecto de los datos de sus clientes. La Gobernación de Casanare, como operadora de la app, es la encargada.
-- **Tus derechos:** conocer, actualizar, rectificar, suprimir y revocar; quejas ante la SIC. Escribe a [canal de la Dirección TIC] o contacto@vertextechco.online.
-- **Política completa:** Política de Tratamiento de Datos Personales de la Gobernación de Casanare ([dirección web]).
+> AVISO DE PRIVACIDAD: En cumplimiento de la Ley 1581 de 2012 y el Decreto 1074 de 2015, le informamos que los datos personales suministrados serán tratados para gestionar su registro, operación comercial, inventario, ventas, pedidos y contacto dentro de esta aplicación. Frente a los datos de clientes finales registrados por los comercios, la MiPyme usuaria actúa como Responsable del Tratamiento y la Gobernación de Casanare, como operadora de la plataforma, actúa como Encargada del Tratamiento. Usted puede ejercer sus derechos a conocer, actualizar, rectificar y suprimir sus datos, así como consultar nuestra Política de Tratamiento de Datos Personales directamente en esta aplicación.
 
-☐ Leí el aviso de privacidad y autorizo el tratamiento de mis datos.
+**Casilla (sin premarcar; el botón «Aceptar y continuar» no se activa hasta marcarla):**
 
-## Formato de autorización para clientes de la MiPyme
-Para que la tienda registre a un cliente con su celular:
+> ☐ He leído el Aviso de Privacidad y autorizo de manera previa, expresa e informada el tratamiento de mis datos personales conforme a la <u>Política de Tratamiento de Datos Personales</u>.
 
-> Yo, ______________________, autorizo a [nombre de la tienda] a guardar mi nombre y mi celular en la app VERTEX AI Pyme para llevar mis compras y saldos y enviarme por WhatsApp comprobantes, cotizaciones y recordatorios de pago. Conozco que puedo pedir que me actualicen o eliminen escribiendo a [canal de la tienda].
+- El texto subrayado es un **enlace visible** que abre la política completa **dentro de la app, sin internet** (ver `POLITICA_TRATAMIENTO_DATOS.md`).
+- Debajo del aviso hay enlaces a **www.casanare.gov.co** y al correo del canal de derechos.
+- La aceptación se guarda en el celular con la fecha y la versión del aviso.
+- El aviso y la política se pueden volver a ver en el menú ⋮ → **Privacidad y datos**, donde también se puede revocar la autorización y borrar los datos del celular.
+
+## Sección B: Anexo 3, autorización de cada cliente del comercio
+
+**Clientes nuevos:** al crear el cliente hay una casilla de autorización **sin marcar**, con enlace a la política. Sin marcarla no se puede guardar.
+
+**Clientes que ya estaban:** en la ficha del cliente → **Formato de autorización de datos (Ley 1581)**. La app:
+1. Llena el formato del Anexo 3 con el nombre del cliente, el comercio, el teléfono, el municipio y la fecha.
+2. Le pone número (AU-…) y lo archiva en «Documentos».
+3. Permite **imprimirlo** para firma o **enviarlo por WhatsApp** pidiendo que respondan **AUTORIZO**.
+4. Cuando el cliente responde, se toca **Ya respondió «AUTORIZO»** y queda registrado con fecha y medio (guarde el pantallazo del chat como prueba).
+
+Texto del formato (Anexo 3):
+
+> **FORMATO DE AUTORIZACIÓN Y CONSENTIMIENTO INFORMADO PARA EL TRATAMIENTO DE DATOS PERSONALES**
 >
-> Fecha: ____ / ____ / ______  Firma o aceptación por WhatsApp: ______________
+> Yo, [cliente], identificado(a) con C.C. / NIT No. ________, actuando en nombre propio (o en representación del establecimiento ________), manifiesto de manera libre, previa, expresa e informada que AUTORIZO a [comercio] en calidad de Responsable del Tratamiento, y a la GOBERNACIÓN DE CASANARE – DIRECCIÓN DE LAS TIC en calidad de Encargada y operadora de la aplicación móvil VERTEX AI Pyme, para recolectar, almacenar, usar, circular y actualizar mis datos personales de contacto, ubicación y transacciones comerciales.
+>
+> Finalidades y Derechos: Declaro haber sido informado(a) de que mis datos serán utilizados exclusivamente para gestionar pedidos, ventas, entregas, control de cartera/fiados y comunicación comercial; que es facultativo responder preguntas sobre datos sensibles; y que puedo ejercer gratuitamente mis derechos a conocer, actualizar, rectificar y suprimir mis datos conforme a la Política de Tratamiento de Datos Personales disponible en la aplicación y en www.casanare.gov.co.
+>
+> Teléfono / Celular · Correo electrónico · Municipio / Dirección · Fecha (DD/MM/AAAA) · Firma del titular · C.C. / NIT
 
-La app recuerda esta obligación al crear cada cliente («Pide autorización al cliente para guardar sus datos»).
+## Uso de la autorización dentro de la app
+- **Seguimiento de clientes** (mensajes comerciales por WhatsApp): el botón «Escribirle» solo aparece para clientes que autorizaron; a los demás se les ofrece «Pedir autorización». Se sugiere no escribir más de una vez por semana.
+- **IA:** nunca recibe nombres de personas, celulares ni correos.

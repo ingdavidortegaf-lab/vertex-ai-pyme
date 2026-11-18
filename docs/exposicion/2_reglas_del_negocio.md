@@ -16,8 +16,11 @@ Aquí están **las cuentas y las reglas**: cuánto se vendió, quién debe y des
 | `codigos.dart` | Códigos de barras: valida el dígito de control EAN, lee etiquetas de **gramera** (producto + peso) y convierte gramos a kilos o libras. Unidad "servicio" | |
 | `documentos.dart` | Los **mensajes de WhatsApp** (comprobante, cotización, pedido, promoción) y el **pedido sugerido** | |
 | `pagos.dart` | **Medios de pago**: efectivo, Nequi, Daviplata, Bancolombia, Bre-B y tarjetas. Revisa que el **pago dividido** sume el total y calcula el **cuadre de caja** | "Cobra como pague el cliente" |
-| `avisos.dart` | **Qué avisar y cuándo**, sin repetir el mismo aviso | |
-| `modo_negocio.dart` | **Cómo trabaja el negocio** (productos o servicios, si fía, gramera…) para adaptar la app | |
+| `avisos.dart` | **Qué avisar y cuándo**, sin repetir el mismo aviso (también los pagos a proveedores que vencen en 3 días) | |
+| `promocion.dart` | **Redactor de promociones**: gancho, descuento real, urgencia y llamado a la acción; reconoce la **temporada** (quincena, fin de semana, viernes negro, Navidad) y pone etiquetas del municipio. Define lo único que viaja a la IA: productos y precios | "Un publicista que funciona sin señal" |
+| `seguimiento.dart` | **Grupos de clientes** según sus compras: hace rato no vienen (3 a 12 semanas), mejores (el 20 % que más compra), nuevos y perdidos (+90 días), con el mensaje sugerido; solo a quien autorizó y no más de una vez por semana | "El CRM del barrio" |
+| `legal.dart` | Los **textos oficiales** de la Ley 1581: aviso, casilla, política y formato del Anexo 3 | |
+| `modo_negocio.dart` | **Cómo trabaja el negocio** (productos o servicios, si fía, gramera…) y los **22 tipos de negocio** con su sugerencia, para adaptar la app | "Sirve para cualquier negocio" |
 | `resumen.dart` | Los "moldes" de los datos: producto con su existencia, cliente con su deuda, resumen del periodo | |
 | `asistente_local.dart` | El **asistente sin internet**: entiende palabras clave ("vendí hoy", "me debe") y responde con los datos del celular | "Responde aunque no haya señal" |
 | `formato.dart` | Pesos colombianos ($25.000), celulares (300 123 4567), quitar tildes | |

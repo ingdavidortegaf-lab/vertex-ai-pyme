@@ -18,20 +18,23 @@ Cada archivo de esta carpeta es **una pantalla o una pieza visual** de la app, h
 | `inventario_page.dart` | **Inventario o Servicios**: productos, existencias, por reponer | "El control de bodega" |
 | `clientes_page.dart` | Lista de clientes con buscador | |
 | `cliente_detalle_page.dart` | Ficha del cliente: cuánto debe, cobrar, cuenta de cobro | |
-| `herramientas_page.dart` | Comprobantes, cotizaciones, pedidos al proveedor, promociones | "Todo lo que se manda por WhatsApp" |
-| `oficina_page.dart` | **Informes**, **Cartera**, **Documentos emitidos** y **Cierre de caja** | "La oficina del contador" |
+| `herramientas_page.dart` | Comprobantes, cotizaciones y **pedido al proveedor**: al llegar se elige si se pagó todo, una parte (30/50/70 %) o todo fiado | "Todo lo que se manda por WhatsApp" |
+| `promocion_page.dart` | **Promociones**: foto o video, texto con **IA** en 5 estilos y **imagen para el estado** con logo y precios | "El publicista de la tienda" |
+| `seguimiento_page.dart` | **Seguimiento**: a qué clientes escribirles hoy y qué decirles | "El CRM del barrio" |
+| `oficina_page.dart` | **Informes**, **Cartera**, **Documentos emitidos**, **Cierre de caja** y **Lo que debo** a proveedores | "La oficina del contador" |
 | `registro_negocio_page.dart` | Las **5 preguntas del inicio**; la app se adapta al negocio | "La app se moldea al negocio" |
 | `pago_widget.dart` | **¿Cómo pagó?**: elegir el medio o **dividir el pago**; datos del negocio para recibir transferencias | |
-| `notificaciones.dart` | Los **avisos** en el celular (se agotó, cobros vencidos) | |
+| `notificaciones.dart` | Los **avisos** en el celular (se agotó, cobros vencidos, pagos a proveedores por vencer) | |
 | `asistente_page.dart` | Chat con el asistente | |
 | `negocio_page.dart` | Mi negocio: nombre, NIT, dirección, logo | |
 | `login_page.dart` | Cuenta: entrar, crear cuenta, clave fuerte, bloqueo | |
-| `consent_gate.dart` | Pide la **autorización de datos** la primera vez (Ley 1581) | |
+| `consent_gate.dart` | Pide la **autorización de datos** la primera vez (Ley 1581), con la casilla sin marcar | |
+| `legal_page.dart` | Aviso oficial, casilla con **enlace visible**, **política completa sin internet** y **Anexo 3** para cada cliente | "Lo jurídico, con los formatos oficiales" |
 | `privacidad_page.dart` | Aviso de privacidad, derechos, borrar datos | |
 | `escaner.dart` | La cámara para leer **códigos de barras** | |
 | `inactividad.dart` | Cierra la sesión tras **30 minutos** sin uso | |
 | `tema.dart` | Colores "pizarra del mercado", letras y botones | "El diseño" |
-| `ilustraciones.dart` | Dibujos hechos con código (logo, pizarra) | "Sin imágenes descargadas" |
+| `ilustraciones.dart` | Dibujos hechos con código: el **logo** (vértice de dos caras con la chispa de la IA, que brilla suave) y la pizarra | "Sin imágenes descargadas" |
 | `graficas.dart` | Gráficas dibujadas con código | |
 | `comun.dart` | Ayudas comunes: mensajes abajo, abrir WhatsApp | |
 

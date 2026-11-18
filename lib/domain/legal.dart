@@ -66,14 +66,17 @@ List<(String, String)> politicaTratamiento({
             'ventas, los pedidos, las entregas, el control de cartera y fiados, '
             'la comunicación comercial (comprobantes, cobros, promociones por '
             'WhatsApp que el comercio decide enviar), los informes del negocio y '
-            'el respaldo en la nube; atender a los titulares y cumplir la ley.'
+            'el control de lo que se debe a proveedores, el seguimiento de clientes '
+            'que autorizaron la comunicación comercial y el respaldo en la nube; '
+            'atender a los titulares y cumplir la ley.'
       ),
       (
         '4. Tratamiento y seguridad',
         'En el celular, la base de datos va cifrada (AES-256) y no se copia en '
             'los respaldos automáticos del sistema. En la nube, los datos viajan '
             'solo por HTTPS y cada comercio ve únicamente los suyos (seguridad por '
-            'fila). La inteligencia artificial recibe solo totales, nunca nombres, '
+            'fila). La inteligencia artificial recibe solo totales del negocio o '
+            'nombres de productos y precios, nunca nombres de personas, '
             'celulares ni correos. La sesión se bloquea tras 5 intentos fallidos y '
             'se cierra tras 30 minutos sin uso. No se venden ni se ceden datos.'
       ),

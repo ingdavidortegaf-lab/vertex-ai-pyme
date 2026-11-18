@@ -93,6 +93,30 @@ void main() {
     }
     await en(hace(1, 19), () => db.saveMovimiento('Servicio de luz', 86000, tipo: 'egreso',
         pagos: const [Pago('nequi', 86000)]));
+    // Proveedores: pedido pagado a la mitad y el resto fiado, con un abono.
+    final llano = await en(hace(12), () => db.saveProveedor('Distribuidora El Llano', '3109876543'));
+    await en(hace(12, 9), () => db.recibirPedido([(arroz, 50, 1800)],
+        conceptoGasto: 'Compra a Distribuidora El Llano',
+        pagosGasto: const [Pago('efectivo', 45000)],
+        pagadoAhora: 45000,
+        proveedorId: llano,
+        proveedorNombre: 'Distribuidora El Llano',
+        venceSaldo: hoy.add(const Duration(days: 3))));
+    final cuenta = (await db.cuentasPorPagar()).single['id'] as String;
+    await en(hace(5, 15), () => db.pagarProveedor(cuenta, 20000, const [Pago('nequi', 20000)]));
+    final lacteos = await en(hace(6), () => db.saveProveedor('Lácteos La Sabana', '3112223344'));
+    await en(hace(6, 8), () => db.recibirPedido([(queso, 6, 18000)],
+        conceptoGasto: 'Compra a Lácteos La Sabana',
+        pagadoAhora: 0,
+        proveedorId: lacteos,
+        proveedorNombre: 'Lácteos La Sabana',
+        venceSaldo: hoy.add(const Duration(days: 10))));
+
+    // Autorizaciones de datos (Anexo 3) y último contacto de seguimiento.
+    await en(hace(60), () => db.registrarAutorizacionCliente(ana, 'firmó el formato en la tienda'));
+    await en(hace(29), () => db.registrarAutorizacionCliente(luz, 'respondió AUTORIZO por WhatsApp'));
+    await en(hace(4), () => db.marcarContactado(ana));
+
     await en(hace(0, 9), () => db.emitirDocumento('cobro', clienteId: pedro, clienteNombre: 'Pedro Rincón', total: 178000));
     await en(hace(0, 9, 5), () => db.emitirDocumento('informe', total: 0, resumen: 'Informe semanal'));
 

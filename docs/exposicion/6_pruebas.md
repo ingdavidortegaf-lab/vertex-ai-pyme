@@ -1,7 +1,7 @@
 # 6 · Pruebas automáticas: 106 pruebas, todas pasan
 
 ## En una frase
-Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 93 en verde.
+Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 106 en verde.
 
 ## Por qué importan
 - Cada vez que cambiamos algo, las corremos: si algo se dañó, **una prueba se pone en rojo** y lo sabemos antes de entregar.
@@ -20,6 +20,10 @@ Son **programas que revisan solos que la app funcione**. Se corren con `flutter 
 | `avisos_test.dart` | Avisos sin repetirse, meta, cartera, **servicios sin inventario**, adaptación al negocio |
 | `pagos_test.dart` | **Pago dividido** (la suma debe dar el total), ventas viejas leídas como efectivo, lo que viaja a la nube y el **cierre de caja** |
 | `sync_adaptativo_test.dart` | Que la app **consulte menos la nube** cuando no hay cambios y vuelva a 30 s cuando sí (para que 100 tiendas no la saturen) |
+| `legal_test.dart` | Que el aviso y la casilla sean **el texto oficial** de la convocatoria, la política completa y el **Anexo 3** en PDF |
+| `proveedores_test.dart` | **Pedido pagado a medias**: todo entra al inventario, el gasto es solo lo pagado, abonos hasta saldar y aviso de vencimiento |
+| `promocion_test.dart` | El **redactor de promociones**: temporada según la fecha, descuento real, combo y que a la IA **no viajen datos de personas** |
+| `seguimiento_test.dart` | Grupos de clientes (hace rato no vienen, mejores, nuevos, perdidos) y que solo se sugiera escribir a quien **autorizó** |
 | `codigos_test.dart` | Códigos de barras y **etiquetas de gramera** |
 | `documentos_test.dart` | Comprobante, cotización, pedido sugerido, promoción |
 | `pdf_test.dart` | La factura en PDF (tirilla y carta) |
@@ -38,4 +42,4 @@ Son **programas que revisan solos que la app funcione**. Se corren con `flutter 
 
 ## Si el jurado pregunta…
 - **"¿Qué tipo de pruebas son?"** → **Unitarias** (reglas sueltas, como la cuenta de cobro) y de **integración** (la base de datos real y la sincronización con un servidor simulado). Además, capturas de pantalla para revisar el diseño.
-- **"¿Probaron en un celular real?"** → Sí, en un Xiaomi 14T: modo avión y sincronización real con Supabase sin duplicados. Las funciones del 17 de noviembre (PDF de cobro, informes y avisos) están probadas con pruebas automáticas y en el PC; en el celular, en curso.
+- **"¿Probaron en un celular real?"** → Sí, en un Xiaomi 14T: modo avión y sincronización real con Supabase sin duplicados. Lo nuevo del 18 de noviembre (proveedores, promociones, seguimiento, parte legal) está probado con pruebas automáticas, capturas en el PC y la versión web en el navegador; en el celular, en curso.
