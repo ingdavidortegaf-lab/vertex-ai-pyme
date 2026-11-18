@@ -4,6 +4,8 @@
 
 App para las MiPymes de Casanare (tiendas de barrio y de pueblo, agro, droguerías, ferreterías y negocios de servicios), presentada en **CreaTIC Casanare 2026** por el equipo **VERTEX TECH**.
 
+**Pruébala ya (iPhone, Android o PC, en el navegador):** https://ingdavidortegaf-lab.github.io/vertex-ai-pyme/. Para instalarla en iPhone o Android, ver [docs/INSTALAR_EN_IPHONE_Y_ANDROID.md](docs/INSTALAR_EN_IPHONE_Y_ANDROID.md).
+
 Lleva ventas, fiados, inventario, cobros, documentos e informes para el contador. **Todo se guarda primero en el celular, cifrado**, y se sincroniza con la nube cuando vuelve la conexión, sin perder ni duplicar nada.
 
 ---
@@ -30,7 +32,8 @@ Lleva ventas, fiados, inventario, cobros, documentos e informes para el contador
 
 | Pieza | Tecnología |
 |---|---|
-| App (Android 12+ y Windows; iPhone listo para compilar en Mac) | **Flutter 3.50 / Dart** |
+| App: Android 12+, Windows y **web** (iPhone con Safari); iPhone nativo listo para compilar en Mac | **Flutter 3.50 / Dart** |
+| Base de datos en el navegador | **SQLite compilada a WebAssembly** (`sqflite_common_ffi_web`) |
 | Base de datos en el dispositivo | **SQLite cifrada con SQLCipher (AES-256)**; la clave va en el almacén seguro del sistema |
 | Backend | **Supabase**: PostgreSQL 17 con **RLS por empresa**, Auth y una Edge Function |
 | IA | **Google Gemini**, llamada solo desde la Edge Function (**TypeScript/Deno**); la clave es un secreto del servidor |

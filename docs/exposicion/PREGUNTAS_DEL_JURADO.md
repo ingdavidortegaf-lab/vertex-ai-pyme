@@ -12,6 +12,9 @@ En **Dart**, con el framework **Flutter** de Google. Además usamos **TypeScript
 **2. ¿Por qué Flutter?**
 Porque con **un solo código** sale la app para Android, Windows e iPhone. Es gratis, lo mantiene Google, compila a código nativo (es rápida) y tiene muchas librerías.
 
+**2b. ¿Funciona en iPhone?**
+Sí, por la **versión web**: https://ingdavidortegaf-lab.github.io/vertex-ai-pyme/. Se abre en Safari y se agrega a la pantalla de inicio como una app. Es el mismo código Flutter compilado a web, y la base SQLite corre en WebAssembly. La app nativa de iPhone para la App Store requiere un Mac y la cuenta de Apple Developer (USD 99 al año); queda para después del piloto.
+
 **3. ¿Es una app nativa, híbrida o web?**
 Es **multiplataforma compilada**: Flutter convierte el código Dart en código de máquina del celular (ARM) y dibuja la pantalla con su propio motor. No es una página web dentro de una app.
 

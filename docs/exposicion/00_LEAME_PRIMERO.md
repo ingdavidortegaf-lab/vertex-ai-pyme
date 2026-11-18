@@ -82,6 +82,9 @@ Todo es **gratis** y de código abierto. El código es nuestro: unas **13.000 l�
 
 ---
 
+## Pruébala en cualquier celular (también iPhone)
+Enlace: https://ingdavidortegaf-lab.github.io/vertex-ai-pyme/. El código QR está en el escritorio (`QR_VERTEX_WEB.png`). Cómo instalarla: `9_documentos_convocatoria/INSTALAR_EN_IPHONE_Y_ANDROID.md`.
+
 ## Dónde está el proyecto real
 - **Proyecto que sí corre:** `C:\dev\vertex_ai_pyme`. Ábrelo en VS Code y presiona **F5** para correr la app, o corre `flutter test` para las pruebas.
 - **Esta carpeta** es una **copia ordenada para explicar**. Si la abres en VS Code puede marcar errores, porque los archivos están separados del proyecto; eso es normal.
