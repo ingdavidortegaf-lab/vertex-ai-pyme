@@ -78226,7 +78226,7 @@ r.toString
 a.$1(r)}},
 avA(a,b,c){var s,r,q,p,o,n,m,l,k,j,i,h=null,g=this.dA$,f=g.h(0,B.eT)
 A:{if(f instanceof A.J){f=new A.a2(c.$2(f,a),b.$2(f,a))
-break A}if(f==null){f=B.bBl
+break A}if(f==null){f=B.bBk
 break A}f=h}s=f.a
 r=h
 q=f.b
@@ -93149,12 +93149,12 @@ l=s>r!==(B.bF===m)
 k=A.dq(B.R,s,r,!1)
 j=A.b([],t.AO)
 for(q=q.v6(k),m=q.length,i=0;i<q.length;q.length===m||(0,A.z)(q),++i){h=q[i]
-j.push(new A.M(h.a,h.b,h.c,h.d))}A:{if(a0){q=B.bAX
+j.push(new A.M(h.a,h.b,h.c,h.d))}A:{if(a0){q=B.bAY
 break A}q=l
 g=q
 if(q){q=B.bBP
 break A}q=!1===g
-if(q){q=B.bBt
+if(q){q=B.bBs
 break A}q=a}f=q.a
 e=a
 d=q.b
@@ -100702,7 +100702,7 @@ he(a){return this.c.$1(a)}}
 A.ar3.prototype={
 ag7(a,b,c){return a.Co(b,c)},
 aWn(a,b,c){if(a.Cq(b,c))return new A.a2(!0,a.Co(b,c))
-return B.bBz}}
+return B.bBy}}
 A.wC.prototype={
 aa(){return new A.Rb(A.aV(t.od),new A.E())}}
 A.ar4.prototype={
@@ -105605,9 +105605,9 @@ switch(b.a){case 0:o=B.bBN
 break
 case 2:o=B.bBO
 break
-case 3:o=B.bBy
+case 3:o=B.bBx
 break
-case 1:o=B.bBA
+case 1:o=B.bBz
 break}s=o.a
 q.b=s
 r=o.b
@@ -113303,11 +113303,11 @@ this.UB()},
 UB(){var s,r,q,p,o,n,m=this,l=m.w
 switch(l.a.c.a){case 0:s=B.bBH
 break
-case 2:s=B.bBB
+case 2:s=B.bBA
 break
-case 3:s=B.bBx
+case 3:s=B.bBw
 break
-case 1:s=B.bBv
+case 1:s=B.bBu
 break
 default:s=null}r=s.a
 q=null
@@ -152604,7 +152604,7 @@ A.ati.prototype={
 $0(){return A.bhE(this.a)},
 $S:0}
 A.Eg.prototype={
-K(a){var s,r,q,p,o=null,n=A.B(a).ok,m=[B.bBR,B.bBG,B.bB3,B.bB8,B.bBm,new A.a2("6. C\xf3mo ejercerlos","Clientes de un comercio: ante el comercio responsable, que puede actualizar o eliminar sus datos desde la app. Usuarios de la app: men\xfa \u22ee \u2192 \xabPrivacidad y datos\xbb (revocar la autorizaci\xf3n y borrar los datos del celular), o por correo a contacto@vertextechco.online. Consultas: respuesta en m\xe1ximo 10 d\xedas h\xe1biles. Reclamos: m\xe1ximo 15 d\xedas h\xe1biles (arts. 14 y 15, Ley 1581 de 2012)."),new A.a2("7. Pol\xedtica de la Gobernaci\xf3n de Casanare","La pol\xedtica de la Encargada est\xe1 disponible en www.casanare.gov.co y en la Direcci\xf3n de las TIC de la Gobernaci\xf3n de Casanare."),B.bBe],l=A.iy(o,o,B.bMb,o),k=t.p,j=A.b([A.N(u.p,o,o,o,o,n.f,o,o,o),B.em,A.N("VERTEX AI Pyme \xb7 Ley 1581 de 2012 y Decreto 1074 de 2015 \xb7 Aviso v2 \xb7 noviembre de 2026",o,o,o,o,n.Q,o,o,o),B.bx,B.z8],k)
+K(a){var s,r,q,p,o=null,n=A.B(a).ok,m=[B.bBR,B.bBG,B.bAV,B.bBB,B.bBl,new A.a2("6. C\xf3mo ejercerlos","Clientes de un comercio: ante el comercio responsable, que puede actualizar o eliminar sus datos desde la app. Usuarios de la app: men\xfa \u22ee \u2192 \xabPrivacidad y datos\xbb (revocar la autorizaci\xf3n y borrar los datos del celular), o por correo a contacto@vertextechco.online. Consultas: respuesta en m\xe1ximo 10 d\xedas h\xe1biles. Reclamos: m\xe1ximo 15 d\xedas h\xe1biles (arts. 14 y 15, Ley 1581 de 2012)."),new A.a2("7. Pol\xedtica de la Gobernaci\xf3n de Casanare","La pol\xedtica de la Encargada est\xe1 disponible en www.casanare.gov.co y en la Direcci\xf3n de las TIC de la Gobernaci\xf3n de Casanare."),B.bBd],l=A.iy(o,o,B.bMb,o),k=t.p,j=A.b([A.N(u.p,o,o,o,o,n.f,o,o,o),B.em,A.N("VERTEX AI Pyme \xb7 Ley 1581 de 2012 y Decreto 1074 de 2015 \xb7 Aviso v2 \xb7 noviembre de 2026",o,o,o,o,n.Q,o,o,o),B.bx,B.z8],k)
 for(s=n.x,r=n.z,q=0;q<8;++q){p=m[q]
 B.n.O(j,A.b([B.fW,A.N(p.a,o,o,o,o,s,o,o,o),B.em,A.N(p.b,o,o,o,o,r,o,o,o)],k))}j.push(B.Er)
 j.push(A.px(A.b([A.fg(B.am5,B.bLO,new A.aKe(),o),A.fg(B.Bl,B.bKC,new A.aKf(),o)],k),8,8))
@@ -153303,7 +153303,7 @@ s=p}for(;;)switch(s){case 0:if(!n.b){s=1
 break}m=null
 l=null
 k=B.bsu.h(0,a.b)
-if(k==null)k=B.bBc
+if(k==null)k=B.bBb
 m=k.a
 l=k.b
 p=4
@@ -154805,14 +154805,14 @@ j=B.q.aT(m.f.a.a)
 if(j.length===0)j="Tu negocio"
 j=A.b([new A.a2(B.alz,j),new A.a2(B.pt,"La pesta\xf1a del cat\xe1logo se llamar\xe1 \xab"+k.gah2()+"\xbb")],t.VU)
 r=k.b
-if(r!==B.fP)j.push(B.bBs)
+if(r!==B.fP)j.push(B.bBr)
 if(k.c)j.push(B.bBS)
-else j.push(B.bBg)
+else j.push(B.bBf)
 r=r!==B.eI
-if(r&&k.d)j.push(B.bB0)
+if(r&&k.d)j.push(B.bB1)
 if(r&&k.e)j.push(B.bBT)
-if(r&&k.f)j.push(B.bBb)
-j.push(B.bBf)
+if(r&&k.f)j.push(B.bBa)
+j.push(B.bBe)
 r=A.b([],t.p)
 for(q=j.length,p=s.d,o=0;o<j.length;j.length===q||(0,A.z)(j),++o){n=j[o]
 r.push(A.dx(!1,B.aM,l,l,!0,l,l,l,!0,l,A.cE(n.a,p,l,l),l,l,l,l,l,!1,l,l,l,l,l,l,A.N(n.b,l,l,l,l,l,l,l,l),l,l,l))}return m.IV(r,"Puedes cambiarlo cuando quieras en el men\xfa \u22ee \u2192 \xabAjustar la app a mi negocio\xbb.","As\xed qued\xf3 tu app")}}
@@ -161666,11 +161666,11 @@ B.QK=s(["1. ceturksnis","2. ceturksnis","3. ceturksnis","4. ceturksnis"],t.s)
 B.QL=s(["\u0434\u043e \u043d. \u0435.","\u043d. \u0435."],t.s)
 B.QM=s(["EEEE, d MMMM 'del' y","d MMMM 'del' y","d MMM y","d/M/yy"],t.s)
 B.t7=s(["\u0e27\u0e31\u0e19\u0e2d\u0e32\u0e17\u0e34\u0e15\u0e22\u0e4c","\u0e27\u0e31\u0e19\u0e08\u0e31\u0e19\u0e17\u0e23\u0e4c","\u0e27\u0e31\u0e19\u0e2d\u0e31\u0e07\u0e04\u0e32\u0e23","\u0e27\u0e31\u0e19\u0e1e\u0e38\u0e18","\u0e27\u0e31\u0e19\u0e1e\u0e24\u0e2b\u0e31\u0e2a\u0e1a\u0e14\u0e35","\u0e27\u0e31\u0e19\u0e28\u0e38\u0e01\u0e23\u0e4c","\u0e27\u0e31\u0e19\u0e40\u0e2a\u0e32\u0e23\u0e4c"],t.s)
-B.bBd=new A.a2("0-30","0-30 d\xedas")
+B.bBc=new A.a2("0-30","0-30 d\xedas")
 B.bB4=new A.a2("31-60","31-60")
 B.bBJ=new A.a2("61-90","61-90")
-B.bBp=new A.a2("90+","+90")
-B.b6o=s([B.bBd,B.bB4,B.bBJ,B.bBp],A.al("A<+(j,j)>"))
+B.bBo=new A.a2("90+","+90")
+B.b6o=s([B.bBc,B.bB4,B.bBJ,B.bBo],A.al("A<+(j,j)>"))
 B.QN=s(["Ianuali","Pepeluali","Malaki","\u02bbApelila","Mei","Iune","Iulai","\u02bbAukake","Kepakemapa","\u02bbOkakopa","Nowemapa","Kekemapa"],t.s)
 B.b6q=s([0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.333,0.408,0.5,0.5,0.833,0.778,0.18,0.333,0.333,0.5,0.564,0.25,0.333,0.25,0.278,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.278,0.278,0.564,0.564,0.564,0.444,0.921,0.722,0.667,0.667,0.722,0.611,0.556,0.722,0.722,0.333,0.389,0.722,0.611,0.889,0.722,0.722,0.556,0.722,0.667,0.556,0.611,0.722,0.722,0.944,0.722,0.722,0.611,0.333,0.278,0.333,0.469,0.5,0.333,0.444,0.5,0.444,0.5,0.444,0.333,0.5,0.5,0.278,0.278,0.5,0.278,0.778,0.5,0.5,0.5,0.5,0.333,0.389,0.278,0.5,0.5,0.722,0.5,0.5,0.444,0.48,0.2,0.48,0.541,0.35,0.5,0.35,0.333,0.5,0.444,1,0.5,0.5,0.333,1,0.556,0.333,0.889,0.35,0.611,0.35,0.35,0.333,0.333,0.444,0.444,0.35,0.5,1,0.333,0.98,0.389,0.333,0.722,0.35,0.444,0.722,0.25,0.333,0.5,0.5,0.5,0.5,0.2,0.5,0.333,0.76,0.276,0.5,0.564,0.333,0.76,0.333,0.4,0.564,0.3,0.3,0.333,0.5,0.453,0.25,0.333,0.3,0.31,0.5,0.75,0.75,0.75,0.444,0.722,0.722,0.722,0.722,0.722,0.722,0.889,0.667,0.611,0.611,0.611,0.611,0.333,0.333,0.333,0.333,0.722,0.722,0.722,0.722,0.722,0.722,0.722,0.564,0.722,0.722,0.722,0.722,0.722,0.722,0.556,0.5,0.444,0.444,0.444,0.444,0.444,0.444,0.667,0.444,0.444,0.444,0.444,0.444,0.278,0.278,0.278,0.278,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.564,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],t.n)
 B.QO=s(["CC","OC"],t.s)
@@ -162090,7 +162090,7 @@ B.uv=s(["J","F","M","A","M","J","J","\xc1","S","O","N","D"],t.s)
 B.b8R=s(["EEEE, y MMMM dd","y MMMM d","y MMM d","yyyy-MM-dd"],t.s)
 B.aS=s(["1","2","3","4","5","6","7","8","9","10","11","12"],t.s)
 B.bBU=new A.a2(B.He,B.ig)
-B.bAZ=new A.a2(B.GX,B.ii)
+B.bB_=new A.a2(B.GX,B.ii)
 B.bBF=new A.a2(B.Hl,B.oC)
 B.bBC=new A.a2(B.Hc,B.oA)
 B.ags=new A.C(1,0.17254901960784313,0.12941176470588237,0.25098039215686274,B.x)
@@ -162098,14 +162098,14 @@ B.aeC=new A.C(1,0.803921568627451,0.6901960784313725,0.9490196078431372,B.x)
 B.bBL=new A.a2(B.ags,B.aeC)
 B.afF=new A.C(1,0.07058823529411765,0.2,0.2,B.x)
 B.age=new A.C(1,0.5607843137254902,0.8509803921568627,0.8509803921568627,B.x)
-B.bB1=new A.a2(B.afF,B.age)
+B.bB2=new A.a2(B.afF,B.age)
 B.afq=new A.C(1,0.23137254901960785,0.10196078431372549,0.16862745098039217,B.x)
 B.aeG=new A.C(1,0.9490196078431372,0.6509803921568628,0.788235294117647,B.x)
 B.bAS=new A.a2(B.afq,B.aeG)
 B.agf=new A.C(1,0.1803921568627451,0.17254901960784313,0.08627450980392157,B.x)
 B.agm=new A.C(1,0.8784313725490196,0.8509803921568627,0.5411764705882353,B.x)
 B.bBI=new A.a2(B.agf,B.agm)
-B.b8S=s([B.bBU,B.bAZ,B.bBF,B.bBC,B.bBL,B.bB1,B.bAS,B.bBI],t.iT)
+B.b8S=s([B.bBU,B.bB_,B.bBF,B.bBC,B.bBL,B.bB2,B.bAS,B.bBI],t.iT)
 B.uw=s(["HH:mm:ss (zzzz)","HH:mm:ss (z)","HH:mm:ss","HH:mm"],t.s)
 B.ux=s(["\u0c1c","\u0c2b\u0c3f","\u0c2e\u0c3e","\u0c0f","\u0c2e\u0c47","\u0c1c\u0c42","\u0c1c\u0c41","\u0c06","\u0c38\u0c46","\u0c05","\u0c28","\u0c21\u0c3f"],t.s)
 B.kx=s(["\u5468\u65e5","\u5468\u4e00","\u5468\u4e8c","\u5468\u4e09","\u5468\u56db","\u5468\u4e94","\u5468\u516d"],t.s)
@@ -162596,23 +162596,23 @@ B.afN=new A.C(1,0.5411764705882353,0.30980392156862746,0,B.x)
 B.bB6=new A.a2(B.H5,B.afN)
 B.Hi=new A.C(1,0.8627450980392157,0.9215686274509803,0.9725490196078431,B.x)
 B.afO=new A.C(1,0.10588235294117647,0.3686274509803922,0.596078431372549,B.x)
-B.bBi=new A.a2(B.Hi,B.afO)
+B.bBh=new A.a2(B.Hi,B.afO)
 B.Hh=new A.C(1,0.984313725490196,0.8901960784313725,0.8666666666666667,B.x)
 B.aeJ=new A.C(1,0.6509803921568628,0.22745098039215686,0.1568627450980392,B.x)
 B.bBE=new A.a2(B.Hh,B.aeJ)
 B.ag9=new A.C(1,0.9294117647058824,0.8901960784313725,0.9686274509803922,B.x)
 B.ag2=new A.C(1,0.41568627450980394,0.24313725490196078,0.6039215686274509,B.x)
-B.bAY=new A.a2(B.ag9,B.ag2)
+B.bAZ=new A.a2(B.ag9,B.ag2)
 B.aft=new A.C(1,0.8745098039215686,0.9450980392156862,0.9450980392156862,B.x)
 B.af8=new A.C(1,0.11372549019607843,0.4196078431372549,0.4196078431372549,B.x)
-B.bAW=new A.a2(B.aft,B.af8)
+B.bAX=new A.a2(B.aft,B.af8)
 B.aeq=new A.C(1,0.9686274509803922,0.9019607843137255,0.9372549019607843,B.x)
 B.ag4=new A.C(1,0.6039215686274509,0.20392156862745098,0.4,B.x)
-B.bBk=new A.a2(B.aeq,B.ag4)
+B.bBj=new A.a2(B.aeq,B.ag4)
 B.aeP=new A.C(1,0.9294117647058824,0.9215686274509803,0.8509803921568627,B.x)
 B.aeW=new A.C(1,0.37254901960784315,0.35294117647058826,0.11764705882352941,B.x)
-B.bB2=new A.a2(B.aeP,B.aeW)
-B.bfp=s([B.bBM,B.bB6,B.bBi,B.bBE,B.bAY,B.bAW,B.bBk,B.bB2],t.iT)
+B.bB3=new A.a2(B.aeP,B.aeW)
+B.bfp=s([B.bBM,B.bB6,B.bBh,B.bBE,B.bAZ,B.bAX,B.bBj,B.bB3],t.iT)
 B.V5=s(["yanvar","fevral","mart","aprel","may","iyun","iyul","avgust","sentabr","oktabr","noyabr","dekabr"],t.s)
 B.vR=s(["\u0c1c\u0c28\u0c35\u0c30\u0c3f","\u0c2b\u0c3f\u0c2c\u0c4d\u0c30\u0c35\u0c30\u0c3f","\u0c2e\u0c3e\u0c30\u0c4d\u0c1a\u0c3f","\u0c0f\u0c2a\u0c4d\u0c30\u0c3f\u0c32\u0c4d","\u0c2e\u0c47","\u0c1c\u0c42\u0c28\u0c4d","\u0c1c\u0c41\u0c32\u0c48","\u0c06\u0c17\u0c38\u0c4d\u0c1f\u0c41","\u0c38\u0c46\u0c2a\u0c4d\u0c1f\u0c46\u0c02\u0c2c\u0c30\u0c4d","\u0c05\u0c15\u0c4d\u0c1f\u0c4b\u0c2c\u0c30\u0c4d","\u0c28\u0c35\u0c02\u0c2c\u0c30\u0c4d","\u0c21\u0c3f\u0c38\u0c46\u0c02\u0c2c\u0c30\u0c4d"],t.s)
 B.V6=s(["y MMMM d EEEE","y MMMM d","y MMM d","d/M/yy"],t.s)
@@ -163125,20 +163125,20 @@ B.Xi=s(["\u043f\u0440\u0435 \u043d\u043e\u0432\u0435 \u0435\u0440\u0435","\u043d
 B.Xj=s(["\u043f\u0440. \u043d. \u0435.","\u043d. \u0435."],t.s)
 B.bpZ=s([0.015176349177441876,0.045529047532325624,0.07588174588720938,0.10623444424209313,0.13658714259697685,0.16693984095186062,0.19729253930674434,0.2276452376616281,0.2579979360165119,0.28835063437139563,0.3188300904430532,0.350925934958123,0.3848314933096426,0.42057480301049466,0.458183274052838,0.4976837250274023,0.5391024159806381,0.5824650784040898,0.6277969426914107,0.6751227633498623,0.7244668422128921,0.775853049866786,0.829304845476233,0.8848452951698498,0.942497089126609,1.0022825574869039,1.0642236851973577,1.1283421258858297,1.1946592148522128,1.2631959812511864,1.3339731595349034,1.407011200216447,1.4823302800086415,1.5599503113873272,1.6398909516233677,1.7221716113234105,1.8068114625156377,1.8938294463134073,1.9832442801866852,2.075074464868551,2.1693382909216234,2.2660538449872063,2.36523901573795,2.4669114995532007,2.5710888059345764,2.6777882626779785,2.7870270208169257,2.898822059350997,3.0131901897720907,3.1301480604002863,3.2497121605402226,3.3718988244681087,3.4967242352587946,3.624204428461639,3.754355295633311,3.887192587735158,4.022731918402185,4.160988767090289,4.301978482107941,4.445716283538092,4.592217266055746,4.741496401646282,4.893568542229298,5.048448422192488,5.20615066083972,5.3666897647573375,5.5300801301023865,5.696336044816294,5.865471690767354,6.037501145825082,6.212438385869475,6.390297286737924,6.571091626112461,6.7548350853498045,6.941541251256611,7.131223617812143,7.323895587840543,7.5195704746346665,7.7182615035334345,7.919981813454504,8.124744458384042,8.332562408825165,8.543448553206703,8.757415699253682,8.974476575321063,9.194643831691977,9.417930041841839,9.644347703669503,9.873909240696694,10.106627003236781,10.342513269534024,10.58158024687427,10.8238400726681,11.069304815507364,11.317986476196008,11.569896988756009,11.825048221409341,12.083451977536606,12.345119996613247,12.610063955123938,12.878295467455942,13.149826086772048,13.42466730586372,13.702830557985108,13.984327217668513,14.269168601521828,14.55736596900856,14.848930523210871,15.143873411576273,15.44220572664832,15.743938506781891,16.04908273684337,16.35764934889634,16.66964922287304,16.985093187232053,17.30399201960269,17.62635644741625,17.95219714852476,18.281524751807332,18.614349837764564,18.95068293910138,19.290534541298456,19.633915083172692,19.98083495742689,20.331304511189067,20.685334046541502,21.042933821039977,21.404114048223256,21.76888489811322,22.137256497705877,22.50923893145328,22.884842241736916,23.264076429332462,23.6469514538663,24.033477234264016,24.42366364919083,24.817520537484558,25.21505769858089,25.61628489293138,26.021211842414342,26.429848230738664,26.842203703840827,27.258287870275353,27.678110301598522,28.10168053274597,28.529008062403893,28.96010235337422,29.39497283293396,29.83362889318845,30.276079891419332,30.722335150426627,31.172403958865512,31.62629557157785,32.08401920991837,32.54558406207592,33.010999283389665,33.4802739966603,33.953417292456834,34.430438229418264,34.911345834551085,35.39614910352207,35.88485700094671,36.37747846067349,36.87402238606382,37.37449765026789,37.87891309649659,38.38727753828926,38.89959975977785,39.41588851594697,39.93615253289054,40.460400508064545,40.98864111053629,41.520882981230194,42.05713473317016,42.597404951718396,43.141702194811224,43.6900349931913,44.24241185063697,44.798841244188324,45.35933162437017,45.92389141541209,46.49252901546552,47.065252796817916,47.64207110610409,48.22299226451468,48.808024568002054,49.3971762874833,49.9904556690408,50.587870934119984,51.189430279724725,51.79514187861014,52.40501387947288,53.0190544071392,53.637271562750364,54.259673423945976,54.88626804504493,55.517063457223934,56.15206766869424,56.79128866487574,57.43473440856916,58.08241284012621,58.734331877617365,59.39049941699807,60.05092333227251,60.715611475655585,61.38457167773311,62.057811747619894,62.7353394731159,63.417162620860914,64.10328893648692,64.79372614476921,65.48848194977529,66.18756403501224,66.89098006357258,67.59873767827808,68.31084450182222,69.02730813691093,69.74813616640164,70.47333615344107,71.20291564160104,71.93688215501312,72.67524319850172,73.41800625771542,74.16517879925733,74.9167682708136,75.67278210128072,76.43322770089146,77.1981124613393,77.96744375590167,78.74122893956174,79.51947534912904,80.30219030335869,81.08938110306934,81.88105503125999,82.67721935322541,83.4778813166706,84.28304815182372,85.09272707154808,85.90692527145302,86.72564993000343,87.54890820862819,88.3767072518277,89.2090541872801,90.04595612594655,90.88742016217518,91.73345337380438,92.58406282226491,93.43925555268066,94.29903859396902,95.16341895893969,96.03240364439274,96.9059996312159,97.78421388448044,98.6670533535366,99.55452497210776],t.n)
 B.x4=s(["Domh","Luan","M\xe1irt","C\xe9ad","D\xe9ar","Aoine","Sath"],t.s)
-B.bBw=new A.a2(0.7078,8.3194)
-B.bBa=new A.a2(0.7895,2.4523)
+B.bBv=new A.a2(0.7078,8.3194)
+B.bB9=new A.a2(0.7895,2.4523)
 B.bBQ=new A.a2(0.8379,1.8528)
-B.bB_=new A.a2(0.8701,1.6891)
-B.bBn=new A.a2(0.8932,1.5806)
+B.bB0=new A.a2(0.8701,1.6891)
+B.bBm=new A.a2(0.8932,1.5806)
 B.bB5=new A.a2(0.9107,1.5043)
-B.bB9=new A.a2(0.9244,1.447)
+B.bB8=new A.a2(0.9244,1.447)
 B.bB7=new A.a2(0.9355,1.4037)
-B.bBo=new A.a2(0.9448,1.3701)
-B.bAV=new A.a2(0.9526,1.3431)
-B.bBj=new A.a2(0.9594,1.3212)
-B.bBq=new A.a2(0.9653,1.3032)
+B.bBn=new A.a2(0.9448,1.3701)
+B.bAW=new A.a2(0.9526,1.3431)
+B.bBi=new A.a2(0.9594,1.3212)
+B.bBp=new A.a2(0.9653,1.3032)
 B.bBD=new A.a2(0.9705,1.288)
-B.Xk=s([B.bBw,B.bBa,B.bBQ,B.bB_,B.bBn,B.bB5,B.bB9,B.bB7,B.bBo,B.bAV,B.bBj,B.bBq,B.bBD],A.al("A<+(D,D)>"))
+B.Xk=s([B.bBv,B.bB9,B.bBQ,B.bB0,B.bBm,B.bB5,B.bB8,B.bB7,B.bBn,B.bAW,B.bBi,B.bBp,B.bBD],A.al("A<+(D,D)>"))
 B.Xl=s(["\u09aa\u09cd\u09f0\u09a5\u09ae \u09a4\u09bf\u09a8\u09bf\u09ae\u09be\u09b9","\u09a6\u09cd\u09ac\u09bf\u09a4\u09c0\u09af\u09bc \u09a4\u09bf\u09a8\u09bf\u09ae\u09be\u09b9","\u09a4\u09c3\u09a4\u09c0\u09af\u09bc \u09a4\u09bf\u09a8\u09bf\u09ae\u09be\u09b9","\u099a\u09a4\u09c1\u09f0\u09cd\u09a5 \u09a4\u09bf\u09a8\u09bf\u09ae\u09be\u09b9"],t.s)
 B.x5=s(["sk","pr","an","tr","kt","pn","\u0161t"],t.s)
 B.x6=s(["januar","februar","marec","april","maj","junij","julij","avgust","september","oktober","november","december"],t.s)
@@ -167747,11 +167747,11 @@ B.bEB=new A.aX(B.dg,!1,!0,!0,!1,B.a9)
 B.bEr=new A.aX(B.dg,!1,!1,!0,!1,B.a9)
 B.a1n=new A.c0([B.bEw,B.aj,B.bE2,B.aj,B.a7B,B.aj,B.a7y,B.aj,B.bEn,B.aj,B.bEe,B.aj,B.bEB,B.aj,B.bEr,B.aj],t.Fp)
 B.bvL={inventario:0,cobros:1,metas:2,sistema:3}
-B.bBh=new A.a2("Inventario","Productos agotados o por acabarse")
+B.bBg=new A.a2("Inventario","Productos agotados o por acabarse")
 B.bBK=new A.a2("Cobros","Clientes con fiados vencidos")
-B.bBr=new A.a2("Metas","Meta de ventas cumplida")
-B.bBu=new A.a2("Sincronizaci\xf3n","Datos que no se pudieron subir")
-B.bsu=new A.W(B.bvL,[B.bBh,B.bBK,B.bBr,B.bBu],A.al("W<j,+(j,j)>"))
+B.bBq=new A.a2("Metas","Meta de ventas cumplida")
+B.bBt=new A.a2("Sincronizaci\xf3n","Datos que no se pudieron subir")
+B.bsu=new A.W(B.bvL,[B.bBg,B.bBK,B.bBq,B.bBt],A.al("W<j,+(j,j)>"))
 B.bCP=new A.dT(1,"hasCheckedState")
 B.bCV=new A.dT(2,"isChecked")
 B.bCU=new A.dT(268435456,"hasSelectedState")
@@ -168801,28 +168801,28 @@ B.bAQ=new A.zx(3,"timeout")
 B.bAR=new A.aM4("2.0.0",1,"v2")
 B.bAT=new A.a2(0,0)
 B.bAU=new A.a2(0,!0)
+B.bAV=new A.a2("3. Finalidades","Gestionar el registro, la operaci\xf3n comercial, el inventario, las ventas, los pedidos, las entregas, el control de cartera y fiados, la comunicaci\xf3n comercial (comprobantes, cobros, promociones por WhatsApp que el comercio decide enviar), los informes del negocio y el control de lo que se debe a proveedores, el seguimiento de clientes que autorizaron la comunicaci\xf3n comercial y el respaldo en la nube; atender a los titulares y cumplir la ley.")
 B.fs=new A.Qe(2,"collapsed")
-B.bAX=new A.a2(B.fs,B.fs)
-B.bB0=new A.a2(B.Bh,"Ventas por peso con gramera")
-B.bB3=new A.a2("3. Finalidades","Gestionar el registro, la operaci\xf3n comercial, el inventario, las ventas, los pedidos, las entregas, el control de cartera y fiados, la comunicaci\xf3n comercial (comprobantes, cobros, promociones por WhatsApp que el comercio decide enviar), los informes del negocio y el respaldo en la nube; atender a los titulares y cumplir la ley.")
-B.bB8=new A.a2("4. Tratamiento y seguridad","En el celular, la base de datos va cifrada (AES-256) y no se copia en los respaldos autom\xe1ticos del sistema. En la nube, los datos viajan solo por HTTPS y cada comercio ve \xfanicamente los suyos (seguridad por fila). La inteligencia artificial recibe solo totales, nunca nombres, celulares ni correos. La sesi\xf3n se bloquea tras 5 intentos fallidos y se cierra tras 30 minutos sin uso. No se venden ni se ceden datos.")
-B.bBb=new A.a2(B.pu,"Pedidos al proveedor en PDF")
-B.bBc=new A.a2("Avisos","")
-B.bBe=new A.a2("8. Vigencia","Rige desde su aceptaci\xf3n en la app (Aviso v2 \xb7 noviembre de 2026). Los cambios sustanciales se avisar\xe1n en la app y se pedir\xe1 de nuevo la autorizaci\xf3n.")
-B.bBf=new A.a2(B.Be,"Informes semanal, quincenal y mensual para tu contador")
-B.bBg=new A.a2(B.mq,"Ventas de contado (sin fiados)")
-B.bBl=new A.a2(B.as,0)
-B.bBm=new A.a2("5. Derechos de los titulares (art. 8, Ley 1581 de 2012)","Conocer, actualizar y rectificar sus datos; solicitar prueba de la autorizaci\xf3n; ser informado del uso dado a sus datos; presentar quejas ante la Superintendencia de Industria y Comercio; revocar la autorizaci\xf3n y pedir la supresi\xf3n cuando no se respeten los principios y garant\xedas; y acceder gratis a sus datos.")
-B.bBs=new A.a2(B.ps,"Puedes crear servicios sin inventario")
+B.bAY=new A.a2(B.fs,B.fs)
+B.bB1=new A.a2(B.Bh,"Ventas por peso con gramera")
+B.bBa=new A.a2(B.pu,"Pedidos al proveedor en PDF")
+B.bBb=new A.a2("Avisos","")
+B.bBd=new A.a2("8. Vigencia","Rige desde su aceptaci\xf3n en la app (Aviso v2 \xb7 noviembre de 2026). Los cambios sustanciales se avisar\xe1n en la app y se pedir\xe1 de nuevo la autorizaci\xf3n.")
+B.bBe=new A.a2(B.Be,"Informes semanal, quincenal y mensual para tu contador")
+B.bBf=new A.a2(B.mq,"Ventas de contado (sin fiados)")
+B.bBk=new A.a2(B.as,0)
+B.bBl=new A.a2("5. Derechos de los titulares (art. 8, Ley 1581 de 2012)","Conocer, actualizar y rectificar sus datos; solicitar prueba de la autorizaci\xf3n; ser informado del uso dado a sus datos; presentar quejas ante la Superintendencia de Industria y Comercio; revocar la autorizaci\xf3n y pedir la supresi\xf3n cuando no se respeten los principios y garant\xedas; y acceder gratis a sus datos.")
+B.bBr=new A.a2(B.ps,"Puedes crear servicios sin inventario")
 B.yc=new A.Qe(0,"left")
 B.yd=new A.Qe(1,"right")
-B.bBt=new A.a2(B.yc,B.yd)
-B.bBv=new A.a2(B.nG,B.nH)
-B.bBx=new A.a2(B.nH,B.nG)
-B.bBy=new A.a2(!1,!1)
-B.bBz=new A.a2(!1,null)
-B.bBA=new A.a2(!1,!0)
-B.bBB=new A.a2(B.nD,B.nE)
+B.bBs=new A.a2(B.yc,B.yd)
+B.bBu=new A.a2(B.nG,B.nH)
+B.bBw=new A.a2(B.nH,B.nG)
+B.bBx=new A.a2(!1,!1)
+B.bBy=new A.a2(!1,null)
+B.bBz=new A.a2(!1,!0)
+B.bBA=new A.a2(B.nD,B.nE)
+B.bBB=new A.a2("4. Tratamiento y seguridad","En el celular, la base de datos va cifrada (AES-256) y no se copia en los respaldos autom\xe1ticos del sistema. En la nube, los datos viajan solo por HTTPS y cada comercio ve \xfanicamente los suyos (seguridad por fila). La inteligencia artificial recibe solo totales del negocio o nombres de productos y precios, nunca nombres de personas, celulares ni correos. La sesi\xf3n se bloquea tras 5 intentos fallidos y se cierra tras 30 minutos sin uso. No se venden ni se ceden datos.")
 B.bBG=new A.a2("2. Datos que se tratan","De los clientes del comercio: nombre, celular y, si el cliente lo da, correo y municipio; sus compras, abonos y saldos. De proveedores: nombre, celular, pedidos y saldos. Del comercio: ventas, gastos, medios de pago, inventario, cotizaciones y documentos. Del usuario: correo para iniciar sesi\xf3n (la contrase\xf1a se guarda con hash). No se tratan datos sensibles ni datos de ni\xf1os, ni\xf1as o adolescentes; responder preguntas sobre datos sensibles es facultativo.")
 B.bBH=new A.a2(B.nE,B.nD)
 B.bBN=new A.a2(!0,!1)
