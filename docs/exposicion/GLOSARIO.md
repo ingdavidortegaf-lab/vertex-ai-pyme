@@ -39,7 +39,7 @@ Si el jurado usa una de estas palabras, ya sabes qué significa y cómo responde
 | **Paquete / librería / dependencia** | Código hecho por otros que reutilizamos | Están en `pubspec.yaml` |
 | **APK** | El instalador de Android | `VERTEX_AI_Pyme.apk` |
 | **Compilar / build** | Convertir el código en el programa que se instala | `flutter build apk` |
-| **Prueba automática (test)** | Un programa que revisa solo que otro funcione | 93 pruebas con `flutter test` |
+| **Prueba automática (test)** | Un programa que revisa solo que otro funcione | 106 pruebas con `flutter test` |
 | **Git / commit** | Historia de cambios del código; cada commit es una "foto" | Todo el proyecto está en Git |
 | **Prompt** | Las instrucciones que se le dan a la IA | Se arman en la Edge Function solo con totales |
 | **Notificación local** | Aviso que el celular se manda a sí mismo, sin servidor | "Se agotó el arroz" |

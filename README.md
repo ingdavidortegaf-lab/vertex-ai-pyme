@@ -65,7 +65,7 @@ flowchart TB
 | `lib/data/` | Base local cifrada, cola y sincronización, conexión con Supabase |
 | `lib/pdf/` | Generación y archivo de PDF, informes contables |
 | `supabase/` | `supabase_schema.sql` (tablas, RLS, triggers) y `functions/asistente` (IA) |
-| `test/` | **93 pruebas automáticas**, incluida una caída de red a mitad del envío |
+| `test/` | **106 pruebas automáticas**, incluida una caída de red a mitad del envío |
 | `docs/base_de_datos/` | Base SQLite de ejemplo y consultas SQL probadas (SQLite, PostgreSQL y MySQL); [cómo mostrarla](docs/base_de_datos/LEEME_BASE_DE_DATOS.md) |
 | `docs/` | Manual, auditoría, política de datos (Ley 1581), licencias, [pagos y modelo de negocio](docs/PAGOS_Y_MODELO_DE_NEGOCIO.md) y guías de exposición |
 
@@ -80,7 +80,7 @@ Cada carpeta de código trae un `LEEME.md` corto. La explicación completa está
 ```powershell
 flutter pub get
 flutter analyze
-flutter test                 # 93 pruebas
+flutter test                 # 106 pruebas
 flutter run -d windows       # en el PC, modo solo local (sin nube)
 flutter run                  # en un celular Android conectado
 ```
@@ -122,7 +122,7 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 
 ## Estado y pendientes
 Probado:
-- 93 pruebas automáticas;
+- 106 pruebas automáticas;
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
 - versión de Windows compilada y ejecutada.
 

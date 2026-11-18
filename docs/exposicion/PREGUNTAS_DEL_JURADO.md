@@ -22,7 +22,7 @@ Es **multiplataforma compilada**: Flutter convierte el código Dart en código d
 **VS Code** como editor, **Flutter SDK 3.50**, **Android SDK**, **Git** para versiones y **Supabase** para la nube. Todo gratuito.
 
 **5. ¿Cuántas líneas de código tiene?**
-Unas **13.000** entre Dart, TypeScript y SQL, más 93 pruebas automáticas.
+Unas **13.000** entre Dart, TypeScript y SQL, más 106 pruebas automáticas.
 
 ---
 
@@ -193,7 +193,7 @@ No:
 - Sin copias de seguridad de Android.
 
 **29. ¿Cómo probaron la app?**
-- **93 pruebas automáticas** (`flutter test`): reglas, base de datos, sincronización con servidor simulado, caída de red, conflictos y PDF.
+- **106 pruebas automáticas** (`flutter test`): reglas, base de datos, sincronización con servidor simulado, caída de red, conflictos y PDF.
 - Prueba real en un Xiaomi 14T: modo avión y sincronización con Supabase sin duplicados.
 - Capturas de pantalla para revisar el diseño.
 

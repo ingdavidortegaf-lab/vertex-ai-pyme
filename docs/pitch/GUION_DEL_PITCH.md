@@ -7,7 +7,7 @@
 
 | Criterio (peso) | Diapositivas | La frase que no puede faltar |
 |---|---|---|
-| **Tecnología (25)** | 4, 8 (demo), 9 | "Funciona en modo avión y sincroniza sin perder ni duplicar nada; 93 pruebas automáticas." |
+| **Tecnología (25)** | 4, 8 (demo), 9 | "Funciona en modo avión y sincroniza sin perder ni duplicar nada; 106 pruebas automáticas." |
 | **Emprendimiento (20)** | 2, 14, 16 | "Piloto de 8 semanas en 15 tiendas, con metas medibles." |
 | **Marketing (20)** | 3, 5, 7, 10, 11 | "Que ningún fiado se pierda. Llegamos por la Gobernación, los mayoristas y el voz a voz entre tenderos." |
 | **Financiera (20)** | 12, 13 | "Gratis para la MiPyme; $19.900 al mes fuera del programa. Equilibrio con 78 tiendas; con 100 quedan unos $455.000 al mes." |
@@ -59,8 +59,13 @@ Pon el celular en **modo avión** frente al jurado y sigue los 5 pasos de la dia
 4. Aviso de "se agotó".
 5. Quita el modo avión: la píldora dice **"Sincronizado"**.
 
+**Si sobra un minuto en la demo (lo nuevo):**
+- **Llegó el pedido → «Una parte» (50 %)**: entra todo al inventario y el saldo aparece en **Lo que debo** con su fecha. Frase: *"Así trabaja el tendero con el proveedor: paga la mitad y la otra mitad fiada."*
+- **Promociones**: elige el arroz, ponle precio de oferta, toca **Redactar con IA** y muestra la **imagen para el estado** con el logo y los precios.
+- **Seguimiento**: *"Estos clientes hace rato no vienen; con un toque les escribo por WhatsApp, solo si autorizaron."*
+
 **9 · Tecnología (2:25–2:50)**
-"Es una sola app en Flutter y Dart, para Android y Windows. Todo se guarda primero en una base cifrada en el celular, y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 93 pruebas automáticas, incluida una que corta internet a mitad del envío."
+"Es una sola app en Flutter y Dart, para Android y Windows. Todo se guarda primero en una base cifrada en el celular, y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 106 pruebas automáticas, incluida una que corta internet a mitad del envío."
 
 **10 · Por qué nosotros (2:50–3:05)**
 "¿Por qué no una app gratuita? Porque las apps grandes sirven para todo el país; nosotros estamos hechos para la tienda de aquí: funciona sin datos todo el día, dice desde cuándo le deben, cobra con un PDF y hay gente de Casanare que la instala."
@@ -82,7 +87,7 @@ Pon el celular en **modo avión** frente al jurado y sigue los 5 pasos de la dia
 "Lo validamos con un piloto de 8 semanas en 15 tiendas de Trinidad y Yopal. Las metas: que 10 tiendas usen la app al menos 4 días por semana, que 6 estén dispuestas a pagar y cerrar un mayorista aliado."
 
 **15 · Legal (4:25–4:40)**
-"Cumplimos la Ley 1581: la MiPyme es responsable de los datos y la Gobernación es encargada. El equipo conserva la propiedad intelectual y la Gobernación recibe una licencia gratuita e indefinida."
+"Cumplimos la Ley 1581 con los formatos oficiales de la convocatoria: la casilla viene sin marcar, con el enlace visible a la política, y cada cliente firma o responde AUTORIZO con el Anexo 3. La MiPyme es responsable de los datos y la Gobernación es encargada. El equipo conserva la propiedad intelectual y la Gobernación recibe una licencia gratuita e indefinida."
 
 **16 · Equipo (4:40–4:50)**
 "Somos tres hermanos de Casanare: desarrollo, procesos y negocio, con el respaldo de la Asociación Aerollano."

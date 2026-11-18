@@ -1,4 +1,4 @@
-# 6 · Pruebas automáticas: 93 pruebas, todas pasan
+# 6 · Pruebas automáticas: 106 pruebas, todas pasan
 
 ## En una frase
 Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 93 en verde.

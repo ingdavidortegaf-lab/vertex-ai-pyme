@@ -25,7 +25,7 @@
 | `3_datos_sin_senal/` | La **memoria del celular** y la sincronización | "¿Cómo funciona sin internet?" |
 | `4_nube_backend/` | **El backend**: la base en internet (Supabase) y la función de IA | "¿Qué backend usaste? ¿Qué API integraste?" |
 | `5_pdf_y_documentos/` | Cómo se **generan los PDF** y cómo se archivan | "¿Cómo generas los PDF?" |
-| `6_pruebas/` | **93 pruebas automáticas** | "¿Cómo sabes que funciona?" |
+| `6_pruebas/` | **106 pruebas automáticas** | "¿Cómo sabes que funciona?" |
 | `7_configuracion/` | Android, Windows y la lista de paquetes | "¿Qué librerías usaste? ¿Cómo compilas?" |
 | `8_seguridad/` | Dónde está cada protección | "¿Es segura? ¿Cumple la Ley 1581?" |
 | `9_documentos_convocatoria/` | Manual, política de datos, licencias, auditoría | Lo que pide la convocatoria |

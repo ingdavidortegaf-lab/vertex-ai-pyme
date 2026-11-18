@@ -254,7 +254,7 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                      base salga del celular por copias de Android.
   (La carpeta ios/ tiene la configuracion de iPhone, iOS 16.)
 
-3.5  test/  - PRUEBAS AUTOMATICAS (93 pruebas, todas pasan)
+3.5  test/  - PRUEBAS AUTOMATICAS (106 pruebas, todas pasan)
   soporte.dart                 Base de pruebas y un servidor falso.
   sync_test.dart               Modo avion, envio unico, caida de red a mitad,
                                reintentos, sesion vencida, otro celular.
@@ -443,7 +443,7 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 -------------------------------------------------------------------------------
 7. QUE ESTA PROBADO Y QUE FALTA
 -------------------------------------------------------------------------------
-  Probado: 93 pruebas automaticas; app instalada en Xiaomi 14T; flujo
+  Probado: 106 pruebas automaticas; app instalada en Xiaomi 14T; flujo
   completo en modo avion; sincronizacion real con Supabase sin duplicados;
   actualizacion a la version con inventario conservando datos.
   Falta probar en el celular: version con herramientas, codigo de barras,
