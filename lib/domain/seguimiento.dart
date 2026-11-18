@@ -123,3 +123,6 @@ bool puedeEscribir(ResumenCliente c, DateTime ahora) =>
     c.autorizo &&
     c.telefono.trim().isNotEmpty &&
     (c.contactado == null || ahora.difference(c.contactado!).inDays >= 7);
+
+/// «hoy», «ayer» o «hace N días».
+String haceDias(int d) => d <= 0 ? 'hoy' : (d == 1 ? 'ayer' : 'hace $d días');

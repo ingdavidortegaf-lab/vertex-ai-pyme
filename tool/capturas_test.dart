@@ -19,6 +19,11 @@ import 'package:vertex_ai_pyme/ui/consent_gate.dart';
 import 'package:vertex_ai_pyme/ui/herramientas_page.dart';
 import 'package:vertex_ai_pyme/ui/home_page.dart';
 import 'package:vertex_ai_pyme/ui/oficina_page.dart';
+import 'package:vertex_ai_pyme/ui/promocion_page.dart';
+import 'package:vertex_ai_pyme/ui/seguimiento_page.dart';
+import 'package:vertex_ai_pyme/domain/documentos.dart';
+import 'package:vertex_ai_pyme/domain/promocion.dart';
+import 'package:vertex_ai_pyme/domain/pagos.dart';
 import 'package:vertex_ai_pyme/ui/registro_negocio_page.dart';
 import 'package:vertex_ai_pyme/ui/tema.dart';
 import '../test/soporte.dart';
@@ -390,5 +395,64 @@ void main() {
     });
     await _esperar(tester);
     await captura(tester, 'phone-cierre-caja');
+  });
+
+  testWidgets('cartel de promoción', (tester) async {
+    await tam(tester, 520);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const Scaffold(
+          body: Padding(
+              padding: EdgeInsets.all(40),
+              child: CartelPromo(
+                negocio: PerfilNegocio(nombre: 'Tienda Doña Marta', telefono: '3101234567'),
+                estilo: EstiloPromo.alegre,
+                productos: [
+                  ProductoPromo('Arroz Diana 500 g', 2000, 2500),
+                  ProductoPromo('Aceite Premier 1 L', 9500, 10900),
+                  ProductoPromo('Panela x 2', 4000, 4000),
+                ],
+              )))));
+    });
+    await _esperar(tester);
+    await captura(tester, 'promo-cartel');
+  });
+
+  testWidgets('promociones', (tester) async {
+    await tam(tester, 1500);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const PromocionPage()));
+    });
+    await _esperar(tester);
+    await tester.tap(find.byType(Checkbox).first);
+    await _esperar(tester);
+    await captura(tester, 'phone-promociones');
+  });
+
+  testWidgets('lo que debo', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      final p = (await db.productos()).first;
+      final pv = await db.saveProveedor('Distribuidora El Llano', '3101234567');
+      await db.recibirPedido([(p.id, 40, p.costo)],
+          conceptoGasto: 'Compra a Distribuidora El Llano',
+          pagosGasto: [Pago('efectivo', (40 * p.costo / 2).roundToDouble())],
+          pagadoAhora: (40 * p.costo / 2).roundToDouble(),
+          proveedorId: pv,
+          proveedorNombre: 'Distribuidora El Llano',
+          venceSaldo: DateTime.now().add(const Duration(days: 2)));
+      await tester.pumpWidget(_app(const CuentasPagarPage()));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-lo-que-debo');
+  });
+
+  testWidgets('seguimiento', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await db.registrarAutorizacionCliente(anaId, 'en la tienda');
+      await tester.pumpWidget(_app(const SeguimientoPage()));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-seguimiento');
   });
 }

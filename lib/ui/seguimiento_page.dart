@@ -142,7 +142,7 @@ class _SeguimientoPageState extends State<SeguimientoPage> {
                             Text(c.nombre, style: t.titleMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
                             Text(
                                 '${c.compras} ${c.compras == 1 ? 'compra' : 'compras'} · ${cop(c.total)} · '
-                                'última hace ${c.diasSinComprar(ahora)} días',
+                                'última ${haceDias(c.diasSinComprar(ahora) ?? 0)}',
                                 style: t.bodySmall),
                           ]),
                         ),
@@ -154,7 +154,7 @@ class _SeguimientoPageState extends State<SeguimientoPage> {
                               style: t.bodySmall?.copyWith(color: pal.fiado)),
                         ),
                       if (c.contactado != null)
-                        Text('Le escribió hace ${ahora.difference(c.contactado!).inDays} días',
+                        Text('Le escribió ${haceDias(ahora.difference(c.contactado!).inDays)}',
                             style: t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
                       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                         TextButton(
