@@ -3,6 +3,7 @@ import '../data/local_db.dart';
 import '../domain/contabilidad.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
+import '../domain/pagos.dart';
 import '../domain/resumen.dart';
 import 'pdf_reportes.dart';
 
@@ -24,6 +25,7 @@ Reporte reporteCuentaCobro({
   required String cliente,
   required String telefono,
   required EstadoCuenta estado,
+  List<String> formasDePago = const [],
 }) {
   final e = estado;
   return Reporte(
@@ -104,6 +106,8 @@ Reporte reporteCuentaCobro({
         ],
         vacia: 'Sin movimientos a crédito.',
       ),
+      if (formasDePago.isNotEmpty && e.saldo > 0.5)
+        Parrafo('Puede pagar por transferencia:  ${formasDePago.join('   ·   ')}', destacado: true),
       const Parrafo('Los abonos se aplican primero a las compras más antiguas. '
           'Si encuentra alguna diferencia, por favor avísenos para revisarla juntos.'),
     ],
@@ -240,7 +244,7 @@ Reporte reporteInforme({
         ],
         derecha: {1, 2, 3},
       ),
-      const Seccion('Flujo de caja (lo que entró y salió en efectivo)'),
+      const Seccion('Flujo de caja (lo que de verdad entró y salió)'),
       Tabla(
         ['Concepto', 'Valor'],
         [
@@ -251,6 +255,28 @@ Reporte reporteInforme({
         derecha: {1},
         pie: ['= Caja neta del periodo', cop(d.cajaNeta)],
       ),
+      const Seccion('Ingresos y pagos por medio de pago'),
+      Tabla(
+        ['Medio', 'Entró', 'Salió', 'Neto'],
+        [
+          for (final m in a.medios.medios)
+            [nombresMedio[m]!, cop(a.medios.entrada(m)), cop(a.medios.salida(m)), cop(a.medios.neto(m))]
+        ],
+        derecha: {1, 2, 3},
+        pie: a.medios.medios.isEmpty
+            ? null
+            : [
+                'Total',
+                cop(a.medios.totalEntradas),
+                cop(a.medios.salidas.values.fold(0.0, (x, y) => x + y)),
+                cop(a.medios.totalEntradas - a.medios.salidas.values.fold(0.0, (x, y) => x + y)),
+              ],
+        vacia: 'Sin pagos registrados en este periodo.',
+      ),
+      if (a.medios.medios.isNotEmpty)
+        Parrafo('Efectivo neto: ${cop(a.medios.neto('efectivo'))} (debe cuadrar con la caja). '
+            'Pagos digitales recibidos (Nequi, Daviplata, bancos y tarjetas): '
+            '${cop(a.medios.totalDigital)}; concílielos con los extractos.'),
       const Seccion('Ventas por día'),
       if (d.dias.every((x) => x.ventas <= 0))
         const Parrafo('Sin ventas en este periodo.')
@@ -332,9 +358,13 @@ Reporte reporteInforme({
               _tipos[m['tipo']] ?? '${m['tipo']}',
               (m['concepto'] as String?) ?? '',
               (m['cliente_nombre'] as String?) ?? '',
-              m['tipo'] == 'ingreso'
-                  ? (m['credito'] == 1 ? 'Crédito' : 'Contado')
-                  : '',
+              m['tipo'] == 'ingreso' && m['credito'] == 1
+                  ? 'Crédito'
+                  : textoPagos(
+                      leerPagos(m['pagos'],
+                          monto: (m['monto'] as num).toDouble(),
+                          tipo: m['tipo'] as String),
+                      conValor: false),
               cop((m['monto'] as num).toDouble()),
             ]
         ],
@@ -359,6 +389,7 @@ String textoInforme(PerfilNegocio n, String numero, DatosInforme d) {
       'Gastos: ${cop(a.gastos)} (${variacion(a.gastos, b.gastos)})\n'
       'Utilidad: ${cop(a.utilidad)}\n'
       'Caja neta: ${cop(d.cajaNeta)}\n'
+      'Recibido por Nequi, bancos y tarjetas: ${cop(a.medios.totalDigital)}\n'
       'Por cobrar: ${cop(d.carteraTotal)}\n'
       'Inventario al costo: ${cop(d.valorCosto)}\n\n'
       '_El detalle completo va en el PDF adjunto._';

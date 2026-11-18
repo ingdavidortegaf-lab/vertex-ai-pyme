@@ -8,6 +8,7 @@ import 'inventario_page.dart';
 import 'login_page.dart';
 import 'negocio_page.dart';
 import 'notificaciones.dart';
+import 'pago_widget.dart';
 import 'privacidad_page.dart';
 import 'registro_negocio_page.dart';
 import 'tablero_page.dart';
@@ -95,6 +96,8 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(builder: (_) => const PrivacidadPage()));
               } else if (v == 'negocio') {
                 mostrarMiNegocio(context);
+              } else if (v == 'pagos') {
+                mostrarDatosPago(context);
               } else if (v == 'ajustar') {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => const RegistroNegocioPage()));
@@ -108,6 +111,13 @@ class _HomePageState extends State<HomePage> {
                 child: ListTile(
                     leading: Icon(Icons.storefront_outlined),
                     title: Text('Mi negocio'),
+                    contentPadding: EdgeInsets.zero),
+              ),
+              PopupMenuItem(
+                value: 'pagos',
+                child: ListTile(
+                    leading: Icon(Icons.account_balance_wallet_outlined),
+                    title: Text('Datos para recibir pagos'),
                     contentPadding: EdgeInsets.zero),
               ),
               PopupMenuItem(

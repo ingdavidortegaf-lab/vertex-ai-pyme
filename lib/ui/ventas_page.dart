@@ -5,6 +5,8 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
+import 'pago_widget.dart';
+import '../domain/pagos.dart';
 import 'escaner.dart';
 import 'herramientas_page.dart';
 import '../domain/codigos.dart';
@@ -156,9 +158,12 @@ class FilaMovimiento extends StatelessWidget {
     };
     final cliente = v['cliente_nombre'] as String?;
     final fecha = fmt.format(DateTime.parse(v['fecha'] as String).toLocal());
+    final pagos = leerPagos(v['pagos'],
+        monto: (v['monto'] as num).toDouble(), tipo: tipo, credito: fiado);
     final partes = [
       if (etiqueta != v['concepto']) etiqueta,
       if (mostrarCliente && cliente != null) cliente,
+      if (pagos.isNotEmpty) textoPagos(pagos, conValor: false),
       fecha,
     ];
     return ListTile(
@@ -202,12 +207,12 @@ Future<void> mostrarFormMovimiento(BuildContext context,
   final String id;
   if (r.items.isNotEmpty) {
     id = await LocalDb.instance.saveVentaProductos(r.items,
-        fiado: r.fiado, clienteId: r.clienteId, concepto: r.concepto);
+        fiado: r.fiado, clienteId: r.clienteId, concepto: r.concepto, pagos: r.pagos);
   } else {
     var concepto = r.concepto.trim();
     if (concepto.isEmpty) concepto = r.tipo == 'abono' ? 'Abono' : 'Venta';
     id = await LocalDb.instance.saveMovimiento(concepto, r.monto,
-        tipo: r.tipo, credito: r.fiado, clienteId: r.clienteId);
+        tipo: r.tipo, credito: r.fiado, clienteId: r.clienteId, pagos: r.pagos);
   }
   SyncService.instance.sync();
   if (r.tipo == 'ingreso') {
@@ -228,9 +233,12 @@ class _Movimiento {
   final bool fiado;
   final String? clienteId;
   final List<ItemVenta> items;
+
+  /// Cómo se pagó (vacío si es fiado).
+  final List<Pago> pagos;
   const _Movimiento(
       this.concepto, this.monto, this.tipo, this.fiado, this.clienteId,
-      [this.items = const []]);
+      [this.items = const [], this.pagos = const []]);
 }
 
 class _FormMovimiento extends StatefulWidget {
@@ -255,6 +263,11 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   bool _fiado = false;
   late String? _clienteId = widget.clienteId;
   String? _errorCliente;
+  List<Pago> _pagos = const [];
+  String? _errorPago;
+
+  /// ¿Este movimiento lleva medio de pago? (todo menos la venta fiada)
+  bool get _llevaPago => !(_tipo == 'ingreso' && _fiado);
 
   /// Productos de la venta: id -> cantidad (en el orden en que se agregaron).
   final _carrito = <String, double>{};
@@ -452,8 +465,17 @@ class _FormMovimientoState extends State<_FormMovimiento> {
         monto > cliente.saldo + 0.5) {
       errCliente = 'El abono supera lo que debe (${cop(cliente.saldo)})';
     }
-    setState(() => _errorCliente = errCliente);
-    if (!okForm || errCliente != null || monto == null || monto <= 0) return;
+    final pagos = _llevaPago ? normalizarPagos(_pagos) : const <Pago>[];
+    final errPago = _llevaPago && monto != null && monto > 0
+        ? problemaPagos(pagos, monto)
+        : null;
+    setState(() {
+      _errorCliente = errCliente;
+      _errorPago = errPago;
+    });
+    if (!okForm || errCliente != null || errPago != null || monto == null || monto <= 0) {
+      return;
+    }
     Navigator.pop(
         context,
         _Movimiento(
@@ -462,7 +484,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
             _tipo,
             _tipo == 'ingreso' && _fiado,
             _tipo == 'egreso' ? null : _clienteId,
-            conProductos ? _items : const []));
+            conProductos ? _items : const [],
+            pagos));
   }
 
   @override
@@ -627,6 +650,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 validator: (v) => parseMonto(v ?? '') == null
                     ? 'Escribe un monto mayor a cero'
                     : null,
+                onChanged: (_) => setState(() {}),
               ),
             ],
             if (_tipo == 'ingreso' &&
@@ -639,6 +663,18 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 onChanged: (v) => setState(() => _fiado = v),
                 title: const Text('Venta fiada'),
                 subtitle: const Text('Queda por cobrar a un cliente'),
+              ),
+            ],
+            if (_llevaPago) ...[
+              const SizedBox(height: 12),
+              SelectorPago(
+                key: ValueKey('pago_$_tipo'),
+                titulo: _tipo == 'egreso' ? '¿Con qué pagó el gasto?' : '¿Cómo pagó?',
+                total: (_tipo == 'ingreso' && _carrito.isNotEmpty)
+                    ? _totalCarrito
+                    : (parseMonto(_monto.text) ?? 0),
+                error: _errorPago,
+                onChanged: (l) => _pagos = l,
               ),
             ],
             if (_tipo != 'egreso') ...[

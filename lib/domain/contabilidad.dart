@@ -229,6 +229,7 @@ String textoCuentaCobro({
   required String numero,
   required EstadoCuenta estado,
   required DateTime fecha,
+  List<String> formasDePago = const [],
 }) {
   final b = StringBuffer()
     ..writeln('*${negocio.nombreVisible}*')
@@ -250,6 +251,14 @@ String textoCuentaCobro({
       ..writeln()
       ..writeln('*Saldo pendiente: ${cop(estado.saldo)}*')
       ..writeln('Debe desde el ${_dia.format(estado.debeDesde!)}.');
+    if (formasDePago.isNotEmpty) {
+      b
+        ..writeln()
+        ..writeln('Puede pagar por transferencia:');
+      for (final x in formasDePago) {
+        b.writeln('• $x');
+      }
+    }
   }
   b
     ..writeln()

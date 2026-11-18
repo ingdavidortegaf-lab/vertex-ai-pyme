@@ -90,6 +90,7 @@ String textoComprobante({
   String? cliente,
   bool fiado = false,
   double saldoCliente = 0,
+  String? formaPago,
 }) {
   final b = StringBuffer()
     ..writeln(_encabezado(negocio))
@@ -102,7 +103,7 @@ String textoComprobante({
     ..writeln(_lineas(lineas))
     ..writeln()
     ..writeln('*Total: ${cop(total)}*')
-    ..writeln('Forma de pago: ${fiado ? 'a crédito (fiado)' : 'contado'}');
+    ..writeln('Forma de pago: ${fiado ? 'a crédito (fiado)' : formaPago ?? 'contado'}');
   if (fiado && saldoCliente > 0) {
     b.writeln('Saldo pendiente a la fecha: ${cop(saldoCliente)}');
   }

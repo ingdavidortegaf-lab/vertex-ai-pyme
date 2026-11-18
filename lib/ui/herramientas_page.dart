@@ -10,6 +10,8 @@ import 'escaner.dart';
 import 'inventario_page.dart';
 import '../pdf/archivo.dart';
 import 'oficina_page.dart';
+import 'pago_widget.dart';
+import '../domain/pagos.dart';
 import '../pdf/pdf_factura.dart';
 import '../domain/codigos.dart';
 import 'tema.dart';
@@ -42,6 +44,8 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
     total: (v['monto'] as num).toDouble(),
     cliente: v['cliente_nombre'] as String?,
     fiado: v['credito'] == 1,
+    formaPago: textoPagos(leerPagos(v['pagos'],
+        monto: (v['monto'] as num).toDouble(), tipo: 'ingreso', credito: v['credito'] == 1)),
     saldoCliente: saldo,
   );
   final fiado = v['credito'] == 1;
@@ -63,7 +67,7 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
     lineas: lineas,
     total: (v['monto'] as num).toDouble(),
     notas: [
-      'Forma de pago: ${fiado ? 'a crédito (fiado)' : 'contado'}',
+      'Forma de pago: ${textoPagos(leerPagos(v['pagos'], monto: (v['monto'] as num).toDouble(), tipo: 'ingreso', credito: fiado))}',
       if (fiado && saldo > 0) 'Saldo pendiente a la fecha: ${cop(saldo)}',
       '¡Gracias por su compra!',
     ],
@@ -196,6 +200,8 @@ class HerramientasGrid extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
     final modo = LocalDb.instance.modo.value;
     final items = [
+      (Icons.point_of_sale_outlined, 'Cierre de caja', 'Efectivo, Nequi, bancos y tarjetas',
+          p.ventasFondo, p.ventas, () => ir(const CierreCajaPage())),
       (
         Icons.receipt_outlined,
         'Comprobantes',
@@ -685,12 +691,16 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
         ),
       ),
     );
-    if (ok != true) return;
+    if (ok != true || !mounted) return;
+    final pagosGasto =
+        gasto ? await pedirPagos(context, total, titulo: '¿Con qué le pagó al proveedor?') : null;
+    if (gasto && pagosGasto == null) return;
     await LocalDb.instance.recibirPedido(
         [for (final (p, c) in items) (p.id, c, p.costo)],
         conceptoGasto: gasto
             ? 'Compra de mercancía${pv == null ? '' : ' a ${pv['nombre']}'}'
-            : null);
+            : null,
+        pagosGasto: pagosGasto);
     SyncService.instance.sync();
     avisar('Mercancía ingresada al inventario');
     if (mounted) Navigator.of(context).pop();
@@ -851,6 +861,7 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
         resumen: lineas.map((l) => l.nombre).join(', '),
         reutilizar: true);
     final numero = documento['numero'] as String;
+    final formas = (await db.datosPago()).lineas();
     final pdf = pdfListo(DocImprimible(
       titulo: 'Cotización',
       numero: numero,
@@ -861,6 +872,7 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
       total: (c['total'] as num).toDouble(),
       notas: [
         'Precios válidos por 8 días o hasta agotar existencias.',
+        if (formas.isNotEmpty) 'Puede pagar por transferencia: ${formas.join(' · ')}',
       ],
     ));
     await archivarDocumento(documento, pdf);
@@ -928,8 +940,13 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
         await LocalDb.instance.deleteCotizacion(id);
         avisar('Cotización eliminada');
       default:
+        final fiado = accion == 'fiado';
+        final pagos = fiado
+            ? null
+            : await pedirPagos(context, (c['total'] as num).toDouble());
+        if (!fiado && pagos == null) return;
         final ventaId = await LocalDb.instance
-            .venderCotizacion(id, fiado: accion == 'fiado');
+            .venderCotizacion(id, fiado: fiado, pagos: pagos);
         SyncService.instance.sync();
         if (!mounted) return;
         final ctx = context;

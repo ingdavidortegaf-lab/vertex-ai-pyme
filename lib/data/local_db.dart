@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
 import '../domain/documentos.dart';
 import '../domain/modo_negocio.dart';
+import '../domain/pagos.dart';
 import '../domain/resumen.dart';
 
 /// Base local CIFRADA (SQLCipher). La clave (256 bits aleatorios) se genera
@@ -127,10 +128,11 @@ class LocalDb {
     await crearHerramientas(d);
     await agregarCodigoYUnidad(d);
     await crearDocumentos(d);
+    await agregarPagos(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 5;
+  static const versionEsquema = 6;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
@@ -138,6 +140,22 @@ class LocalDb {
     if (viejo < 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
     if (viejo < 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
     if (viejo < 5) await crearDocumentos(d); // v5: archivo de documentos
+    if (viejo < 6) await agregarPagos(d); // v6: medios de pago
+  }
+
+  /// v6: medios de pago de cada movimiento (JSON: [{"medio","monto"}]).
+  /// Los movimientos anteriores quedan sin pagos y se leen como efectivo.
+  static Future<void> agregarPagos(Database d) async {
+    await d.execute('ALTER TABLE ventas ADD COLUMN pagos TEXT');
+  }
+
+  /// Valida y ordena los pagos de un movimiento. La venta fiada no lleva
+  /// pagos. Si no se indicó cómo pagó, es efectivo.
+  static List<Pago>? _pagosDe(String tipo, bool fiado, double monto, List<Pago>? pagos) {
+    if (tipo == 'ingreso' && fiado) return null;
+    final l = normalizarPagos(pagos ?? [Pago('efectivo', monto)]);
+    if (problemaPagos(l, monto) != null) throw ArgumentError('pagos');
+    return l;
   }
 
   /// v5: archivo de documentos emitidos (facturas, cotizaciones, cuentas de
@@ -430,7 +448,10 @@ class LocalDb {
   /// Solo se agregan. tipo: 'ingreso' (venta), 'egreso' (gasto) o 'abono'
   /// (pago de una deuda). [credito] = venta fiada (queda por cobrar).
   Future<String> saveMovimiento(String concepto, double monto,
-      {String tipo = 'ingreso', bool credito = false, String? clienteId}) async {
+      {String tipo = 'ingreso',
+      bool credito = false,
+      String? clienteId,
+      List<Pago>? pagos}) async {
     if (!tiposMovimiento.contains(tipo)) throw ArgumentError('tipo');
     if (!monto.isFinite || monto <= 0) throw ArgumentError('monto');
     if (concepto.trim().isEmpty) throw ArgumentError('concepto');
@@ -438,6 +459,7 @@ class LocalDb {
     if ((fiado || tipo == 'abono') && clienteId == null) {
       throw ArgumentError('cliente');
     }
+    final medios = _pagosDe(tipo, fiado, monto, pagos);
     final id = newId();
     final row = <String, Object?>{
       'id': id,
@@ -449,8 +471,16 @@ class LocalDb {
       'fecha': _ahora(),
     };
     await db.transaction((t) async {
-      await t.insert('ventas', {...row, 'sync': 'pendiente'});
-      await _enqueue(t, 'ventas', id, {...row, 'credito': fiado});
+      await t.insert('ventas', {
+        ...row,
+        'pagos': medios == null ? null : codificarPagos(medios),
+        'sync': 'pendiente'
+      });
+      await _enqueue(t, 'ventas', id, {
+        ...row,
+        'credito': fiado,
+        'pagos': medios?.map((p) => p.aMapa()).toList(),
+      });
     });
     _avisar();
     return id;
@@ -680,7 +710,10 @@ class LocalDb {
   /// Venta con productos: un movimiento de venta por el total y una salida de
   /// inventario por cada producto, todo en una sola transacción.
   Future<String> saveVentaProductos(List<ItemVenta> items,
-      {bool fiado = false, String? clienteId, String? concepto}) async {
+      {bool fiado = false,
+      String? clienteId,
+      String? concepto,
+      List<Pago>? pagos}) async {
     final validos = items.where((i) => i.cantidad > 0).toList();
     if (validos.isEmpty) throw ArgumentError('items');
     if (fiado && clienteId == null) throw ArgumentError('cliente');
@@ -692,6 +725,7 @@ class LocalDb {
         ? concepto!.trim()
         : validos.map((i) => '${cant(i.cantidad)} × ${i.nombre}').join(', ');
     if (texto.length > 120) texto = '${texto.substring(0, 117)}…';
+    final medios = _pagosDe('ingreso', fiado, total, pagos);
     final id = newId();
     final venta = <String, Object?>{
       'id': id,
@@ -703,8 +737,16 @@ class LocalDb {
       'fecha': _ahora(),
     };
     await db.transaction((t) async {
-      await t.insert('ventas', {...venta, 'sync': 'pendiente'});
-      await _enqueue(t, 'ventas', id, {...venta, 'credito': fiado});
+      await t.insert('ventas', {
+        ...venta,
+        'pagos': medios == null ? null : codificarPagos(medios),
+        'sync': 'pendiente'
+      });
+      await _enqueue(t, 'ventas', id, {
+        ...venta,
+        'credito': fiado,
+        'pagos': medios?.map((p) => p.aMapa()).toList(),
+      });
       for (final i in validos) {
         await _insertarInventario(
             t,
@@ -734,6 +776,22 @@ class LocalDb {
       }
     });
     modo.value = m;
+    _avisar();
+  }
+
+  /// Cuentas del negocio para recibir transferencias.
+  Future<DatosPago> datosPago() async => DatosPago(
+        nequi: await ajuste('pago_nequi') ?? '',
+        daviplata: await ajuste('pago_daviplata') ?? '',
+        bancolombia: await ajuste('pago_bancolombia') ?? '',
+        llave: await ajuste('pago_llave') ?? '',
+      );
+
+  Future<void> guardarDatosPago(DatosPago d) async {
+    await setAjuste('pago_nequi', d.nequi.trim());
+    await setAjuste('pago_daviplata', d.daviplata.trim());
+    await setAjuste('pago_bancolombia', d.bancolombia.trim());
+    await setAjuste('pago_llave', d.llave.trim());
     _avisar();
   }
 
@@ -796,7 +854,7 @@ class LocalDb {
   /// Llegó la mercancía: entrada de inventario por cada producto y, si se
   /// pide, el gasto de la compra; todo en una sola transacción.
   Future<void> recibirPedido(List<(String productoId, double cantidad, double costo)> items,
-      {String? conceptoGasto}) async {
+      {String? conceptoGasto, List<Pago>? pagosGasto}) async {
     final validos = items.where((x) => x.$2 > 0).toList();
     if (validos.isEmpty) throw ArgumentError('items');
     final total = validos.fold(0.0, (s, x) => s + x.$2 * x.$3);
@@ -818,8 +876,14 @@ class LocalDb {
           'credito': 0,
           'fecha': _ahora(),
         };
-        await t.insert('ventas', {...row, 'sync': 'pendiente'});
-        await _enqueue(t, 'ventas', id, {...row, 'credito': false});
+        final medios = _pagosDe('egreso', false, total, pagosGasto)!;
+        await t.insert('ventas',
+            {...row, 'pagos': codificarPagos(medios), 'sync': 'pendiente'});
+        await _enqueue(t, 'ventas', id, {
+          ...row,
+          'credito': false,
+          'pagos': medios.map((p) => p.aMapa()).toList(),
+        });
       }
     });
     _avisar();
@@ -868,13 +932,14 @@ class LocalDb {
       ];
 
   /// Convierte la cotización en venta (descuenta inventario) y la marca.
-  Future<String> venderCotizacion(String id, {bool fiado = false}) async {
+  Future<String> venderCotizacion(String id,
+      {bool fiado = false, List<Pago>? pagos}) async {
     final r = await db.query('cotizaciones', where: 'id = ?', whereArgs: [id]);
     if (r.isEmpty) throw ArgumentError('cotizacion');
     final c = r.first;
     if (c['estado'] == 'vendida') throw StateError('ya vendida');
     final ventaId = await saveVentaProductos(itemsCotizacion(c),
-        fiado: fiado, clienteId: c['cliente_id'] as String?);
+        fiado: fiado, clienteId: c['cliente_id'] as String?, pagos: pagos);
     await db.update('cotizaciones', {'estado': 'vendida', 'venta_id': ventaId},
         where: 'id = ?', whereArgs: [id]);
     _avisar();
@@ -1010,7 +1075,11 @@ class LocalDb {
         'AND fecha >= ? AND fecha < ?',
         [a, b]);
     final ventas = _dbl(r['ven']), fiado = _dbl(r['fia']);
+    final medios = porMedio(await db.rawQuery(
+        'SELECT tipo, credito, monto, pagos FROM ventas WHERE fecha >= ? AND fecha < ?',
+        [a, b]));
     return ResumenPeriodo(
+      medios: medios,
       ventas: ventas,
       nVentas: (r['nven'] as num?)?.toInt() ?? 0,
       gastos: _dbl(r['gas']),
@@ -1106,6 +1175,11 @@ class LocalDb {
             'tipo': tipo,
             'credito': f['credito'] == true ? 1 : 0,
             'fecha': isoUtc(fecha),
+            'pagos': f['pagos'] == null
+                ? null
+                : f['pagos'] is String
+                    ? f['pagos']
+                    : jsonEncode(f['pagos']),
             'sync': 'enviado',
           },
           conflictAlgorithm: ConflictAlgorithm.ignore);

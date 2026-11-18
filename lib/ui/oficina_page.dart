@@ -5,9 +5,11 @@ import 'package:printing/printing.dart';
 import '../data/local_db.dart';
 import '../domain/contabilidad.dart';
 import '../domain/formato.dart';
+import '../domain/pagos.dart';
 import '../pdf/archivo.dart';
 import 'comun.dart';
 import 'herramientas_page.dart';
+import 'pago_widget.dart';
 import '../pdf/reportes_contables.dart';
 import 'tema.dart';
 
@@ -39,13 +41,15 @@ Future<void> generarCuentaCobro(BuildContext context, String clienteId) async {
           ? 'Al día'
           : 'Debe desde ${_dia.format(estado.debeDesde!)} (${estado.diasMora} días)');
   final numero = documento['numero'] as String;
+  final formas = (await db.datosPago()).lineas();
   final reporte = reporteCuentaCobro(
       negocio: negocio,
       numero: numero,
       fecha: ahora,
       cliente: nombre,
       telefono: tel,
-      estado: estado);
+      estado: estado,
+      formasDePago: formas);
   await archivarDocumento(documento, reporte.pdf);
   if (!context.mounted) return;
   await mostrarDocumento(context,
@@ -55,7 +59,8 @@ Future<void> generarCuentaCobro(BuildContext context, String clienteId) async {
           cliente: nombre,
           numero: numero,
           estado: estado,
-          fecha: ahora),
+          fecha: ahora,
+          formasDePago: formas),
       telefono: tel,
       pdf: reporte.pdf,
       boton: 'Cobrar por WhatsApp');
@@ -569,6 +574,169 @@ class _DocumentosPageState extends State<DocumentosPage> {
                     ),
         ),
       ]),
+    );
+  }
+}
+
+// ---------------------------------------------------------- cierre de caja
+/// Cierre de caja del día: cuánto entró por cada medio de pago, cuánto
+/// efectivo debería haber y la diferencia con lo que se cuenta.
+class CierreCajaPage extends StatefulWidget {
+  const CierreCajaPage({super.key});
+  @override
+  State<CierreCajaPage> createState() => _CierreCajaPageState();
+}
+
+class _CierreCajaPageState extends State<CierreCajaPage> {
+  PorMedio? _m;
+  int _nMovs = 0;
+  final _base = TextEditingController();
+  final _contado = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _cargar();
+  }
+
+  @override
+  void dispose() {
+    _base.dispose();
+    _contado.dispose();
+    super.dispose();
+  }
+
+  Future<void> _cargar() async {
+    final db = LocalDb.instance;
+    final hoy = DateTime.now();
+    final desde = DateTime(hoy.year, hoy.month, hoy.day);
+    final movs = await db.movimientosEntre(desde, desde.add(const Duration(days: 1)));
+    final base = double.tryParse(await db.ajuste('caja_base') ?? '') ?? 0;
+    if (!mounted) return;
+    setState(() {
+      _m = porMedio(movs);
+      _nMovs = movs.length;
+      if (_base.text.isEmpty && base > 0) _base.text = cop(base).substring(1);
+    });
+  }
+
+  double get _baseV => parseMonto(_base.text) ?? 0;
+
+  String _texto(PorMedio m) {
+    final esperado = m.efectivoEsperado(_baseV);
+    final contado = parseMonto(_contado.text);
+    final b = StringBuffer()
+      ..writeln('*Cierre de caja ${_dia.format(DateTime.now())}*')
+      ..writeln();
+    for (final x in m.medios) {
+      b.writeln('${nombresMedio[x]}: entró ${cop(m.entrada(x))}'
+          '${m.salida(x) > 0 ? ', salió ${cop(m.salida(x))}' : ''}');
+    }
+    b
+      ..writeln()
+      ..writeln('Base: ${cop(_baseV)}')
+      ..writeln('Efectivo esperado: ${cop(esperado)}');
+    if (contado != null) {
+      final dif = contado - esperado;
+      b.writeln('Efectivo contado: ${cop(contado)} '
+          '(${dif.abs() < 1 ? 'cuadra' : dif > 0 ? 'sobran ${cop(dif)}' : 'faltan ${cop(-dif)}'})');
+    }
+    return b.toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final m = _m;
+    final t = Theme.of(context).textTheme;
+    final pal = Paleta.of(context);
+    final esquema = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Cierre de caja de hoy'), actions: [
+        IconButton(
+          tooltip: 'Datos para recibir pagos',
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          onPressed: () => mostrarDatosPago(context),
+        ),
+      ]),
+      body: m == null
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(padding: const EdgeInsets.all(16), children: [
+              Text('$_nMovs movimientos hoy', style: t.bodyMedium),
+              const SizedBox(height: 10),
+              Card(
+                child: Column(children: [
+                  if (m.medios.isEmpty)
+                    const Padding(padding: EdgeInsets.all(20), child: Text('Todavía no hay pagos hoy.')),
+                  for (final x in m.medios)
+                    ListTile(
+                      leading: Icon(iconosMedio[x]),
+                      title: Text(nombresMedio[x]!),
+                      subtitle: m.salida(x) > 0 ? Text('Pagos y gastos: ${cop(m.salida(x))}') : null,
+                      trailing: Text(cop(m.entrada(x)), style: cifras(t.titleMedium?.copyWith(color: pal.ventas))),
+                    ),
+                ]),
+              ),
+              const SizedBox(height: 16),
+              Text('Cuadre del efectivo', style: t.titleMedium),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(
+                  child: TextField(
+                    controller: _base,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Base con la que abrió', prefixText: r'$ '),
+                    onChanged: (v) {
+                      setState(() {});
+                      LocalDb.instance.setAjuste('caja_base', (parseMonto(v) ?? 0).toStringAsFixed(0));
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _contado,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Efectivo que contó', prefixText: r'$ '),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              Builder(builder: (_) {
+                final esperado = m.efectivoEsperado(_baseV);
+                final contado = parseMonto(_contado.text);
+                final dif = contado == null ? null : contado - esperado;
+                final color = dif == null || dif.abs() < 1 ? pal.ventas : esquema.error;
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: pal.ventasFondo, borderRadius: BorderRadius.circular(14)),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('Efectivo que debería haber', style: t.bodySmall),
+                    Text(cop(esperado), style: cifras(t.headlineMedium)),
+                    Text('Base + efectivo recibido − gastos pagados en efectivo', style: t.bodySmall),
+                    if (dif != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                          dif.abs() < 1
+                              ? 'La caja cuadra'
+                              : dif > 0
+                                  ? 'Sobran ${cop(dif)}'
+                                  : 'Faltan ${cop(-dif)}',
+                          style: t.titleMedium?.copyWith(color: color, fontWeight: FontWeight.w700)),
+                    ],
+                  ]),
+                );
+              }),
+              const SizedBox(height: 12),
+              Text('Lo recibido por Nequi, Daviplata, bancos y tarjetas (${cop(m.totalDigital)}) '
+                  'se revisa en la app de cada banco.', style: t.bodySmall),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: () => enviarWhatsApp(_texto(m)),
+                icon: const Icon(Icons.chat_outlined),
+                label: const Text('Enviar el cierre por WhatsApp'),
+              ),
+            ]),
     );
   }
 }

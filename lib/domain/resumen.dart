@@ -1,3 +1,5 @@
+import 'pagos.dart';
+
 /// Totales del mes. Se calculan en el celular, sin conexión.
 class Resumen {
   /// Ventas del mes (de contado y fiadas).
@@ -132,7 +134,11 @@ class ResumenPeriodo {
   /// Ganancia de los productos vendidos (precio − costo). Solo cuenta
   /// ventas hechas con productos del inventario.
   final double gananciaProductos;
+
+  /// Entradas y salidas por medio de pago (efectivo, Nequi, tarjeta…).
+  final PorMedio medios;
   const ResumenPeriodo({
+    this.medios = const PorMedio({}, {}),
     this.ventas = 0,
     this.nVentas = 0,
     this.gastos = 0,
