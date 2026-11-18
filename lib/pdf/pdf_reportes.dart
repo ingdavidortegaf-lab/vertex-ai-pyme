@@ -147,7 +147,7 @@ Future<Uint8List> pdfReporte(Reporte r) async {
         child: pw.Wrap(spacing: 6, runSpacing: 6, children: [
           for (final i in b.items)
             pw.Container(
-              width: 124,
+              width: 118,
               padding: const pw.EdgeInsets.all(7),
               decoration: pw.BoxDecoration(
                   color: _verdeClaro,
