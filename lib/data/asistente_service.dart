@@ -125,4 +125,22 @@ class AsistenteService {
       return (respaldo, false);
     }
   }
+
+  /// Promoción redactada por la IA en la nube (solo viajan nombres de
+  /// productos, precios, estilo y ocasión). Sin señal o sin IA activa
+  /// devuelve null y la app usa el redactor local.
+  static Future<String?> promocionIA(
+    Map<String, dynamic> cuerpo, {
+    required RemoteApi? api,
+    required Future<bool> Function() hayRed,
+  }) async {
+    if (api == null || !api.haySesion || !await _red(hayRed)) return null;
+    try {
+      final r = await api.asistente(cuerpo);
+      if (r == null || r.trim().isEmpty) return null;
+      return r.length > 1200 ? r.substring(0, 1200) : r.trim();
+    } catch (_) {
+      return null;
+    }
+  }
 }

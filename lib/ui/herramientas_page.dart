@@ -7,10 +7,10 @@ import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
 import 'escaner.dart';
-import 'inventario_page.dart';
 import '../pdf/archivo.dart';
 import 'oficina_page.dart';
 import 'pago_widget.dart';
+import 'promocion_page.dart';
 import '../domain/pagos.dart';
 import '../pdf/pdf_factura.dart';
 import '../domain/codigos.dart';
@@ -1283,148 +1283,6 @@ class _NuevaCotizacionPageState extends State<NuevaCotizacionPage> {
               onPressed: _guardar,
               icon: const Icon(Icons.chat_outlined),
               label: const Text('Guardar y enviar por WhatsApp'),
-            ),
-          ]),
-    );
-  }
-}
-
-// ------------------------------------------------------- promociones
-class PromocionPage extends StatefulWidget {
-  const PromocionPage({super.key});
-  @override
-  State<PromocionPage> createState() => _PromocionPageState();
-}
-
-class _PromocionPageState extends State<PromocionPage> {
-  List<ProductoStock> _productos = const [];
-  final _elegidos = <String>{};
-  final _precios = <String, TextEditingController>{};
-  final _titulo = TextEditingController(text: 'Ofertas de hoy');
-  final _nota = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    () async {
-      final ps = (await LocalDb.instance.productos())
-          .where((x) => x.stock > 0 || x.esServicio)
-          .toList();
-      if (mounted) setState(() => _productos = ps);
-    }();
-  }
-
-  @override
-  void dispose() {
-    for (final c in _precios.values) {
-      c.dispose();
-    }
-    _titulo.dispose();
-    _nota.dispose();
-    super.dispose();
-  }
-
-  TextEditingController _ctrl(ProductoStock p) => _precios.putIfAbsent(
-      p.id, () => TextEditingController(text: cop(p.precio).substring(1)));
-
-  Future<void> _compartir() async {
-    final l = [
-      for (final p in _productos)
-        if (_elegidos.contains(p.id))
-          (p.nombre, parseMonto(_ctrl(p).text) ?? p.precio)
-    ];
-    if (l.isEmpty) {
-      avisar('Elige al menos un producto');
-      return;
-    }
-    final negocio = await LocalDb.instance.perfilNegocio();
-    final texto = textoPromocion(
-        negocio: negocio,
-        productos: l,
-        titulo: _titulo.text.trim().isEmpty
-            ? 'Ofertas de hoy'
-            : _titulo.text.trim(),
-        nota: _nota.text);
-    if (!mounted) return;
-    await mostrarDocumento(context,
-        titulo: 'Promoción',
-        texto: texto,
-        boton: 'Compartir por WhatsApp',
-        nota: 'Compártela en tu estado, en grupos del barrio o en una lista de '
-            'difusión de WhatsApp para llegar a varios clientes a la vez.');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
-    final esquema = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Promociones')),
-      body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-          children: [
-            Text(
-                'Elige productos con existencias, ajusta el precio de oferta y '
-                'compártelo por WhatsApp.',
-                style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
-            const SizedBox(height: 14),
-            TextField(
-                controller: _titulo,
-                decoration: const InputDecoration(
-                    labelText: 'Título', hintText: 'Ofertas de hoy')),
-            const SizedBox(height: 10),
-            TextField(
-                controller: _nota,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                    labelText: 'Nota (opcional)',
-                    hintText: 'Ej.: solo hasta el sábado')),
-            const TituloSeccion('Productos'),
-            if (_productos.isEmpty)
-              Text('No hay productos con existencias. Agrégalos en Inventario.',
-                  style: t.bodyMedium)
-            else
-              Card(
-                child: Column(children: [
-                  for (final (i, p) in _productos.indexed) ...[
-                    if (i > 0) const Divider(indent: 16),
-                    CheckboxListTile(
-                      value: _elegidos.contains(p.id),
-                      onChanged: (v) => setState(() => v == true
-                          ? _elegidos.add(p.id)
-                          : _elegidos.remove(p.id)),
-                      title: Text(p.nombre,
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
-                      subtitle: _elegidos.contains(p.id)
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: TextField(
-                                controller: _ctrl(p),
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                decoration: const InputDecoration(
-                                    isDense: true,
-                                    labelText: 'Precio de oferta',
-                                    prefixText: r'$ '),
-                              ),
-                            )
-                          : Text(p.esServicio
-                              ? '${cop(p.precio)} · servicio'
-                              : '${cop(p.precio)} · hay ${cantidadTexto(p.stock)}'),
-                      controlAffinity: ListTileControlAffinity.leading,
-                    ),
-                  ],
-                ]),
-              ),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF1C7A43),
-                  foregroundColor: Colors.white),
-              onPressed: _compartir,
-              icon: const Icon(Icons.campaign_outlined),
-              label: const Text('Ver y compartir por WhatsApp'),
             ),
           ]),
     );

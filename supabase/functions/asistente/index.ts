@@ -80,6 +80,33 @@ function promptMensaje(b: Record<string, unknown>): string {
   );
 }
 
+function promptPromocion(b: Record<string, unknown>): string {
+  const lista = Array.isArray(b.productos) ? b.productos.slice(0, 8) : [];
+  const lineas = lista
+    .map((x) => {
+      const p = (x ?? {}) as Record<string, unknown>;
+      const nombre = limpiar(String(p.nombre ?? "")).slice(0, 40);
+      const antes = num(p.antes);
+      return nombre
+        ? `- ${nombre}: ${cop(num(p.precio))}${antes > num(p.precio) ? ` (antes ${cop(antes)})` : ""}`
+        : "";
+    })
+    .filter(Boolean)
+    .join("\n");
+  const estilo = limpiar(String(b.estilo ?? "Alegre")).slice(0, 30);
+  const ocasion = limpiar(String(b.ocasion ?? "Hoy")).slice(0, 30);
+  return (
+    "Eres experto en mercadeo para tiendas de barrio de Casanare, Colombia. " +
+    "Escribe UN anuncio para el estado de WhatsApp (máximo 70 palabras), en " +
+    `español cercano (usted), estilo «${estilo}», ocasión «${ocasion}». ` +
+    "Empieza con un gancho llamativo, usa 3 a 5 emojis, pon cada producto en " +
+    "su línea con el precio EXACTO dado (no inventes precios ni productos) y " +
+    "termina invitando a pedir por WhatsApp. Usa *negrilla* de WhatsApp en los " +
+    "precios. Sin enlaces ni teléfonos. Devuelve solo el anuncio.\n" +
+    `Productos:\n${lineas || "- (sin productos)"}`
+  );
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method" }, 405);
   if (!(await usuarioValido(req))) return json({ error: "auth" }, 401);
@@ -95,7 +122,11 @@ Deno.serve(async (req) => {
     return json({ error: "bad_json" }, 400);
   }
 
-  const prompt = b.modo === "mensaje" ? promptMensaje(b) : promptConsejo(b);
+  const prompt = b.modo === "mensaje"
+    ? promptMensaje(b)
+    : b.modo === "promocion"
+    ? promptPromocion(b)
+    : promptConsejo(b);
 
   try {
     const r = await fetch(
