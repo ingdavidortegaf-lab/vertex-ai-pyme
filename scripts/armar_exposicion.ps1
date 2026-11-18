@@ -27,12 +27,14 @@ $carpetas = [ordered]@{
   '7_configuracion' = @("$proy\pubspec.yaml", "$proy\android\app\build.gradle.kts", "$proy\android\app\src\main\AndroidManifest.xml",
                         "$proy\android\app\src\main\res\xml\data_extraction_rules.xml", "$proy\scripts\preparar_proyecto.ps1", "$proy\scripts\generar_licencias.ps1")
   '8_seguridad' = @()
+  '10_base_de_datos' = Get-ChildItem "$proy\docs\base_de_datos\*" -File | Where-Object Name -ne 'LEEME_BASE_DE_DATOS.md' | ForEach-Object { $_.FullName }
   '9_documentos_convocatoria' = @('MANUAL_USUARIO.md','COMO_ESTA_CONSTRUIDO.txt','CONTABILIDAD_DOCUMENTOS_Y_ADAPTACION.md','AUDITORIA.md',
                                   'LICENCIAS.md','POLITICA_TRATAMIENTO_DATOS.md','AVISO_PRIVACIDAD_Y_AUTORIZACION.md','PAGOS_Y_MODELO_DE_NEGOCIO.md') | ForEach-Object { "$proy\docs\$_" }
 }
 foreach ($c in $carpetas.Keys) {
   $d = New-Item -ItemType Directory "$Destino\$c"
-  Copy-Item "$guias\$c.md" "$d\EXPLICACION.md"
+  $explicacion = if (Test-Path "$guias\$c.md") { "$guias\$c.md" } else { "$proy\docs\base_de_datos\LEEME_BASE_DE_DATOS.md" }
+  Copy-Item $explicacion "$d\EXPLICACION.md"
   foreach ($f in $carpetas[$c]) { if (Test-Path $f) { Copy-Item $f $d } }
 }
 # Archivos con otro nombre para que se entienda de donde vienen

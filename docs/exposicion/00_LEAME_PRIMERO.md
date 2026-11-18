@@ -29,6 +29,7 @@
 | `7_configuracion/` | Android, Windows y la lista de paquetes | "¿Qué librerías usaste? ¿Cómo compilas?" |
 | `8_seguridad/` | Dónde está cada protección | "¿Es segura? ¿Cumple la Ley 1581?" |
 | `9_documentos_convocatoria/` | Manual, política de datos, licencias, auditoría | Lo que pide la convocatoria |
+| `10_base_de_datos/` | **La base de datos**: una base de ejemplo, consultas SQL probadas (SQLite, PostgreSQL y MySQL) y cómo mostrarla en DBeaver o Supabase | "¿Cómo es la base de datos? Muéstrela" |
 
 En **cada carpeta** hay un archivo **`EXPLICACION.md`** que dice, en palabras sencillas:
 - qué hace cada archivo de código;

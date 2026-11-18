@@ -138,6 +138,25 @@ La existencia **no se guarda como un número**: es la **suma de todos los movimi
 
 ---
 
+## E1. Base de datos (para mostrarla, mira `10_base_de_datos/EXPLICACION.md`)
+
+**E1.1 ¿Qué motor de base de datos usaron? ¿Por qué no MySQL?**
+- En el celular, **SQLite**: es embebida, vive dentro de la app sin servidor y funciona sin internet. Va cifrada con SQLCipher.
+- En la nube, **PostgreSQL** (Supabase), por la seguridad por fila (RLS), el JSON (`jsonb`) y los triggers.
+- MySQL necesita un servidor encendido y no trae RLS. El SQL es estándar: tenemos las mismas consultas en MySQL para mostrarlo.
+
+**E1.2 ¿Cómo está modelada?**
+Tablas `clientes`, `ventas` (ventas, gastos y abonos), `productos`, `inventario`, `cola_sync` y `documentos`. En la nube, además, `empresas` y `miembros`; cada fila lleva `empresa_id`.
+- Las llaves son **UUID** creados en el celular.
+- La existencia del inventario **se calcula** sumando movimientos.
+- Las ventas **solo se agregan**: es una bitácora auditable.
+
+**E1.3 ¿Por qué la venta no tiene llave foránea al cliente?**
+Porque el sistema funciona sin conexión: una venta puede llegar a la nube antes que el cliente creado en otro celular, y la llave foránea la rechazaría. La integridad la cuidan la app y los triggers. Sí hay llave foránea a `empresas` y reglas **CHECK** en montos, tipos y pagos.
+
+**E1.4 Muéstreme una consulta.**
+Abre DBeaver con `vertex_demo.db` y corre la consulta 8 (inventario calculado) o la 5 (ventas por medio de pago). En Supabase, la consulta 5 de la nube demuestra que **no hay duplicados**.
+
 ## E2. Pagos, escala y costos
 
 **E2.1 ¿Cómo manejan los pagos por Nequi, Bancolombia o tarjeta?**

@@ -63,6 +63,7 @@ flowchart TB
 | `lib/pdf/` | Generación y archivo de PDF, informes contables |
 | `supabase/` | `supabase_schema.sql` (tablas, RLS, triggers) y `functions/asistente` (IA) |
 | `test/` | **93 pruebas automáticas**, incluida una caída de red a mitad del envío |
+| `docs/base_de_datos/` | Base SQLite de ejemplo y consultas SQL probadas (SQLite, PostgreSQL y MySQL); [cómo mostrarla](docs/base_de_datos/LEEME_BASE_DE_DATOS.md) |
 | `docs/` | Manual, auditoría, política de datos (Ley 1581), licencias, [pagos y modelo de negocio](docs/PAGOS_Y_MODELO_DE_NEGOCIO.md) y guías de exposición |
 
 Cada carpeta de código trae un `LEEME.md` corto. La explicación completa está en [`docs/COMO_ESTA_CONSTRUIDO.txt`](docs/COMO_ESTA_CONSTRUIDO.txt) y en [`docs/exposicion/`](docs/exposicion/00_LEAME_PRIMERO.md).

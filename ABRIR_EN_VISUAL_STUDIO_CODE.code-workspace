@@ -15,7 +15,8 @@
     { "name": "4 - PDF Y DOCUMENTOS", "path": "lib/pdf" },
     { "name": "5 - BACKEND EN LA NUBE (Supabase e IA)", "path": "supabase" },
     { "name": "6 - PRUEBAS AUTOMATICAS", "path": "test" },
-    { "name": "7 - GUIAS PARA EXPONER", "path": "docs/exposicion" }
+    { "name": "7 - GUIAS PARA EXPONER", "path": "docs/exposicion" },
+    { "name": "8 - BASE DE DATOS (consultas SQL)", "path": "docs/base_de_datos" }
   ],
   "settings": {
     "dart.flutterSdkPath": "C:\\dev\\flutter",
