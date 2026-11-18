@@ -85,18 +85,52 @@ class ModoNegocio {
       );
 }
 
+/// Emoji de cada tipo de negocio (en los botones de elección).
+const emojiTipo = {
+  'Tienda de todo un poco': '🛒',
+  'Tienda o minimercado': '🏪',
+  'Panadería o cafetería': '🥐',
+  'Frutas y verduras': '🍌',
+  'Carnicería o pollo': '🍗',
+  'Droguería': '💊',
+  'Ferretería': '🔧',
+  'Agro y veterinaria': '🐄',
+  'Licorera': '🍻',
+  'Restaurante o comidas': '🍲',
+  'Comidas rápidas y domicilios': '🍔',
+  'Ropa y calzado': '👟',
+  'Papelería y variedades': '✏️',
+  'Celulares y tecnología': '📱',
+  'Artesanías y emprendimiento': '🧶',
+  'Peluquería o belleza': '💇',
+  'Taller o reparaciones': '🛠️',
+  'Lavadero de carros y motos': '🚿',
+  'Transporte o mensajería': '🛵',
+  'Hospedaje': '🛏️',
+  'Servicios profesionales': '💼',
+  'Otro': '✨',
+};
+
+String conEmoji(String tipo) => '${emojiTipo[tipo] ?? '✨'} $tipo';
+
 /// Sugerencias según el tipo de negocio elegido (el dueño puede cambiarlas).
 ModoNegocio sugerenciaPorTipo(String tipo) => switch (tipo) {
-      'Restaurante o comidas' =>
+      'Restaurante o comidas' || 'Comidas rápidas y domicilios' || 'Panadería o cafetería' =>
         const ModoNegocio(oferta: Oferta.ambos, gramera: false, codigos: false),
       'Peluquería o belleza' ||
       'Taller o reparaciones' ||
+      'Lavadero de carros y motos' ||
+      'Transporte o mensajería' ||
+      'Hospedaje' ||
       'Servicios profesionales' =>
         const ModoNegocio(
             oferta: Oferta.servicios,
             gramera: false,
             codigos: false,
             pedidos: false),
-      'Droguería' || 'Ferretería' => const ModoNegocio(gramera: false),
+      'Droguería' || 'Ferretería' || 'Licorera' || 'Papelería y variedades' => const ModoNegocio(gramera: false),
+      'Ropa y calzado' || 'Celulares y tecnología' || 'Artesanías y emprendimiento' =>
+        const ModoNegocio(oferta: Oferta.ambos, gramera: false),
+      'Frutas y verduras' || 'Carnicería o pollo' => const ModoNegocio(codigos: false),
       _ => const ModoNegocio(),
     };

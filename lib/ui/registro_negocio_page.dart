@@ -281,7 +281,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
           Wrap(spacing: 8, runSpacing: 8, children: [
             for (final x in tiposNegocio)
               ChoiceChip(
-                label: Text(x),
+                label: Text(conEmoji(x)),
                 selected: _tipo == x,
                 onSelected: (_) => setState(() {
                   _tipo = x;

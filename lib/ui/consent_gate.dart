@@ -82,10 +82,10 @@ class _ConsentGateState extends State<ConsentGate> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
               child: Column(children: [
-                const Row(children: [
-                  LogoVertex(tam: 32),
+                const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  LogoVertex(tam: 44, animar: true),
                 ]),
-                const SizedBox(width: 150, height: 120, child: IlustracionEscudo()),
+                const SizedBox(width: 150, height: 110, child: IlustracionEscudo()),
                 const SizedBox(height: 10),
                 Text('Bienvenido a VERTEX AI Pyme',
                     textAlign: TextAlign.center,

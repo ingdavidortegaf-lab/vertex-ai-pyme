@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         titleSpacing: 16,
         title: Row(children: [
-          const LogoVertex(tam: 32),
+          const LogoVertex(tam: 32, animar: true),
           const SizedBox(width: 10),
           Text.rich(TextSpan(
             text: 'VERTEX ',

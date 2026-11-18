@@ -46,7 +46,9 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
     cliente: v['cliente_nombre'] as String?,
     fiado: v['credito'] == 1,
     formaPago: textoPagos(leerPagos(v['pagos'],
-        monto: (v['monto'] as num).toDouble(), tipo: 'ingreso', credito: v['credito'] == 1)),
+        monto: (v['monto'] as num).toDouble(),
+        tipo: 'ingreso',
+        credito: v['credito'] == 1)),
     saldoCliente: saldo,
   );
   final fiado = v['credito'] == 1;
@@ -201,8 +203,14 @@ class HerramientasGrid extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
     final modo = LocalDb.instance.modo.value;
     final items = [
-      (Icons.point_of_sale_outlined, 'Cierre de caja', 'Efectivo, Nequi, bancos y tarjetas',
-          p.ventasFondo, p.ventas, () => ir(const CierreCajaPage())),
+      (
+        Icons.point_of_sale_outlined,
+        'Cierre de caja',
+        'Efectivo, Nequi, bancos y tarjetas',
+        p.ventasFondo,
+        p.ventas,
+        () => ir(const CierreCajaPage())
+      ),
       (
         Icons.receipt_outlined,
         'Comprobantes',
@@ -282,44 +290,48 @@ class HerramientasGrid extends StatelessWidget {
     return LayoutBuilder(builder: (context, box) {
       final ancho = (box.maxWidth - 10) / 2;
       return Wrap(spacing: 10, runSpacing: 10, children: [
-        for (final (icono, titulo, sub, fondo, tinta, onTap) in items)
-          SizedBox(
-            width: ancho,
-            child: Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(18),
-                onTap: onTap,
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              color: fondo,
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Icon(icono, color: tinta, size: 22),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(titulo,
-                            style: Theme.of(context).textTheme.titleSmall),
-                        const SizedBox(height: 2),
-                        SizedBox(
-                          height: 34,
-                          child: Text(sub,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant)),
-                        ),
-                      ]),
+        for (final (i, (icono, titulo, sub, fondo, tinta, onTap))
+            in items.indexed)
+          Aparecer(
+            orden: i,
+            child: SizedBox(
+              width: ancho,
+              child: Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: onTap,
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: fondo,
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Icon(icono, color: tinta, size: 22),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(titulo,
+                              style: Theme.of(context).textTheme.titleSmall),
+                          const SizedBox(height: 2),
+                          SizedBox(
+                            height: 34,
+                            child: Text(sub,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant)),
+                          ),
+                        ]),
+                  ),
                 ),
               ),
             ),
@@ -693,79 +705,95 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
             _ => 0.0,
           };
           return Padding(
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(c).bottom),
+            padding: EdgeInsets.fromLTRB(
+                20, 0, 20, 20 + MediaQuery.viewInsetsOf(c).bottom),
             child: SingleChildScrollView(
-              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Text('¿Llegó el pedido?', style: t.headlineSmall),
-                const SizedBox(height: 4),
-                Text('Se suman ${items.length == 1 ? '1 producto' : '${items.length} productos'} al inventario. '
-                    'Total a precio de costo: ${cop(total)}.'),
-                if (total > 0) ...[
-                  const SizedBox(height: 14),
-                  Text('¿Cuánto le pagaste${pv == null ? '' : ' a ${pv['nombre']}'}?', style: t.titleSmall),
-                  const SizedBox(height: 8),
-                  SegmentedButton<String>(
-                    showSelectedIcon: false,
-                    segments: const [
-                      ButtonSegment(value: 'todo', label: Text('Todo')),
-                      ButtonSegment(value: 'parte', label: Text('Una parte')),
-                      ButtonSegment(value: 'nada', label: Text('Todo fiado')),
-                    ],
-                    selected: {modo},
-                    onSelectionChanged: (v) => set(() => modo = v.first),
-                  ),
-                  if (modo == 'parte') ...[
-                    const SizedBox(height: 10),
-                    Row(children: [
-                      Expanded(
-                        child: TextField(
-                          controller: parte,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(labelText: 'Le pagué ahora', prefixText: r'$ '),
-                          onChanged: (_) => set(() {}),
-                        ),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('¿Llegó el pedido?', style: t.headlineSmall),
+                    const SizedBox(height: 4),
+                    Text(
+                        'Se suman ${items.length == 1 ? '1 producto' : '${items.length} productos'} al inventario. '
+                        'Total a precio de costo: ${cop(total)}.'),
+                    if (total > 0) ...[
+                      const SizedBox(height: 14),
+                      Text(
+                          '¿Cuánto le pagaste${pv == null ? '' : ' a ${pv['nombre']}'}?',
+                          style: t.titleSmall),
+                      const SizedBox(height: 8),
+                      SegmentedButton<String>(
+                        showSelectedIcon: false,
+                        segments: const [
+                          ButtonSegment(value: 'todo', label: Text('Todo')),
+                          ButtonSegment(
+                              value: 'parte', label: Text('Una parte')),
+                          ButtonSegment(
+                              value: 'nada', label: Text('Todo fiado')),
+                        ],
+                        selected: {modo},
+                        onSelectionChanged: (v) => set(() => modo = v.first),
                       ),
-                      const SizedBox(width: 8),
-                      for (final pct in const [30, 50, 70])
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: ActionChip(
-                            label: Text('$pct %'),
-                            onPressed: () => set(() => parte.text = (total * pct / 100).toStringAsFixed(0)),
+                      if (modo == 'parte') ...[
+                        const SizedBox(height: 10),
+                        Row(children: [
+                          Expanded(
+                            child: TextField(
+                              controller: parte,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  labelText: 'Le pagué ahora',
+                                  prefixText: r'$ '),
+                              onChanged: (_) => set(() {}),
+                            ),
                           ),
+                          const SizedBox(width: 8),
+                          for (final pct in const [30, 50, 70])
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: ActionChip(
+                                label: Text('$pct %'),
+                                onPressed: () => set(() => parte.text =
+                                    (total * pct / 100).toStringAsFixed(0)),
+                              ),
+                            ),
+                        ]),
+                      ],
+                      if (modo != 'todo') ...[
+                        const SizedBox(height: 10),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.event_outlined),
+                          title: Text('Queda debiendo ${cop(total - pagado)}'),
+                          subtitle: Text(
+                              'Pagar a más tardar el ${fmt.format(vence)} (toca para cambiar)'),
+                          onTap: () async {
+                            final f = await showDatePicker(
+                                context: c,
+                                initialDate: vence,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now()
+                                    .add(const Duration(days: 180)));
+                            if (f != null) set(() => vence = f);
+                          },
                         ),
-                    ]),
-                  ],
-                  if (modo != 'todo') ...[
-                    const SizedBox(height: 10),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.event_outlined),
-                      title: Text('Queda debiendo ${cop(total - pagado)}'),
-                      subtitle: Text('Pagar a más tardar el ${fmt.format(vence)} (toca para cambiar)'),
-                      onTap: () async {
-                        final f = await showDatePicker(
-                            context: c,
-                            initialDate: vence,
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime.now().add(const Duration(days: 180)));
-                        if (f != null) set(() => vence = f);
+                      ],
+                    ],
+                    const SizedBox(height: 14),
+                    FilledButton(
+                      onPressed: () {
+                        if (modo == 'parte' &&
+                            (pagado <= 0 || pagado >= total)) {
+                          avisar(
+                              'Escribe cuánto pagaste (más de 0 y menos del total)');
+                          return;
+                        }
+                        Navigator.pop(c, true);
                       },
+                      child: const Text('Ingresar al inventario'),
                     ),
-                  ],
-                ],
-                const SizedBox(height: 14),
-                FilledButton(
-                  onPressed: () {
-                    if (modo == 'parte' && (pagado <= 0 || pagado >= total)) {
-                      avisar('Escribe cuánto pagaste (más de 0 y menos del total)');
-                      return;
-                    }
-                    Navigator.pop(c, true);
-                  },
-                  child: const Text('Ingresar al inventario'),
-                ),
-              ]),
+                  ]),
             ),
           );
         },
@@ -779,12 +807,15 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
     parte.dispose();
     if (ok != true || !mounted) return;
     final pagosGasto = pagado > 0
-        ? await pedirPagos(context, pagado, titulo: '¿Con qué le pagaste al proveedor?')
+        ? await pedirPagos(context, pagado,
+            titulo: '¿Con qué le pagaste al proveedor?')
         : null;
     if (pagado > 0 && pagosGasto == null) return;
     await LocalDb.instance.recibirPedido(
         [for (final (p, c) in items) (p.id, c, p.costo)],
-        conceptoGasto: total > 0 ? 'Compra de mercancía${pv == null ? '' : ' a ${pv['nombre']}'}' : null,
+        conceptoGasto: total > 0
+            ? 'Compra de mercancía${pv == null ? '' : ' a ${pv['nombre']}'}'
+            : null,
         pagosGasto: pagosGasto,
         pagadoAhora: pagado,
         proveedorId: pv?['id'] as String?,
@@ -963,7 +994,8 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
       total: (c['total'] as num).toDouble(),
       notas: [
         'Precios válidos por 8 días o hasta agotar existencias.',
-        if (formas.isNotEmpty) 'Puede pagar por transferencia: ${formas.join(' · ')}',
+        if (formas.isNotEmpty)
+          'Puede pagar por transferencia: ${formas.join(' · ')}',
       ],
     ));
     await archivarDocumento(documento, pdf);

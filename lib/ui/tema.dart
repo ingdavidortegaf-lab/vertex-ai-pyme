@@ -438,3 +438,26 @@ class EstadoVacio extends StatelessWidget {
     );
   }
 }
+
+/// Entrada suave (sube y aparece) escalonada por [orden]. Si el celular
+/// pide reducir el movimiento, se muestra de una vez.
+class Aparecer extends StatelessWidget {
+  final int orden;
+  final Widget child;
+  const Aparecer({super.key, this.orden = 0, required this.child});
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return child;
+    final ms = 260 + 45 * orden.clamp(0, 10);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: ms),
+      curve: Interval((45 * orden.clamp(0, 10)) / ms, 1, curve: Curves.easeOutCubic),
+      child: child,
+      builder: (_, v, c) => Opacity(
+        opacity: v,
+        child: Transform.translate(offset: Offset(0, 12 * (1 - v)), child: c),
+      ),
+    );
+  }
+}

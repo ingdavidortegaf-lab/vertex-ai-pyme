@@ -10,6 +10,7 @@ import 'herramientas_page.dart';
 import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'negocio_page.dart';
+import 'oficina_page.dart';
 import 'tema.dart';
 import 'ventas_page.dart';
 
@@ -39,9 +40,17 @@ class _TableroPageState extends State<TableroPage> {
     super.dispose();
   }
 
+  double _porPagar = 0;
+
   Future<void> _load() async {
     final d = await LocalDb.instance.datosAsistente();
-    if (mounted) setState(() => _d = d);
+    final pp = await LocalDb.instance.totalPorPagar();
+    if (mounted) {
+      setState(() {
+        _d = d;
+        _porPagar = pp;
+      });
+    }
   }
 
   void _abrirCliente(String id) => Navigator.of(context).push(
@@ -146,6 +155,23 @@ class _TableroPageState extends State<TableroPage> {
                     child: const Text('Ver clientes')),
               ),
               _PorCobrar(d: d, onCliente: _abrirCliente),
+              if (_porPagar > 0.5) ...[
+                TituloSeccion(
+                  'Le debes a proveedores',
+                  accion: TextButton(
+                      onPressed: () => Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (_) => const CuentasPagarPage())),
+                      child: const Text('Ver')),
+                ),
+                Card(
+                  child: ListTile(
+                    leading: Icon(Icons.account_balance_outlined, color: p.gastos),
+                    title: Text(cop(_porPagar),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: p.gastos)),
+                    subtitle: const Text('Saldo de pedidos que pagaste en parte'),
+                  ),
+                ),
+              ],
               if (d.topClientes.isNotEmpty) ...[
                 const TituloSeccion('Tus mejores clientes del mes'),
                 Card(

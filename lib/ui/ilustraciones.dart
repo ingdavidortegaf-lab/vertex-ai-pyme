@@ -24,34 +24,109 @@ Paint _tiza(Color c, double ancho) => Paint()
   ..style = PaintingStyle.stroke;
 
 // ------------------------------------------------------------------ logo
-/// Marca de VERTEX: una «V» de tiza con una chispa (la IA).
-class LogoVertex extends StatelessWidget {
+/// Marca de VERTEX: un vértice de dos caras (la «V») con un punto de luz y
+/// la chispa amarilla de la IA. Es el mismo dibujo del ícono de la app
+/// (docs/pitch/generador/iconos.js). Con [animar], la chispa titila suave.
+class LogoVertex extends StatefulWidget {
   final double tam;
-  const LogoVertex({super.key, this.tam = 32});
+  final bool animar;
+  const LogoVertex({super.key, this.tam = 32, this.animar = false});
   @override
-  Widget build(BuildContext context) => CustomPaint(
-      size: Size.square(tam), painter: _LogoPainter(Paleta.of(context)));
+  State<LogoVertex> createState() => _LogoVertexState();
 }
 
-class _LogoPainter extends CustomPainter {
-  final Paleta p;
-  _LogoPainter(this.p);
+class _LogoVertexState extends State<LogoVertex> with SingleTickerProviderStateMixin {
+  AnimationController? _c;
+
   @override
-  void paint(Canvas c, Size s) {
-    final w = s.width;
-    c.drawRRect(
-        RRect.fromRectAndRadius(Offset.zero & s, Radius.circular(w * 0.28)),
-        Paint()..color = const Color(0xFF2A5646));
-    final v = Path()
-      ..moveTo(w * 0.26, w * 0.30)
-      ..lineTo(w * 0.48, w * 0.74)
-      ..lineTo(w * 0.70, w * 0.30);
-    c.drawPath(v, _tiza(p.ventasTiza, w * 0.13));
-    _chispa(c, Offset(w * 0.79, w * 0.22), w * 0.13, p.fiadoTiza);
+  void initState() {
+    super.initState();
+    if (widget.animar) {
+      _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat(reverse: true);
+    }
   }
 
   @override
-  bool shouldRepaint(_LogoPainter o) => o.p != p;
+  void dispose() {
+    _c?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final quieto = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final c = _c;
+    if (c == null || quieto) {
+      return CustomPaint(size: Size.square(widget.tam), painter: _LogoPainter(1));
+    }
+    return AnimatedBuilder(
+      animation: c,
+      builder: (_, __) => CustomPaint(
+          size: Size.square(widget.tam), painter: _LogoPainter(0.82 + 0.18 * Curves.easeInOut.transform(c.value))),
+    );
+  }
+}
+
+class _LogoPainter extends CustomPainter {
+  final double brillo; // 0..1, tamaño relativo de la chispa
+  _LogoPainter(this.brillo);
+
+  @override
+  void paint(Canvas c, Size s) {
+    final w = s.width;
+    double g(double x) => x / 512 * w;
+    final caja = Offset.zero & s;
+    c.drawRRect(
+        RRect.fromRectAndRadius(caja, Radius.circular(g(116))),
+        Paint()
+          ..shader = const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF245C49), Color(0xFF17362C), Color(0xFF0D211A)],
+            stops: [0, .55, 1],
+          ).createShader(caja));
+    final izq = Path()
+      ..moveTo(g(104), g(132))
+      ..lineTo(g(186), g(132))
+      ..lineTo(g(256), g(318))
+      ..lineTo(g(256), g(400))
+      ..close();
+    final der = Path()
+      ..moveTo(g(408), g(132))
+      ..lineTo(g(326), g(132))
+      ..lineTo(g(256), g(318))
+      ..lineTo(g(256), g(400))
+      ..close();
+    final alto = Rect.fromLTRB(0, g(132), w, g(400));
+    c.drawPath(
+        izq,
+        Paint()
+          ..shader = const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFB4F0C9), Color(0xFF5FCB8C)])
+              .createShader(alto));
+    c.drawPath(
+        der,
+        Paint()
+          ..shader = const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF7FD9A3), Color(0xFF2F9E64)])
+              .createShader(alto));
+    final centro = Offset(g(256), g(392));
+    c.drawCircle(
+        centro,
+        g(30),
+        Paint()
+          ..shader = const RadialGradient(colors: [Color(0xF2FFFFFF), Color(0x00FFFFFF)])
+              .createShader(Rect.fromCircle(center: centro, radius: g(30))));
+    _chispa(c, Offset(g(396), g(108)), g(46) * brillo, const Color(0xFFF4C55A));
+    _chispa(c, Offset(g(340), g(70)), g(18) * (1.8 - brillo), const Color(0xCCF4C55A));
+  }
+
+  @override
+  bool shouldRepaint(_LogoPainter o) => o.brillo != brillo;
 }
 
 void _chispa(Canvas c, Offset o, double r, Color color) {

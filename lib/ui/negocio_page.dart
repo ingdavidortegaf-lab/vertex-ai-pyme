@@ -4,20 +4,35 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import '../data/local_db.dart';
+import '../domain/modo_negocio.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
 import 'comun.dart';
 import 'tema.dart';
 
+/// Tipos de negocio (con su emoji) para que la app sirva a cualquiera:
+/// la tienda de barrio primero, y luego comercio, comidas y servicios.
 const tiposNegocio = [
   'Tienda de todo un poco',
   'Tienda o minimercado',
+  'Panadería o cafetería',
+  'Frutas y verduras',
+  'Carnicería o pollo',
   'Droguería',
   'Ferretería',
   'Agro y veterinaria',
+  'Licorera',
   'Restaurante o comidas',
+  'Comidas rápidas y domicilios',
+  'Ropa y calzado',
+  'Papelería y variedades',
+  'Celulares y tecnología',
+  'Artesanías y emprendimiento',
   'Peluquería o belleza',
   'Taller o reparaciones',
+  'Lavadero de carros y motos',
+  'Transporte o mensajería',
+  'Hospedaje',
   'Servicios profesionales',
   'Otro',
 ];
@@ -159,7 +174,7 @@ class _FormNegocioState extends State<_FormNegocio> {
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (final x in tiposNegocio)
                 ChoiceChip(
-                  label: Text(x),
+                  label: Text(conEmoji(x)),
                   selected: _tipo == x,
                   onSelected: (_) => setState(() => _tipo = x),
                 ),
