@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../domain/formato.dart';
 import '../domain/paises.dart';
@@ -66,14 +67,14 @@ class _CampoTelefonoState extends State<CampoTelefono> {
             onPressed: _elegirPais,
             style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(p.bandera, style: const TextStyle(fontSize: 18)),
+              Bandera(p),
               const SizedBox(width: 4),
               Text('+${p.codigo}'),
               const Icon(Icons.arrow_drop_down, size: 18),
             ]),
           ),
         ),
-        helperText: 'Toca la bandera para elegir otro país',
+        helperText: 'Toca el país para cambiarlo',
       ),
       validator: (v) {
         final r = normalizarTelefono(v ?? '', pais: p.codigo);
@@ -86,6 +87,27 @@ class _CampoTelefonoState extends State<CampoTelefono> {
         return null;
       },
       onFieldSubmitted: widget.alEnviar,
+    );
+  }
+}
+
+/// Bandera del país. En Windows (que no dibuja banderas en emoji) se
+/// muestra el código del país en una etiqueta.
+class Bandera extends StatelessWidget {
+  final Pais pais;
+  final double tam;
+  const Bandera(this.pais, {super.key, this.tam = 18});
+  @override
+  Widget build(BuildContext context) {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) {
+      return Text(pais.bandera, style: TextStyle(fontSize: tam));
+    }
+    final e = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(color: e.secondaryContainer, borderRadius: BorderRadius.circular(5)),
+      child: Text(pais.iso,
+          style: TextStyle(fontSize: tam * .62, fontWeight: FontWeight.w800, color: e.onSecondaryContainer)),
     );
   }
 }
@@ -121,7 +143,7 @@ class _ListaPaisesState extends State<_ListaPaises> {
             child: ListView(children: [
               for (final p in l)
                 ListTile(
-                  leading: Text(p.bandera, style: const TextStyle(fontSize: 24)),
+                  leading: Bandera(p, tam: 24),
                   title: Text(p.nombre),
                   trailing: Text('+${p.codigo}'),
                   onTap: () => Navigator.pop(context, p),

@@ -18,6 +18,7 @@ import 'package:vertex_ai_pyme/ui/comun.dart';
 import 'package:vertex_ai_pyme/ui/consent_gate.dart';
 import 'package:vertex_ai_pyme/ui/herramientas_page.dart';
 import 'package:vertex_ai_pyme/ui/home_page.dart';
+import 'package:vertex_ai_pyme/ui/clientes_page.dart';
 import 'package:vertex_ai_pyme/ui/ilustraciones.dart';
 import 'package:vertex_ai_pyme/ui/oficina_page.dart';
 import 'package:vertex_ai_pyme/ui/promocion_page.dart';
@@ -472,5 +473,26 @@ void main() {
     });
     await _esperar(tester);
     await captura(tester, 'logo');
+  });
+
+  testWidgets('cliente nuevo con país', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(Builder(
+          builder: (c) => Scaffold(
+              body: Center(
+                  child: FilledButton(onPressed: () => mostrarFormCliente(c), child: const Text('abrir')))))));
+    });
+    await _esperar(tester);
+    await tester.tap(find.text('abrir'));
+    await _esperar(tester);
+    await tester.tap(find.byKey(const Key('selector_pais')));
+    await _esperar(tester);
+    await captura(tester, 'phone-paises');
+    await tester.tap(find.text('Estados Unidos / Canadá'));
+    await _esperar(tester);
+    await tester.enterText(find.byType(TextFormField).at(1), '305 123 4567');
+    await _esperar(tester);
+    await captura(tester, 'phone-cliente-eeuu');
   });
 }

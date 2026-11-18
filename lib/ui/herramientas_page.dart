@@ -617,7 +617,7 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       return;
     }
     if (t == null) {
-      avisar('Revisa el celular del proveedor (toca la bandera si es de otro país)');
+      avisar('Revisa el celular del proveedor (toca el país si es de otro país)');
       return;
     }
     final id = await LocalDb.instance.saveProveedor(n, t);
