@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:pdf/pdf.dart';
 import 'package:vertex_ai_pyme/domain/documentos.dart';
-import 'package:vertex_ai_pyme/ui/pdf_factura.dart';
+import 'package:vertex_ai_pyme/pdf/pdf_factura.dart';
 
 void main() {
   setUpAll(() => initializeDateFormatting('es_CO'));

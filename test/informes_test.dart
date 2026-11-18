@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:vertex_ai_pyme/domain/contabilidad.dart';
 import 'package:vertex_ai_pyme/domain/documentos.dart';
-import 'package:vertex_ai_pyme/ui/pdf_reportes.dart';
-import 'package:vertex_ai_pyme/ui/reportes_contables.dart';
+import 'package:vertex_ai_pyme/pdf/pdf_reportes.dart';
+import 'package:vertex_ai_pyme/pdf/reportes_contables.dart';
 import 'soporte.dart';
 
 void main() {

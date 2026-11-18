@@ -40,7 +40,7 @@ La clave *anon* es pública por diseño: la seguridad la dan las políticas RLS.
 
 ## 4. Supabase (plan gratuito)
 1. En supabase.com crea un proyecto (región São Paulo, la más cercana).
-2. **SQL Editor → New query**: pega todo `supabase_schema.sql` y ejecuta **Run**.
+2. **SQL Editor → New query**: pega todo `supabase/supabase_schema.sql` y ejecuta **Run**.
 3. **Authentication → Users → Add user → Create new user**: correo y clave de
    demo, con **Auto Confirm User** marcado. (Al crearlo se le crea su empresa
    automáticamente.)

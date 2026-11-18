@@ -17,13 +17,12 @@ foreach ($f in @('00_LEAME_PRIMERO.md','GUIA_VISUAL.html','GUION_PARA_EXPONER.md
   Copy-Item "$guias\$f" "$Destino\$f"
 }
 
-$pdf = @('pdf_factura.dart','pdf_reportes.dart','reportes_contables.dart','archivo.dart')
 $carpetas = [ordered]@{
-  '1_pantallas' = Get-ChildItem "$proy\lib\ui\*.dart" | Where-Object { $pdf -notcontains $_.Name } | ForEach-Object { $_.FullName }
+  '1_pantallas' = Get-ChildItem "$proy\lib\ui\*.dart" | ForEach-Object { $_.FullName }
   '2_reglas_del_negocio' = Get-ChildItem "$proy\lib\domain\*.dart" | ForEach-Object { $_.FullName }
   '3_datos_sin_senal' = (Get-ChildItem "$proy\lib\data\*.dart" | ForEach-Object { $_.FullName }) + @("$proy\lib\main.dart", "$proy\lib\config.dart")
-  '4_nube_backend' = @("$proy\supabase_schema.sql")
-  '5_pdf_y_documentos' = $pdf | ForEach-Object { "$proy\lib\ui\$_" }
+  '4_nube_backend' = @("$proy\supabase\supabase_schema.sql")
+  '5_pdf_y_documentos' = Get-ChildItem "$proy\lib\pdf\*.dart" | ForEach-Object { $_.FullName }
   '6_pruebas' = (Get-ChildItem "$proy\test\*.dart" | ForEach-Object { $_.FullName }) + @("$proy\tool\capturas_test.dart", "$proy\tool\muestra_pdf_test.dart")
   '7_configuracion' = @("$proy\pubspec.yaml", "$proy\android\app\build.gradle.kts", "$proy\android\app\src\main\AndroidManifest.xml",
                         "$proy\android\app\src\main\res\xml\data_extraction_rules.xml", "$proy\scripts\preparar_proyecto.ps1", "$proy\scripts\generar_licencias.ps1")

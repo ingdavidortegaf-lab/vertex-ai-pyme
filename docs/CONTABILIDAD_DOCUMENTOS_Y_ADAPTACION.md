@@ -83,8 +83,8 @@ El abono paga parte del fiado de agosto, que queda con $20.000 pendientes y 109 
 
 ### Cómo funciona por dentro
 - Periodos (`rangoPeriodo` en `contabilidad.dart`): la semana va de lunes a domingo; la quincena, del 1 al 15 o del 16 a fin de mes; el mes, del 1 al último día. Siempre se calcula también el periodo anterior del mismo tipo para comparar.
-- Los datos salen de la base del celular (`cargarInforme` en `lib/ui/reportes_contables.dart`). Por eso **funciona sin internet**.
-- El PDF se arma por bloques: indicadores, tablas, barras y párrafos (`lib/ui/pdf_reportes.dart`). Es de varias páginas, en tamaño carta, con encabezado, número del documento y "Página x de y".
+- Los datos salen de la base del celular (`cargarInforme` en `lib/pdf/reportes_contables.dart`). Por eso **funciona sin internet**.
+- El PDF se arma por bloques: indicadores, tablas, barras y párrafos (`lib/pdf/pdf_reportes.dart`). Es de varias páginas, en tamaño carta, con encabezado, número del documento y "Página x de y".
 
 ### Buen uso
 - **Cada lunes:** el informe de la semana pasada. **El día 16 y el día 1:** el de la quincena. **Cada inicio de mes:** el del mes anterior, para el contador.
@@ -188,9 +188,9 @@ La app es **primero sin internet**: se usa sin cuenta y el registro del negocio 
 | `lib/domain/contabilidad.dart` | Cuenta de cobro (FIFO y antigüedad), periodos, gastos por concepto, variación |
 | `lib/domain/avisos.dart` | Reglas de los avisos (qué avisar y cuándo) |
 | `lib/domain/modo_negocio.dart` | Cómo trabaja el negocio y las sugerencias por tipo |
-| `lib/ui/archivo.dart` | Guardar, leer, imprimir y compartir los PDF archivados |
-| `lib/ui/pdf_reportes.dart` | PDF de varias páginas por bloques (informes y cuenta de cobro) |
-| `lib/ui/reportes_contables.dart` | Arma el informe y la cuenta de cobro con los datos de la base |
+| `lib/pdf/archivo.dart` | Guardar, leer, imprimir y compartir los PDF archivados |
+| `lib/pdf/pdf_reportes.dart` | PDF de varias páginas por bloques (informes y cuenta de cobro) |
+| `lib/pdf/reportes_contables.dart` | Arma el informe y la cuenta de cobro con los datos de la base |
 | `lib/ui/oficina_page.dart` | Pantallas de Informes, Cartera y Documentos emitidos |
 | `lib/ui/registro_negocio_page.dart` | Registro guiado en 5 pasos |
 | `lib/ui/notificaciones.dart` | Avisos en el celular |

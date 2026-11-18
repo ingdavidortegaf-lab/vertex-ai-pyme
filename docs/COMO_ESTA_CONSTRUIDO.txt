@@ -98,7 +98,7 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   pubspec.yaml (33)      Lista de paquetes que usa la app y su version.
   pubspec.lock           Versiones exactas descargadas (no se edita a mano).
   analysis_options.yaml  Reglas de calidad del codigo (flutter analyze).
-  supabase_schema.sql    Script completo de la base de datos en la nube:
+  supabase/supabase_schema.sql  Script completo de la base de datos en la nube:
                          tablas, reglas de seguridad RLS, triggers. Se pega
                          en Supabase > SQL Editor. Se puede volver a correr.
   README.md              Como compilar y configurar.
@@ -209,6 +209,8 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   herramientas_page.dart (1070)  Comprobantes, cotizaciones, pedir
                            mercancia (proveedores) y promociones; vista
                            previa con WhatsApp, Imprimir y PDF.
+  --- lib/pdf/  PDF Y DOCUMENTOS ---
+
   pdf_factura.dart (174)   Genera el comprobante/cotizacion/pedido en PDF
                            con logo: tirilla de 80 mm o tamano carta.
   pdf_reportes.dart        PDF de varias paginas por bloques (indicadores,

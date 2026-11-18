@@ -5,10 +5,10 @@ import 'package:printing/printing.dart';
 import '../data/local_db.dart';
 import '../domain/contabilidad.dart';
 import '../domain/formato.dart';
-import 'archivo.dart';
+import '../pdf/archivo.dart';
 import 'comun.dart';
 import 'herramientas_page.dart';
-import 'reportes_contables.dart';
+import '../pdf/reportes_contables.dart';
 import 'tema.dart';
 
 // "La oficina" del negocio: informes para el contador, cartera con cuentas

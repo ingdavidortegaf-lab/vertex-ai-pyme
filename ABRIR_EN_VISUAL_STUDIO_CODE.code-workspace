@@ -1,0 +1,80 @@
+{
+  // ================================================================
+  //  VERTEX AI Pyme: abre ESTE archivo en Visual Studio Code
+  //  (doble clic, o en VS Code: Archivo > Abrir área de trabajo desde archivo).
+  //
+  //  A la izquierda verás el código ordenado por partes, con nombres en español.
+  //  Para CORRER la app: tecla F5 (o el botón verde ▶ de "Ejecutar y depurar")
+  //  y elige "▶ Correr en el PC (Windows)". Se abre la ventana de la app.
+  // ================================================================
+  "folders": [
+    { "name": "0 - PROYECTO COMPLETO (para correr)", "path": "." },
+    { "name": "1 - PANTALLAS (lo que ve el tendero)", "path": "lib/ui" },
+    { "name": "2 - REGLAS DEL NEGOCIO (las cuentas)", "path": "lib/domain" },
+    { "name": "3 - DATOS SIN SENAL (base y sincronizacion)", "path": "lib/data" },
+    { "name": "4 - PDF Y DOCUMENTOS", "path": "lib/pdf" },
+    { "name": "5 - BACKEND EN LA NUBE (Supabase e IA)", "path": "supabase" },
+    { "name": "6 - PRUEBAS AUTOMATICAS", "path": "test" },
+    { "name": "7 - GUIAS PARA EXPONER", "path": "docs/exposicion" }
+  ],
+  "settings": {
+    "dart.flutterSdkPath": "C:\\dev\\flutter",
+    "dart.flutterHotReloadOnSave": "all",
+    "files.encoding": "utf8",
+    "workbench.startupEditor": "none",
+    "explorer.compactFolders": false,
+    "files.exclude": {
+      "**/.dart_tool": true,
+      "**/build": true,
+      "**/.idea": true,
+      "**/*.iml": true
+    }
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "▶ Correr en el PC (Windows)",
+        "type": "dart",
+        "request": "launch",
+        "cwd": "${workspaceFolder:0 - PROYECTO COMPLETO (para correr)}",
+        "program": "lib/main.dart",
+        "deviceId": "windows",
+        "args": ["--dart-define-from-file=dart_defines.json"]
+      },
+      {
+        "name": "▶ Correr en el PC sin nube (modo avión)",
+        "type": "dart",
+        "request": "launch",
+        "cwd": "${workspaceFolder:0 - PROYECTO COMPLETO (para correr)}",
+        "program": "lib/main.dart",
+        "deviceId": "windows"
+      },
+      {
+        "name": "▶ Correr en el celular (conectado por USB)",
+        "type": "dart",
+        "request": "launch",
+        "cwd": "${workspaceFolder:0 - PROYECTO COMPLETO (para correr)}",
+        "program": "lib/main.dart",
+        "args": ["--dart-define-from-file=dart_defines.json"],
+        "env": {
+          "ANDROID_HOME": "C:\\Android\\sdk",
+          "JAVA_TOOL_OPTIONS": "-Djavax.net.ssl.trustStore=C:\\Android\\java-truststore\\cacerts-avast.jks -Djavax.net.ssl.trustStorePassword=changeit"
+        }
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Correr las 88 pruebas automáticas",
+        "type": "shell",
+        "command": "C:\\dev\\flutter\\bin\\flutter.bat test",
+        "options": { "cwd": "${workspaceFolder:0 - PROYECTO COMPLETO (para correr)}" },
+        "group": { "kind": "test", "isDefault": true },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
