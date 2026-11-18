@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/local_db.dart';
 import '../data/sync_service.dart';
 import 'asistente_page.dart';
 import 'clientes_page.dart';
@@ -6,7 +7,9 @@ import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'login_page.dart';
 import 'negocio_page.dart';
+import 'notificaciones.dart';
 import 'privacidad_page.dart';
+import 'registro_negocio_page.dart';
 import 'tablero_page.dart';
 import 'tema.dart';
 import 'ventas_page.dart';
@@ -19,6 +22,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _i = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // La app se adapta a las respuestas del registro guiado.
+    LocalDb.instance.modo.addListener(_refrescar);
+    // Avisos en el celular (agotados, cobros vencidos, meta cumplida).
+    Avisos.instance.vigilar();
+  }
+
+  @override
+  void dispose() {
+    LocalDb.instance.modo.removeListener(_refrescar);
+    super.dispose();
+  }
+
+  void _refrescar() => setState(() {});
 
   void _ir(int i) => setState(() => _i = i);
 
@@ -52,7 +72,9 @@ class _HomePageState extends State<HomePage> {
           Text.rich(TextSpan(
             text: 'VERTEX ',
             style: t.titleLarge?.copyWith(
-                color: p.tizaBlanca, fontWeight: FontWeight.w800, letterSpacing: 0.4),
+                color: p.tizaBlanca,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4),
             children: [
               TextSpan(
                   text: 'AI Pyme',
@@ -69,10 +91,13 @@ class _HomePageState extends State<HomePage> {
             tooltip: 'Más opciones',
             onSelected: (v) {
               if (v == 'privacidad') {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const PrivacidadPage()));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PrivacidadPage()));
               } else if (v == 'negocio') {
                 mostrarMiNegocio(context);
+              } else if (v == 'ajustar') {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => const RegistroNegocioPage()));
               } else if (v == 'sync') {
                 SyncService.instance.reintentarErrores();
               }
@@ -83,6 +108,13 @@ class _HomePageState extends State<HomePage> {
                 child: ListTile(
                     leading: Icon(Icons.storefront_outlined),
                     title: Text('Mi negocio'),
+                    contentPadding: EdgeInsets.zero),
+              ),
+              PopupMenuItem(
+                value: 'ajustar',
+                child: ListTile(
+                    leading: Icon(Icons.tune),
+                    title: Text('Ajustar la app a mi negocio'),
                     contentPadding: EdgeInsets.zero),
               ),
               PopupMenuItem(
@@ -131,9 +163,15 @@ class _HomePageState extends State<HomePage> {
               selectedIcon: Icon(Icons.receipt_long, color: p.ventas),
               label: 'Caja'),
           NavigationDestination(
-              icon: const Icon(Icons.inventory_2_outlined),
-              selectedIcon: Icon(Icons.inventory_2, color: p.ventas),
-              label: 'Inventario'),
+              icon: Icon(LocalDb.instance.modo.value.vendeProductos
+                  ? Icons.inventory_2_outlined
+                  : Icons.handyman_outlined),
+              selectedIcon: Icon(
+                  LocalDb.instance.modo.value.vendeProductos
+                      ? Icons.inventory_2
+                      : Icons.handyman,
+                  color: p.ventas),
+              label: LocalDb.instance.modo.value.nombreCatalogo),
           NavigationDestination(
               icon: const Icon(Icons.people_outline),
               selectedIcon: Icon(Icons.people, color: p.fiado),
@@ -180,7 +218,8 @@ class PildoraSync extends StatelessWidget {
     final s = SyncService.instance;
     final p = Paleta.of(context);
     return AnimatedBuilder(
-      animation: Listenable.merge([s.estado, s.pendientes, s.errores, s.subidos]),
+      animation:
+          Listenable.merge([s.estado, s.pendientes, s.errores, s.subidos]),
       builder: (context, _) {
         final e = s.estado.value;
         final subidos = s.subidos.value;
@@ -194,7 +233,8 @@ class PildoraSync extends StatelessWidget {
         var texto = textoEstado(e, s.pendientes.value, s.errores.value);
         final resaltar = e == EstadoSync.sincronizado && subidos > 0;
         if (resaltar) {
-          texto = 'Sincronizado · ${subidos == 1 ? '1 registro subido' : '$subidos registros subidos'}';
+          texto =
+              'Sincronizado · ${subidos == 1 ? '1 registro subido' : '$subidos registros subidos'}';
         }
         return Semantics(
           button: true,
@@ -204,7 +244,8 @@ class PildoraSync extends StatelessWidget {
                 ? tiza.withValues(alpha: 0.22)
                 : p.tizaBlanca.withValues(alpha: 0.08),
             shape: StadiumBorder(
-                side: BorderSide(color: tiza.withValues(alpha: resaltar ? 0.9 : 0.35))),
+                side: BorderSide(
+                    color: tiza.withValues(alpha: resaltar ? 0.9 : 0.35))),
             child: InkWell(
               customBorder: const StadiumBorder(),
               onTap: () {
@@ -214,13 +255,15 @@ class PildoraSync extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 36),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     if (e == EstadoSync.sincronizando)
                       SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: tiza),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: tiza),
                       )
                     else
                       Icon(icono, size: 16, color: tiza),

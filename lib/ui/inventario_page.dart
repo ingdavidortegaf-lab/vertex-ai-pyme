@@ -54,18 +54,24 @@ class _InventarioPageState extends State<InventarioPage> {
     final p = Paleta.of(context);
     final esquema = Theme.of(context).colorScheme;
     final reponer = _items.where((x) => x.agotado || x.bajo).length;
-    final valor = _items.fold(0.0, (s, x) => s + (x.stock > 0 ? x.stock * x.costo : 0));
+    final valor =
+        _items.fold(0.0, (s, x) => s + (x.stock > 0 ? x.stock * x.costo : 0));
     final f = _filtro.trim().toLowerCase();
     final lista = _items
         .where((x) => !_soloReponer || x.agotado || x.bajo)
-        .where((x) => f.isEmpty || x.nombre.toLowerCase().contains(f) || x.codigo.contains(f.trim()))
+        .where((x) =>
+            f.isEmpty ||
+            x.nombre.toLowerCase().contains(f) ||
+            x.codigo.contains(f.trim()))
         .toList();
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => mostrarFormProducto(context),
         icon: const Icon(Icons.add_box_outlined),
-        label: const Text('Producto'),
+        label: Text(LocalDb.instance.modo.value.vendeProductos
+            ? 'Producto'
+            : 'Servicio'),
       ),
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
@@ -81,66 +87,73 @@ class _InventarioPageState extends State<InventarioPage> {
                     label: const Text('Agregar el primero'),
                   ),
                 )
-              : ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: [
-                  Row(children: [
-                    Expanded(
-                      child: _Dato(
-                          titulo: 'Valor a costo',
-                          valor: cop(valor),
-                          color: esquema.onSurface),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _Dato(
-                          titulo: 'Por reponer',
-                          valor: reponer == 1 ? '1 producto' : '$reponer productos',
-                          color: reponer > 0 ? p.gastos : p.ventas,
-                          icono: reponer > 0
-                              ? Icons.warning_amber_rounded
-                              : Icons.check_circle_outline),
-                    ),
-                  ]),
-                  const SizedBox(height: 12),
-                  TextField(
-                    onChanged: (v) => setState(() => _filtro = v),
-                    decoration: const InputDecoration(
-                        hintText: 'Buscar producto', prefixIcon: Icon(Icons.search)),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    ChoiceChip(
-                      label: Text('Todos (${_items.length})'),
-                      selected: !_soloReponer,
-                      onSelected: (_) => setState(() => _soloReponer = false),
-                    ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      label: Text('Por reponer ($reponer)'),
-                      selected: _soloReponer,
-                      onSelected: (_) => setState(() => _soloReponer = true),
-                    ),
-                  ]),
-                  const SizedBox(height: 12),
-                  if (lista.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                          _soloReponer
-                              ? 'Nada por reponer. ¡Todo está surtido!'
-                              : 'Ningún producto coincide.',
-                          textAlign: TextAlign.center,
-                          style: t.bodyLarge),
-                    )
-                  else
-                    Card(
-                      child: Column(children: [
-                        for (final (i, x) in lista.indexed) ...[
-                          if (i > 0) const Divider(indent: 72),
-                          _FilaProducto(x: x),
-                        ],
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
+                  children: [
+                      Row(children: [
+                        Expanded(
+                          child: _Dato(
+                              titulo: 'Valor a costo',
+                              valor: cop(valor),
+                              color: esquema.onSurface),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _Dato(
+                              titulo: 'Por reponer',
+                              valor: reponer == 1
+                                  ? '1 producto'
+                                  : '$reponer productos',
+                              color: reponer > 0 ? p.gastos : p.ventas,
+                              icono: reponer > 0
+                                  ? Icons.warning_amber_rounded
+                                  : Icons.check_circle_outline),
+                        ),
                       ]),
-                    ),
-                ]),
+                      const SizedBox(height: 12),
+                      TextField(
+                        onChanged: (v) => setState(() => _filtro = v),
+                        decoration: const InputDecoration(
+                            hintText: 'Buscar producto',
+                            prefixIcon: Icon(Icons.search)),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(children: [
+                        ChoiceChip(
+                          label: Text('Todos (${_items.length})'),
+                          selected: !_soloReponer,
+                          onSelected: (_) =>
+                              setState(() => _soloReponer = false),
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: Text('Por reponer ($reponer)'),
+                          selected: _soloReponer,
+                          onSelected: (_) =>
+                              setState(() => _soloReponer = true),
+                        ),
+                      ]),
+                      const SizedBox(height: 12),
+                      if (lista.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                              _soloReponer
+                                  ? 'Nada por reponer. ¡Todo está surtido!'
+                                  : 'Ningún producto coincide.',
+                              textAlign: TextAlign.center,
+                              style: t.bodyLarge),
+                        )
+                      else
+                        Card(
+                          child: Column(children: [
+                            for (final (i, x) in lista.indexed) ...[
+                              if (i > 0) const Divider(indent: 72),
+                              _FilaProducto(x: x),
+                            ],
+                          ]),
+                        ),
+                    ]),
     );
   }
 }
@@ -150,7 +163,10 @@ class _Dato extends StatelessWidget {
   final Color color;
   final IconData? icono;
   const _Dato(
-      {required this.titulo, required this.valor, required this.color, this.icono});
+      {required this.titulo,
+      required this.valor,
+      required this.color,
+      this.icono});
 
   @override
   Widget build(BuildContext context) {
@@ -160,8 +176,8 @@ class _Dato extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(titulo,
-              style: t.bodyMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              style: t.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
           const SizedBox(height: 4),
           Row(children: [
             if (icono != null) ...[
@@ -172,7 +188,8 @@ class _Dato extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: Text(valor, style: cifras(t.titleLarge?.copyWith(color: color))),
+                child: Text(valor,
+                    style: cifras(t.titleLarge?.copyWith(color: color))),
               ),
             ),
           ]),
@@ -190,14 +207,27 @@ class EtiquetaStock extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = Paleta.of(context);
     final t = Theme.of(context).textTheme;
-    final (Color fondo, Color tinta, String texto) = x.agotado
-        ? (p.gastosFondo, p.gastos, 'Agotado')
-        : x.bajo
-            ? (p.fiadoFondo, p.fiado, 'Quedan ${cantidadConUnidad(x.stock, x.unidad)}')
-            : (p.ventasFondo, p.ventas, x.unidad == 'und' ? '${cantidadTexto(x.stock)} und.' : cantidadConUnidad(x.stock, x.unidad));
+    final (Color fondo, Color tinta, String texto) = x.esServicio
+        ? (p.asistenteFondo, p.asistente, 'Servicio')
+        : x.agotado
+            ? (p.gastosFondo, p.gastos, 'Agotado')
+            : x.bajo
+                ? (
+                    p.fiadoFondo,
+                    p.fiado,
+                    'Quedan ${cantidadConUnidad(x.stock, x.unidad)}'
+                  )
+                : (
+                    p.ventasFondo,
+                    p.ventas,
+                    x.unidad == 'und'
+                        ? '${cantidadTexto(x.stock)} und.'
+                        : cantidadConUnidad(x.stock, x.unidad)
+                  );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(10)),
+      decoration:
+          BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(10)),
       child: Text(texto, style: cifras(t.labelLarge?.copyWith(color: tinta))),
     );
   }
@@ -220,12 +250,13 @@ class _FilaProducto extends StatelessWidget {
       leading: Container(
         width: 44,
         height: 44,
-        decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(14)),
+        decoration: BoxDecoration(
+            color: fondo, borderRadius: BorderRadius.circular(14)),
         child: Icon(Icons.inventory_2_outlined, color: tinta),
       ),
       title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(
-          '${cop(x.precio)}${x.unidad == 'und' ? '' : '/${x.unidad}'}${x.costo > 0 ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}'),
+          '${cop(x.precio)}${esPorPeso(x.unidad) ? '/${x.unidad}' : ''}${x.costo > 0 ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}'),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         EtiquetaStock(x: x),
         const SizedBox(width: 6),
@@ -244,24 +275,28 @@ Future<void> _acciones(BuildContext context, ProductoStock x) async {
         ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           title: Text(x.nombre, style: Theme.of(c).textTheme.titleLarge),
-          subtitle: Text('Hay ${cantidadTexto(x.stock)} · mínimo ${cantidadTexto(x.minimo)}'),
+          subtitle: Text(x.esServicio
+              ? 'Servicio · ${cop(x.precio)}'
+              : 'Hay ${cantidadTexto(x.stock)} · mínimo ${cantidadTexto(x.minimo)}'),
           trailing: EtiquetaStock(x: x),
         ),
         const Divider(),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          leading: const Icon(Icons.add_circle_outline),
-          title: const Text('Llegó mercancía'),
-          subtitle: const Text('Suma unidades al stock'),
-          onTap: () => Navigator.pop(c, 'entrada'),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          leading: const Icon(Icons.fact_check_outlined),
-          title: const Text('Corregir por conteo'),
-          subtitle: const Text('Ajusta a lo que hay de verdad'),
-          onTap: () => Navigator.pop(c, 'ajuste'),
-        ),
+        if (!x.esServicio) ...[
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+            leading: const Icon(Icons.add_circle_outline),
+            title: const Text('Llegó mercancía'),
+            subtitle: const Text('Suma unidades al stock'),
+            onTap: () => Navigator.pop(c, 'entrada'),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+            leading: const Icon(Icons.fact_check_outlined),
+            title: const Text('Corregir por conteo'),
+            subtitle: const Text('Ajusta a lo que hay de verdad'),
+            onTap: () => Navigator.pop(c, 'ajuste'),
+          ),
+        ],
         ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: const Icon(Icons.edit_outlined),
@@ -270,7 +305,8 @@ Future<void> _acciones(BuildContext context, ProductoStock x) async {
         ),
         ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          leading: Icon(Icons.delete_outline, color: Theme.of(c).colorScheme.error),
+          leading:
+              Icon(Icons.delete_outline, color: Theme.of(c).colorScheme.error),
           title: Text('Eliminar producto',
               style: TextStyle(color: Theme.of(c).colorScheme.error)),
           onTap: () => Navigator.pop(c, 'eliminar'),
@@ -295,7 +331,9 @@ Future<void> _acciones(BuildContext context, ProductoStock x) async {
       final entrada = accion == 'entrada';
       final n = await _pedirCantidad(context,
           titulo: entrada ? 'Llegó mercancía' : 'Corregir por conteo',
-          etiqueta: entrada ? '¿Cuántas unidades llegaron?' : '¿Cuántas hay de verdad?',
+          etiqueta: entrada
+              ? '¿Cuántas unidades llegaron?'
+              : '¿Cuántas hay de verdad?',
           inicial: entrada ? null : cantidadTexto(x.stock < 0 ? 0 : x.stock));
       if (n == null) return;
       final cambio = entrada ? n : n - x.stock;
@@ -332,7 +370,8 @@ Future<double?> _pedirCantidad(BuildContext context,
         decoration: InputDecoration(labelText: etiqueta),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
+        TextButton(
+            onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
         FilledButton(
           onPressed: () {
             final n = _numero(ctrl.text);
@@ -349,7 +388,8 @@ Future<double?> _pedirCantidad(BuildContext context,
 }
 
 /// Crear (producto == null) o editar un producto.
-Future<void> mostrarFormProducto(BuildContext context, {ProductoStock? producto}) async {
+Future<void> mostrarFormProducto(BuildContext context,
+    {ProductoStock? producto}) async {
   final r = await showModalBottomSheet<_DatosProducto>(
     context: context,
     isScrollControlled: true,
@@ -373,8 +413,8 @@ class _DatosProducto {
   final String nombre;
   final double precio, costo, minimo, stock;
   final String codigo, unidad;
-  const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo, this.stock,
-      this.codigo, this.unidad);
+  const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo,
+      this.stock, this.codigo, this.unidad);
 }
 
 class _FormProducto extends StatefulWidget {
@@ -386,16 +426,26 @@ class _FormProducto extends StatefulWidget {
 
 class _FormProductoState extends State<_FormProducto> {
   final _form = GlobalKey<FormState>();
-  late final _nombre = TextEditingController(text: widget.producto?.nombre ?? '');
+  late final _nombre =
+      TextEditingController(text: widget.producto?.nombre ?? '');
   late final _precio = TextEditingController(
-      text: widget.producto == null ? '' : cop(widget.producto!.precio).substring(1));
+      text: widget.producto == null
+          ? ''
+          : cop(widget.producto!.precio).substring(1));
   late final _costo = TextEditingController(
-      text: (widget.producto?.costo ?? 0) > 0 ? cop(widget.producto!.costo).substring(1) : '');
+      text: (widget.producto?.costo ?? 0) > 0
+          ? cop(widget.producto!.costo).substring(1)
+          : '');
   late final _minimo = TextEditingController(
-      text: (widget.producto?.minimo ?? 0) > 0 ? cantidadTexto(widget.producto!.minimo) : '');
+      text: (widget.producto?.minimo ?? 0) > 0
+          ? cantidadTexto(widget.producto!.minimo)
+          : '');
   final _stock = TextEditingController();
-  late final _codigo = TextEditingController(text: widget.producto?.codigo ?? '');
-  late String _unidad = widget.producto?.unidad ?? 'und';
+  late final _codigo =
+      TextEditingController(text: widget.producto?.codigo ?? '');
+  late String _unidad =
+      widget.producto?.unidad ?? LocalDb.instance.modo.value.unidadInicial;
+  bool get _servicio => _unidad == 'serv';
 
   @override
   void dispose() {
@@ -424,14 +474,35 @@ class _FormProductoState extends State<_FormProducto> {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final nuevo = widget.producto == null;
+    final modo = LocalDb.instance.modo.value;
+    // Solo se ofrecen las formas de vender que el negocio usa (y la actual).
+    final segmentos = [
+      if (modo.vendeProductos || _unidad == 'und')
+        const ButtonSegment(value: 'und', label: Text('Unidad')),
+      if ((modo.vendeProductos && modo.gramera) || _unidad == 'kg')
+        const ButtonSegment(
+            value: 'kg', icon: Icon(Icons.scale_outlined), label: Text('Kilo')),
+      if ((modo.vendeProductos && modo.gramera) || _unidad == 'lb')
+        const ButtonSegment(
+            value: 'lb',
+            icon: Icon(Icons.scale_outlined),
+            label: Text('Libra')),
+      if (modo.vendeServicios || _unidad == 'serv')
+        const ButtonSegment(
+            value: 'serv',
+            icon: Icon(Icons.handyman_outlined),
+            label: Text('Servicio')),
+    ];
+    final que = _servicio ? 'servicio' : 'producto';
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Form(
           key: _form,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text(nuevo ? 'Nuevo producto' : 'Editar producto', style: t.headlineSmall),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(nuevo ? 'Nuevo $que' : 'Editar $que', style: t.headlineSmall),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nombre,
@@ -439,109 +510,130 @@ class _FormProductoState extends State<_FormProducto> {
               textCapitalization: TextCapitalization.sentences,
               maxLength: 80,
               decoration: const InputDecoration(
-                  labelText: 'Nombre', hintText: 'Ej.: Arroz 500 g', counterText: ''),
-              validator: (v) =>
-                  (v ?? '').trim().length < 2 ? 'Escribe el nombre del producto' : null,
+                  labelText: 'Nombre',
+                  hintText: 'Ej.: Arroz 500 g',
+                  counterText: ''),
+              validator: (v) => (v ?? '').trim().length < 2
+                  ? 'Escribe el nombre del producto'
+                  : null,
             ),
             const SizedBox(height: 12),
-            Text('Se vende por', style: t.titleSmall),
-            const SizedBox(height: 8),
-            SegmentedButton<String>(
-              showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: 'und', label: Text('Unidad')),
-                ButtonSegment(value: 'kg', icon: Icon(Icons.scale_outlined), label: Text('Kilo')),
-                ButtonSegment(value: 'lb', icon: Icon(Icons.scale_outlined), label: Text('Libra')),
-              ],
-              selected: {_unidad},
-              onSelectionChanged: (s) => setState(() => _unidad = s.first),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _codigo,
-              keyboardType: TextInputType.number,
-              maxLength: 40,
-              decoration: InputDecoration(
-                labelText: _unidad == 'und'
-                    ? 'Código de barras (opcional)'
-                    : 'Código en la gramera (PLU, opcional)',
-                helperText: _unidad == 'und'
-                    ? 'Escanéalo o escríbelo; sirve también con lector USB'
-                    : 'El número del producto en la etiqueta de la gramera',
-                counterText: '',
-                suffixIcon: IconButton(
-                  tooltip: 'Escanear',
-                  icon: const Icon(Icons.qr_code_scanner),
-                  onPressed: () async {
-                    final c = await escanearCodigo(context);
-                    if (c == null) return;
-                    final b = leerEtiquetaBalanza(c);
-                    // Si se escanea una etiqueta de gramera, se guarda su PLU.
-                    setState(() => _codigo.text = b?.plu ?? normalizarCodigo(c));
-                  },
+            if (segmentos.length > 1) ...[
+              Text('Se vende por', style: t.titleSmall),
+              const SizedBox(height: 8),
+              SegmentedButton<String>(
+                showSelectedIcon: false,
+                segments: segmentos,
+                selected: {_unidad},
+                onSelectionChanged: (s) => setState(() => _unidad = s.first),
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_servicio)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                    'Los servicios no llevan inventario: no se agotan ni piden mínimo.',
+                    style: t.bodySmall),
+              ),
+            if (!_servicio && (modo.codigos || _codigo.text.isNotEmpty)) ...[
+              TextFormField(
+                controller: _codigo,
+                keyboardType: TextInputType.number,
+                maxLength: 40,
+                decoration: InputDecoration(
+                  labelText: _unidad == 'und'
+                      ? 'Código de barras (opcional)'
+                      : 'Código en la gramera (PLU, opcional)',
+                  helperText: _unidad == 'und'
+                      ? 'Escanéalo o escríbelo; sirve también con lector USB'
+                      : 'El número del producto en la etiqueta de la gramera',
+                  counterText: '',
+                  suffixIcon: IconButton(
+                    tooltip: 'Escanear',
+                    icon: const Icon(Icons.qr_code_scanner),
+                    onPressed: () async {
+                      final c = await escanearCodigo(context);
+                      if (c == null) return;
+                      final b = leerEtiquetaBalanza(c);
+                      // Si se escanea una etiqueta de gramera, se guarda su PLU.
+                      setState(
+                          () => _codigo.text = b?.plu ?? normalizarCodigo(c));
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
+            ],
             Row(children: [
               Expanded(
                 child: TextFormField(
                   controller: _precio,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                      labelText: _unidad == 'und' ? 'Precio de venta' : 'Precio por $_unidad',
+                      labelText: esPorPeso(_unidad)
+                          ? 'Precio por $_unidad'
+                          : 'Precio de venta',
                       prefixText: r'$ '),
-                  validator: (v) =>
-                      parseMonto(v ?? '') == null ? 'Precio mayor a cero' : null,
+                  validator: (v) => parseMonto(v ?? '') == null
+                      ? 'Precio mayor a cero'
+                      : null,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: TextFormField(
                   controller: _costo,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                       labelText: 'Costo (opcional)', prefixText: r'$ '),
-                  validator: (v) => (v ?? '').trim().isNotEmpty &&
-                          parseMonto(v!) == null
-                      ? 'Costo no válido'
-                      : null,
+                  validator: (v) =>
+                      (v ?? '').trim().isNotEmpty && parseMonto(v!) == null
+                          ? 'Costo no válido'
+                          : null,
                 ),
               ),
             ]),
-            const SizedBox(height: 12),
-            Row(children: [
-              if (nuevo) ...[
+            if (!_servicio) ...[
+              const SizedBox(height: 12),
+              Row(children: [
+                if (nuevo) ...[
+                  Expanded(
+                    child: TextFormField(
+                      controller: _stock,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      decoration:
+                          const InputDecoration(labelText: '¿Cuántos tienes?'),
+                      validator: (v) => (v ?? '').trim().isNotEmpty &&
+                              ((_numero(v!) ?? -1) < 0)
+                          ? 'Cantidad no válida'
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
                 Expanded(
                   child: TextFormField(
-                    controller: _stock,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: '¿Cuántos tienes?'),
-                    validator: (v) => (v ?? '').trim().isNotEmpty &&
-                            ((_numero(v!) ?? -1) < 0)
-                        ? 'Cantidad no válida'
-                        : null,
+                    controller: _minimo,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                        labelText: 'Avisar cuando queden', hintText: 'Ej.: 5'),
+                    validator: (v) =>
+                        (v ?? '').trim().isNotEmpty && ((_numero(v!) ?? -1) < 0)
+                            ? 'Cantidad no válida'
+                            : null,
                   ),
                 ),
-                const SizedBox(width: 10),
-              ],
-              Expanded(
-                child: TextFormField(
-                  controller: _minimo,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      labelText: 'Avisar cuando queden', hintText: 'Ej.: 5'),
-                  validator: (v) => (v ?? '').trim().isNotEmpty &&
-                          ((_numero(v!) ?? -1) < 0)
-                      ? 'Cantidad no válida'
-                      : null,
-                ),
-              ),
-            ]),
+              ]),
+            ],
             const SizedBox(height: 20),
             FilledButton(
                 onPressed: _guardar,
-                child: Text(nuevo ? 'Guardar producto' : 'Guardar cambios')),
+                child: Text(nuevo ? 'Guardar $que' : 'Guardar cambios')),
           ]),
         ),
       ),

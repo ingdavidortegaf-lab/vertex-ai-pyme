@@ -116,7 +116,7 @@ class ProductoCampos {
   ];
 
   /// Unidades de venta: por unidad o por peso (gramera).
-  static const unidades = ['und', 'kg', 'lb'];
+  static const unidades = ['und', 'kg', 'lb', 'serv'];
 
   /// Fecha para campos que no existían en versiones anteriores: cualquier
   /// cambio real gana sobre ella al unir.

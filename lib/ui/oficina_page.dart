@@ -348,7 +348,7 @@ class _CarteraPageState extends State<CarteraPage> {
                     title: Text(nombre),
                     subtitle:
                         Text('Debe desde el ${_dia.format(e.debeDesde!)} · '
-                            '${e.diasMora} días'),
+                            '${e.diasMora} ${e.diasMora == 1 ? 'día' : 'días'}'),
                     trailing: Text(cop(e.saldo), style: cifras(t.titleMedium)),
                     onTap: () => generarCuentaCobro(context, id),
                   ),

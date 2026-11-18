@@ -15,6 +15,9 @@ const tiposNegocio = [
   'Ferretería',
   'Agro y veterinaria',
   'Restaurante o comidas',
+  'Peluquería o belleza',
+  'Taller o reparaciones',
+  'Servicios profesionales',
   'Otro',
 ];
 
@@ -43,6 +46,28 @@ Future<void> mostrarMiNegocio(BuildContext context) async {
   avisar('Datos del negocio guardados');
 }
 
+/// Elige una imagen de la galería y la copia a la carpeta privada de la
+/// app; devuelve la ruta (o null si se cancela o falla).
+Future<String?> elegirLogoNegocio() async {
+  try {
+    final img = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
+    if (img == null) return null;
+    final bytes = await img.readAsBytes();
+    if (bytes.length > 2 * 1024 * 1024) {
+      avisar('La imagen pesa más de 2 MB; elige una más liviana');
+      return null;
+    }
+    final dir = await getApplicationDocumentsDirectory();
+    final f = File('${dir.path}/logo_${DateTime.now().millisecondsSinceEpoch}.img');
+    await f.writeAsBytes(bytes, flush: true);
+    return f.path;
+  } catch (_) {
+    avisar('No se pudo cargar la imagen');
+    return null;
+  }
+}
+
 class _FormNegocio extends StatefulWidget {
   final PerfilNegocio actual;
   const _FormNegocio({required this.actual});
@@ -61,24 +86,9 @@ class _FormNegocioState extends State<_FormNegocio> {
   late final _tel = TextEditingController(text: mostrarTelefono(widget.actual.telefono));
   late String _logo = widget.actual.logo;
 
-  /// Elige una imagen y la copia a la carpeta privada de la app.
   Future<void> _elegirLogo() async {
-    try {
-      final img = await ImagePicker()
-          .pickImage(source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
-      if (img == null) return;
-      final bytes = await img.readAsBytes();
-      if (bytes.length > 2 * 1024 * 1024) {
-        avisar('La imagen pesa más de 2 MB; elige una más liviana');
-        return;
-      }
-      final dir = await getApplicationDocumentsDirectory();
-      final f = File('${dir.path}/logo_${DateTime.now().millisecondsSinceEpoch}.img');
-      await f.writeAsBytes(bytes, flush: true);
-      if (mounted) setState(() => _logo = f.path);
-    } catch (_) {
-      avisar('No se pudo cargar la imagen');
-    }
+    final r = await elegirLogoNegocio();
+    if (r != null && mounted) setState(() => _logo = r);
   }
 
   @override

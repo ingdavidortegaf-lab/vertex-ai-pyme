@@ -11,6 +11,7 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
 import '../domain/documentos.dart';
+import '../domain/modo_negocio.dart';
 import '../domain/resumen.dart';
 
 /// Base local CIFRADA (SQLCipher). La clave (256 bits aleatorios) se genera
@@ -40,6 +41,10 @@ class LocalDb {
 
   /// Aumenta cada vez que cambian los datos: las pantallas lo escuchan.
   final cambios = ValueNotifier<int>(0);
+
+  /// Cómo trabaja el negocio (respuestas del registro guiado). Las pantallas
+  /// lo escuchan para adaptarse.
+  final modo = ValueNotifier<ModoNegocio>(const ModoNegocio());
   void _avisar() => cambios.value++;
 
   /// En el PC (Windows) se usa SQLite por FFI en la carpeta privada de la
@@ -712,6 +717,26 @@ class LocalDb {
   }
 
   // ----------------------------------------------------------- herramientas
+  /// Lee el modo del negocio guardado y avisa a las pantallas.
+  Future<ModoNegocio> cargarModo() async {
+    final r = await db.query('ajustes', where: "clave LIKE 'modo_%'");
+    final m = ModoNegocio.deAjustes(
+        {for (final x in r) x['clave'] as String: x['valor'] as String?});
+    modo.value = m;
+    return m;
+  }
+
+  Future<void> guardarModo(ModoNegocio m) async {
+    await db.transaction((t) async {
+      for (final e in m.aAjustes().entries) {
+        await t.insert('ajustes', {'clave': e.key, 'valor': e.value},
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    });
+    modo.value = m;
+    _avisar();
+  }
+
   Future<PerfilNegocio> perfilNegocio() async => PerfilNegocio(
         nombre: await ajuste('negocio_nombre') ?? '',
         tipo: await ajuste('negocio_tipo') ?? '',

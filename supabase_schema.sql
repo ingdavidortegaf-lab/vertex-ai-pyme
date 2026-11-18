@@ -269,3 +269,8 @@ begin
   new.recibido_at := now();
   return new;
 end $$;
+-- v5: servicios (unidad 'serv'): se venden sin llevar inventario
+-- (peluquería, taller, domicilios, asesorías…).
+alter table public.productos drop constraint if exists productos_unidad_check;
+alter table public.productos add constraint productos_unidad_check
+  check (unidad in ('und','kg','lb','serv'));

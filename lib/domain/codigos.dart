@@ -8,6 +8,7 @@
 ///   aquí.
 library;
 
+import 'formato.dart';
 import 'resumen.dart';
 
 String normalizarCodigo(String s) => s.replaceAll(RegExp(r'\s'), '').trim();
@@ -70,6 +71,16 @@ double pesoEnUnidad(int gramos, String unidad) {
 }
 
 bool esPorPeso(String unidad) => unidad == 'kg' || unidad == 'lb';
+
+/// Servicio (corte, domicilio, consulta, reparación…): no lleva inventario.
+bool esServicio(String unidad) => unidad == 'serv';
+
+/// Precio con su unidad: «$2.500 c/u», «$9.000/kg» o «$30.000» (servicio).
+String precioConUnidad(double precio, String unidad) => esPorPeso(unidad)
+    ? '${cop(precio)}/$unidad'
+    : esServicio(unidad)
+        ? cop(precio)
+        : '${cop(precio)} c/u';
 
 /// «3», «0,750 kg», «1,5 lb».
 String cantidadConUnidad(double c, String unidad) {

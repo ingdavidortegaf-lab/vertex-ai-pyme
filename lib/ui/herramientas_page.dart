@@ -55,19 +55,19 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
       reutilizar: true);
   final numero = documento['numero'] as String;
   final doc = DocImprimible(
-        titulo: 'Comprobante de venta',
-        numero: numero,
-        fecha: DateTime.parse(v['fecha'] as String).toLocal(),
-        negocio: negocio,
-        cliente: v['cliente_nombre'] as String?,
-        lineas: lineas,
-        total: (v['monto'] as num).toDouble(),
-        notas: [
-          'Forma de pago: ${fiado ? 'a crédito (fiado)' : 'contado'}',
-          if (fiado && saldo > 0) 'Saldo pendiente a la fecha: ${cop(saldo)}',
-          '¡Gracias por su compra!',
-        ],
-      );
+    titulo: 'Comprobante de venta',
+    numero: numero,
+    fecha: DateTime.parse(v['fecha'] as String).toLocal(),
+    negocio: negocio,
+    cliente: v['cliente_nombre'] as String?,
+    lineas: lineas,
+    total: (v['monto'] as num).toDouble(),
+    notas: [
+      'Forma de pago: ${fiado ? 'a crédito (fiado)' : 'contado'}',
+      if (fiado && saldo > 0) 'Saldo pendiente a la fecha: ${cop(saldo)}',
+      '¡Gracias por su compra!',
+    ],
+  );
   final pdf = pdfListo(doc);
   await archivarDocumento(documento, pdf);
   if (!context.mounted) return;
@@ -98,10 +98,12 @@ Future<void> mostrarDocumento(BuildContext context,
       final t = Theme.of(c).textTheme;
       final esquema = Theme.of(c).colorScheme;
       return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(c).height * 0.85),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.sizeOf(c).height * 0.85),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Text(titulo, style: t.headlineSmall),
             const SizedBox(height: 12),
             Flexible(
@@ -113,25 +115,30 @@ Future<void> mostrarDocumento(BuildContext context,
                   border: Border.all(color: esquema.outlineVariant),
                 ),
                 child: SingleChildScrollView(
-                  child: SelectableText(texto.replaceAll('*', '').replaceAll('_', ''),
+                  child: SelectableText(
+                      texto.replaceAll('*', '').replaceAll('_', ''),
                       style: cifras(t.bodyMedium)),
                 ),
               ),
             ),
             if (nota != null) ...[
               const SizedBox(height: 10),
-              Text(nota, style: t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
+              Text(nota,
+                  style:
+                      t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
             ],
             const SizedBox(height: 14),
             FilledButton.icon(
               style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF1C7A43), foregroundColor: Colors.white),
+                  backgroundColor: const Color(0xFF1C7A43),
+                  foregroundColor: Colors.white),
               onPressed: () {
                 Navigator.pop(c);
                 enviarWhatsApp(texto, telefono: telefono);
               },
               icon: const Icon(Icons.chat_outlined),
-              label: Text(telefono.isEmpty ? '$boton (elegir contacto)' : boton),
+              label:
+                  Text(telefono.isEmpty ? '$boton (elegir contacto)' : boton),
             ),
             if (pdf != null) ...[
               const SizedBox(height: 10),
@@ -167,7 +174,8 @@ Future<void> mostrarDocumento(BuildContext context,
               const SizedBox(height: 6),
               Text('El PDF queda guardado en «Documentos emitidos».',
                   textAlign: TextAlign.center,
-                  style: t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
+                  style:
+                      t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
             ],
           ]),
         ),
@@ -186,21 +194,66 @@ class HerramientasGrid extends StatelessWidget {
     final p = Paleta.of(context);
     void ir(Widget w) =>
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
+    final modo = LocalDb.instance.modo.value;
     final items = [
-      (Icons.receipt_outlined, 'Comprobantes', 'Envía la venta por WhatsApp',
-          p.ventasFondo, p.ventas, () => ir(const ComprobantesPage())),
-      (Icons.request_quote_outlined, 'Cotizaciones', 'Arma y envía precios',
-          p.asistenteFondo, p.asistente, () => ir(const CotizacionesPage())),
-      (Icons.local_shipping_outlined, 'Pedir mercancía', 'Pedido sugerido al proveedor',
-          p.fiadoFondo, p.fiado, () => ir(const PedidoProveedorPage())),
-      (Icons.campaign_outlined, 'Promociones', 'Ofertas para tu WhatsApp',
-          p.gastosFondo, p.gastos, () => ir(const PromocionPage())),
-      (Icons.insert_chart_outlined, 'Informes', 'Semana, quincena y mes en PDF',
-          p.ventasFondo, p.ventas, () => ir(const InformesPage())),
-      (Icons.account_balance_wallet_outlined, 'Cartera', 'Quién debe y desde cuándo',
-          p.fiadoFondo, p.fiado, () => ir(const CarteraPage())),
-      (Icons.folder_open_outlined, 'Documentos', 'Todo lo emitido, con su número',
-          p.asistenteFondo, p.asistente, () => ir(const DocumentosPage())),
+      (
+        Icons.receipt_outlined,
+        'Comprobantes',
+        'Envía la venta por WhatsApp',
+        p.ventasFondo,
+        p.ventas,
+        () => ir(const ComprobantesPage())
+      ),
+      (
+        Icons.request_quote_outlined,
+        'Cotizaciones',
+        'Arma y envía precios',
+        p.asistenteFondo,
+        p.asistente,
+        () => ir(const CotizacionesPage())
+      ),
+      if (modo.vendeProductos && modo.pedidos)
+        (
+          Icons.local_shipping_outlined,
+          'Pedir mercancía',
+          'Pedido sugerido al proveedor',
+          p.fiadoFondo,
+          p.fiado,
+          () => ir(const PedidoProveedorPage())
+        ),
+      (
+        Icons.campaign_outlined,
+        'Promociones',
+        'Ofertas para tu WhatsApp',
+        p.gastosFondo,
+        p.gastos,
+        () => ir(const PromocionPage())
+      ),
+      (
+        Icons.insert_chart_outlined,
+        'Informes',
+        'Semana, quincena y mes en PDF',
+        p.ventasFondo,
+        p.ventas,
+        () => ir(const InformesPage())
+      ),
+      if (modo.fia)
+        (
+          Icons.account_balance_wallet_outlined,
+          'Cartera',
+          'Quién debe y desde cuándo',
+          p.fiadoFondo,
+          p.fiado,
+          () => ir(const CarteraPage())
+        ),
+      (
+        Icons.folder_open_outlined,
+        'Documentos',
+        'Todo lo emitido, con su número',
+        p.asistenteFondo,
+        p.asistente,
+        () => ir(const DocumentosPage())
+      ),
     ];
     return LayoutBuilder(builder: (context, box) {
       final ancho = (box.maxWidth - 10) / 2;
@@ -214,26 +267,35 @@ class HerramientasGrid extends StatelessWidget {
                 onTap: onTap,
                 child: Padding(
                   padding: const EdgeInsets.all(14),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          color: fondo, borderRadius: BorderRadius.circular(12)),
-                      child: Icon(icono, color: tinta, size: 22),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(titulo, style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: 2),
-                    SizedBox(
-                      height: 34,
-                      child: Text(sub,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                    ),
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: fondo,
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Icon(icono, color: tinta, size: 22),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(titulo,
+                            style: Theme.of(context).textTheme.titleSmall),
+                        const SizedBox(height: 2),
+                        SizedBox(
+                          height: 34,
+                          child: Text(sub,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant)),
+                        ),
+                      ]),
                 ),
               ),
             ),
@@ -261,7 +323,9 @@ class _ComprobantesPageState extends State<ComprobantesPage> {
 
   Future<void> _load() async {
     final m = await LocalDb.instance.movimientos(limite: 100);
-    if (mounted) setState(() => _ventas = m.where((x) => x['tipo'] == 'ingreso').toList());
+    if (mounted) {
+      setState(() => _ventas = m.where((x) => x['tipo'] == 'ingreso').toList());
+    }
   }
 
   @override
@@ -276,30 +340,35 @@ class _ComprobantesPageState extends State<ComprobantesPage> {
               ? const Center(
                   child: Padding(
                       padding: EdgeInsets.all(24),
-                      child: Text('Aún no hay ventas. Registra una y aquí podrás '
+                      child: Text(
+                          'Aún no hay ventas. Registra una y aquí podrás '
                           'enviar su comprobante.',
                           textAlign: TextAlign.center)))
-              : ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 24), children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
-                    child: Text(
-                        'Toca una venta para ver su comprobante y enviarlo por '
-                        'WhatsApp. Trae número, productos y total, listo para '
-                        'conectar después con facturación electrónica.',
-                        style: Theme.of(context).textTheme.bodyMedium),
-                  ),
-                  Card(
-                    child: Column(children: [
-                      for (final (i, x) in v.indexed) ...[
-                        if (i > 0) const Divider(indent: 72),
-                        InkWell(
-                          onTap: () => enviarComprobante(context, x['id'] as String),
-                          child: IgnorePointer(child: FilaMovimiento(v: x, fmt: fmt)),
-                        ),
-                      ],
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+                  children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+                        child: Text(
+                            'Toca una venta para ver su comprobante y enviarlo por '
+                            'WhatsApp. Trae número, productos y total, listo para '
+                            'conectar después con facturación electrónica.',
+                            style: Theme.of(context).textTheme.bodyMedium),
+                      ),
+                      Card(
+                        child: Column(children: [
+                          for (final (i, x) in v.indexed) ...[
+                            if (i > 0) const Divider(indent: 72),
+                            InkWell(
+                              onTap: () =>
+                                  enviarComprobante(context, x['id'] as String),
+                              child: IgnorePointer(
+                                  child: FilaMovimiento(v: x, fmt: fmt)),
+                            ),
+                          ],
+                        ]),
+                      ),
                     ]),
-                  ),
-                ]),
     );
   }
 }
@@ -345,13 +414,19 @@ class _Carrito extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 6),
           child: Row(children: [
             Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(p.nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: t.titleSmall),
-                Text(
-                    '${cop(usarCosto ? p.costo : p.precio)}${p.unidad == 'und' ? ' c/u' : '/${p.unidad}'}'
-                    ' · hay ${cantidadConUnidad(p.stock, p.unidad)}',
-                    style: t.bodySmall?.copyWith(color: esquema.onSurfaceVariant)),
-              ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(p.nombre,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: t.titleSmall),
+                    Text(
+                        '${precioConUnidad(usarCosto ? p.costo : p.precio, p.unidad)}'
+                        '${p.esServicio ? '' : ' · hay ${cantidadConUnidad(p.stock, p.unidad)}'}',
+                        style: t.bodySmall
+                            ?.copyWith(color: esquema.onSurfaceVariant)),
+                  ]),
             ),
             IconButton(
               tooltip: 'Quitar',
@@ -386,8 +461,11 @@ class _Carrito extends StatelessWidget {
 
 /// Lee un código (cámara, lector o teclado) y suma el producto a [cant].
 /// Con etiqueta de gramera suma el peso leído.
-Future<void> agregarPorCodigo(BuildContext context, List<ProductoStock> productos,
-    Map<String, double> cant, VoidCallback alCambiar) async {
+Future<void> agregarPorCodigo(
+    BuildContext context,
+    List<ProductoStock> productos,
+    Map<String, double> cant,
+    VoidCallback alCambiar) async {
   final c = await escanearCodigo(context);
   if (c == null) return;
   final r = buscarPorCodigo(productos, c);
@@ -403,7 +481,8 @@ Future<void> agregarPorCodigo(BuildContext context, List<ProductoStock> producto
       : '${p.nombre}: ${cantidadConUnidad(r.cantidad!, p.unidad)}');
 }
 
-Future<ProductoStock?> _elegirProducto(BuildContext context, List<ProductoStock> l) {
+Future<ProductoStock?> _elegirProducto(
+    BuildContext context, List<ProductoStock> l) {
   if (l.isEmpty) {
     avisar('Primero agrega productos en la pestaña Inventario');
     return Future.value(null);
@@ -486,8 +565,12 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
                   labelText: 'Celular (WhatsApp)', hintText: '300 123 4567')),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancelar')),
-          FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Guardar')),
+          TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: const Text('Cancelar')),
+          FilledButton(
+              onPressed: () => Navigator.pop(c, true),
+              child: const Text('Guardar')),
         ],
       ),
     );
@@ -540,7 +623,8 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
           etiquetaPrecio: 'Costo aprox.',
           lineas: [
             for (final (p, c) in items)
-              LineaDoc(p.nombre, c, p.costo, p.unidad == 'serv' ? 'und' : p.unidad)
+              LineaDoc(
+                  p.nombre, c, p.costo, p.unidad == 'serv' ? 'und' : p.unidad)
           ],
           total: total,
           notas: [
@@ -572,23 +656,31 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       builder: (c) => StatefulBuilder(
         builder: (c, set) => AlertDialog(
           title: const Text('¿Llegó el pedido?'),
-          content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Se sumarán ${items.length == 1 ? '1 producto' : '${items.length} productos'} '
-                'al inventario con las cantidades del pedido.'),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: gasto,
-              onChanged: total > 0 ? (v) => set(() => gasto = v) : null,
-              title: const Text('Registrar la compra como gasto'),
-              subtitle: Text(total > 0
-                  ? 'Total a precio de costo: ${cop(total)}'
-                  : 'Los productos no tienen costo registrado'),
-            ),
-          ]),
+          content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    'Se sumarán ${items.length == 1 ? '1 producto' : '${items.length} productos'} '
+                    'al inventario con las cantidades del pedido.'),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: gasto,
+                  onChanged: total > 0 ? (v) => set(() => gasto = v) : null,
+                  title: const Text('Registrar la compra como gasto'),
+                  subtitle: Text(total > 0
+                      ? 'Total a precio de costo: ${cop(total)}'
+                      : 'Los productos no tienen costo registrado'),
+                ),
+              ]),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancelar')),
-            FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Sí, ingresar')),
+            TextButton(
+                onPressed: () => Navigator.pop(c, false),
+                child: const Text('Cancelar')),
+            FilledButton(
+                onPressed: () => Navigator.pop(c, true),
+                child: const Text('Sí, ingresar')),
           ],
         ),
       ),
@@ -612,83 +704,93 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       appBar: AppBar(title: const Text('Pedir mercancía')),
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
-          : ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 32), children: [
-              Text(
-                  'Te sugerimos lo que se está agotando para quedar en el doble del '
-                  'mínimo. Ajusta las cantidades y envíalo a tu proveedor.',
-                  style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
-              const TituloSeccion('Proveedor'),
-              Row(children: [
-                Expanded(
-                  child: _proveedores.isEmpty
-                      ? Text('Sin proveedores guardados', style: t.bodyMedium)
-                      : DropdownButtonFormField<String>(
-                          initialValue: _proveedorId,
-                          isExpanded: true,
-                          items: [
-                            for (final x in _proveedores)
-                              DropdownMenuItem(
-                                  value: x['id'] as String,
-                                  child: Text(x['nombre'] as String,
-                                      overflow: TextOverflow.ellipsis)),
-                          ],
-                          onChanged: (v) => setState(() => _proveedorId = v),
-                        ),
-                ),
-                const SizedBox(width: 8),
-                IconButton.filledTonal(
-                    tooltip: 'Nuevo proveedor',
-                    onPressed: _nuevoProveedor,
-                    icon: const Icon(Icons.person_add_alt)),
-              ]),
-              const TituloSeccion('Productos del pedido'),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 4, 10),
-                  child: _Carrito(
-                      productos: _productos,
-                      cantidades: _cant,
-                      usarCosto: true,
-                      onCambio: () => setState(() {})),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final p = await _elegirProducto(context, _productos);
-                      if (p != null) setState(() => _cant[p.id] = (_cant[p.id] ?? 0) + 1);
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Agregar'),
+          : ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              children: [
+                  Text(
+                      'Te sugerimos lo que se está agotando para quedar en el doble del '
+                      'mínimo. Ajusta las cantidades y envíalo a tu proveedor.',
+                      style: t.bodyMedium
+                          ?.copyWith(color: esquema.onSurfaceVariant)),
+                  const TituloSeccion('Proveedor'),
+                  Row(children: [
+                    Expanded(
+                      child: _proveedores.isEmpty
+                          ? Text('Sin proveedores guardados',
+                              style: t.bodyMedium)
+                          : DropdownButtonFormField<String>(
+                              initialValue: _proveedorId,
+                              isExpanded: true,
+                              items: [
+                                for (final x in _proveedores)
+                                  DropdownMenuItem(
+                                      value: x['id'] as String,
+                                      child: Text(x['nombre'] as String,
+                                          overflow: TextOverflow.ellipsis)),
+                              ],
+                              onChanged: (v) =>
+                                  setState(() => _proveedorId = v),
+                            ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton.filledTonal(
+                        tooltip: 'Nuevo proveedor',
+                        onPressed: _nuevoProveedor,
+                        icon: const Icon(Icons.person_add_alt)),
+                  ]),
+                  const TituloSeccion('Productos del pedido'),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 4, 10),
+                      child: _Carrito(
+                          productos: _productos,
+                          cantidades: _cant,
+                          usarCosto: true,
+                          onCambio: () => setState(() {})),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () =>
-                        agregarPorCodigo(context, _productos, _cant, () => setState(() {})),
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text('Escanear'),
+                  const SizedBox(height: 10),
+                  Row(children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final p = await _elegirProducto(context, _productos);
+                          if (p != null) {
+                            setState(
+                                () => _cant[p.id] = (_cant[p.id] ?? 0) + 1);
+                          }
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Agregar'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => agregarPorCodigo(
+                            context, _productos, _cant, () => setState(() {})),
+                        icon: const Icon(Icons.qr_code_scanner),
+                        label: const Text('Escanear'),
+                      ),
+                    ),
+                  ]),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF1C7A43),
+                        foregroundColor: Colors.white),
+                    onPressed: _enviar,
+                    icon: const Icon(Icons.chat_outlined),
+                    label: const Text('Enviar pedido por WhatsApp'),
                   ),
-                ),
-              ]),
-              const SizedBox(height: 20),
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF1C7A43), foregroundColor: Colors.white),
-                onPressed: _enviar,
-                icon: const Icon(Icons.chat_outlined),
-                label: const Text('Enviar pedido por WhatsApp'),
-              ),
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: _llego,
-                icon: const Icon(Icons.inventory_outlined),
-                label: const Text('Llegó el pedido: ingresar al inventario'),
-              ),
-            ]),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: _llego,
+                    icon: const Icon(Icons.inventory_outlined),
+                    label:
+                        const Text('Llegó el pedido: ingresar al inventario'),
+                  ),
+                ]),
     );
   }
 }
@@ -726,7 +828,9 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
     final negocio = await db.perfilNegocio();
     var tel = '';
     final cid = c['cliente_id'] as String?;
-    if (cid != null) tel = ((await db.cliente(cid))?['telefono'] as String?) ?? '';
+    if (cid != null) {
+      tel = ((await db.cliente(cid))?['telefono'] as String?) ?? '';
+    }
     final lineas = [
       for (final i in LocalDb.itemsCotizacion(c))
         LineaDoc(i.nombre, i.cantidad, i.precio, i.unidad)
@@ -748,17 +852,17 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
         reutilizar: true);
     final numero = documento['numero'] as String;
     final pdf = pdfListo(DocImprimible(
-          titulo: 'Cotización',
-          numero: numero,
-          fecha: fecha,
-          negocio: negocio,
-          cliente: c['cliente_nombre'] as String?,
-          lineas: lineas,
-          total: (c['total'] as num).toDouble(),
-          notas: [
-            'Precios válidos por 8 días o hasta agotar existencias.',
-          ],
-        ));
+      titulo: 'Cotización',
+      numero: numero,
+      fecha: fecha,
+      negocio: negocio,
+      cliente: c['cliente_nombre'] as String?,
+      lineas: lineas,
+      total: (c['total'] as num).toDouble(),
+      notas: [
+        'Precios válidos por 8 días o hasta agotar existencias.',
+      ],
+    ));
     await archivarDocumento(documento, pdf);
     if (!mounted) return;
     await mostrarDocumento(context,
@@ -805,8 +909,10 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
           ],
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-            leading: Icon(Icons.delete_outline, color: Theme.of(s).colorScheme.error),
-            title: Text('Eliminar', style: TextStyle(color: Theme.of(s).colorScheme.error)),
+            leading: Icon(Icons.delete_outline,
+                color: Theme.of(s).colorScheme.error),
+            title: Text('Eliminar',
+                style: TextStyle(color: Theme.of(s).colorScheme.error)),
             onTap: () => Navigator.pop(s, 'eliminar'),
           ),
           const SizedBox(height: 8),
@@ -822,8 +928,8 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
         await LocalDb.instance.deleteCotizacion(id);
         avisar('Cotización eliminada');
       default:
-        final ventaId =
-            await LocalDb.instance.venderCotizacion(id, fiado: accion == 'fiado');
+        final ventaId = await LocalDb.instance
+            .venderCotizacion(id, fiado: accion == 'fiado');
         SyncService.instance.sync();
         if (!mounted) return;
         final ctx = context;
@@ -842,8 +948,8 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Cotizaciones')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => const NuevaCotizacionPage())),
+        onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const NuevaCotizacionPage())),
         icon: const Icon(Icons.add),
         label: const Text('Cotización'),
       ),
@@ -853,43 +959,57 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
               ? const Center(
                   child: Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('Arma una cotización con tus productos, envíala por '
+                  child: Text(
+                      'Arma una cotización con tus productos, envíala por '
                       'WhatsApp y conviértela en venta cuando el cliente confirme.',
                       textAlign: TextAlign.center),
                 ))
-              : ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: [
-                  Card(
-                    child: Column(children: [
-                      for (final (i, c) in l.indexed) ...[
-                        if (i > 0) const Divider(indent: 16),
-                        ListTile(
-                          title: Text(
-                              '${c['cliente_nombre'] ?? 'Sin cliente'} · N.º ${numeroDoc(c['id'] as String)}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                          subtitle: Text(fmt.format(
-                              DateTime.parse(c['creado'] as String).toLocal())),
-                          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                            Text(cop((c['total'] as num).toDouble()),
-                                style: cifras(t.titleSmall)),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: c['estado'] == 'vendida' ? p.ventasFondo : p.asistenteFondo,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(c['estado'] == 'vendida' ? 'Vendida' : 'Abierta',
-                                  style: t.labelMedium?.copyWith(
-                                      color: c['estado'] == 'vendida' ? p.ventas : p.asistente)),
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
+                  children: [
+                      Card(
+                        child: Column(children: [
+                          for (final (i, c) in l.indexed) ...[
+                            if (i > 0) const Divider(indent: 16),
+                            ListTile(
+                              title: Text(
+                                  '${c['cliente_nombre'] ?? 'Sin cliente'} · N.º ${numeroDoc(c['id'] as String)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                              subtitle: Text(fmt.format(
+                                  DateTime.parse(c['creado'] as String)
+                                      .toLocal())),
+                              trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(cop((c['total'] as num).toDouble()),
+                                        style: cifras(t.titleSmall)),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: c['estado'] == 'vendida'
+                                            ? p.ventasFondo
+                                            : p.asistenteFondo,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                          c['estado'] == 'vendida'
+                                              ? 'Vendida'
+                                              : 'Abierta',
+                                          style: t.labelMedium?.copyWith(
+                                              color: c['estado'] == 'vendida'
+                                                  ? p.ventas
+                                                  : p.asistente)),
+                                    ),
+                                  ]),
+                              onTap: () => _acciones(c),
                             ),
-                          ]),
-                          onTap: () => _acciones(c),
-                        ),
-                      ],
+                          ],
+                        ]),
+                      ),
                     ]),
-                  ),
-                ]),
     );
   }
 }
@@ -921,7 +1041,8 @@ class _NuevaCotizacionPageState extends State<NuevaCotizacionPage> {
     }();
   }
 
-  double get _total => _productos.fold(0.0, (s, p) => s + (_cant[p.id] ?? 0) * p.precio);
+  double get _total =>
+      _productos.fold(0.0, (s, p) => s + (_cant[p.id] ?? 0) * p.precio);
 
   Future<void> _elegirCliente() async {
     final r = await showModalBottomSheet<ClienteSaldo?>(
@@ -990,67 +1111,81 @@ class _NuevaCotizacionPageState extends State<NuevaCotizacionPage> {
     final p = Paleta.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Nueva cotización')),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 32), children: [
-        Card(
-          child: ListTile(
-            leading: _cliente == null
-                ? const Icon(Icons.person_outline)
-                : AvatarCliente(nombre: _cliente!.nombre, clave: _cliente!.nombre, tam: 36),
-            title: Text(_cliente?.nombre ?? 'Cliente (opcional)'),
-            trailing: const Icon(Icons.expand_more),
-            onTap: _elegirCliente,
-          ),
-        ),
-        const TituloSeccion('Productos'),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 4, 10),
-            child: _Carrito(
-                productos: _productos, cantidades: _cant, onCambio: () => setState(() {})),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () async {
-                final x = await _elegirProducto(context, _productos);
-                if (x != null) setState(() => _cant[x.id] = (_cant[x.id] ?? 0) + 1);
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Agregar'),
+      body: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          children: [
+            Card(
+              child: ListTile(
+                leading: _cliente == null
+                    ? const Icon(Icons.person_outline)
+                    : AvatarCliente(
+                        nombre: _cliente!.nombre,
+                        clave: _cliente!.nombre,
+                        tam: 36),
+                title: Text(_cliente?.nombre ?? 'Cliente (opcional)'),
+                trailing: const Icon(Icons.expand_more),
+                onTap: _elegirCliente,
+              ),
             ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () =>
-                  agregarPorCodigo(context, _productos, _cant, () => setState(() {})),
-              icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Escanear'),
+            const TituloSeccion('Productos'),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 4, 10),
+                child: _Carrito(
+                    productos: _productos,
+                    cantidades: _cant,
+                    onCambio: () => setState(() {})),
+              ),
             ),
-          ),
-        ]),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-              color: p.asistenteFondo, borderRadius: BorderRadius.circular(14)),
-          child: Row(children: [
-            Text('Total', style: t.titleMedium?.copyWith(color: p.asistente)),
-            const Spacer(),
-            Text(cop(_total), style: cifras(t.headlineSmall?.copyWith(color: p.asistente))),
+            const SizedBox(height: 10),
+            Row(children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    final x = await _elegirProducto(context, _productos);
+                    if (x != null) {
+                      setState(() => _cant[x.id] = (_cant[x.id] ?? 0) + 1);
+                    }
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Agregar'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => agregarPorCodigo(
+                      context, _productos, _cant, () => setState(() {})),
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Escanear'),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                  color: p.asistenteFondo,
+                  borderRadius: BorderRadius.circular(14)),
+              child: Row(children: [
+                Text('Total',
+                    style: t.titleMedium?.copyWith(color: p.asistente)),
+                const Spacer(),
+                Text(cop(_total),
+                    style:
+                        cifras(t.headlineSmall?.copyWith(color: p.asistente))),
+              ]),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF1C7A43),
+                  foregroundColor: Colors.white),
+              onPressed: _guardar,
+              icon: const Icon(Icons.chat_outlined),
+              label: const Text('Guardar y enviar por WhatsApp'),
+            ),
           ]),
-        ),
-        const SizedBox(height: 16),
-        FilledButton.icon(
-          style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF1C7A43), foregroundColor: Colors.white),
-          onPressed: _guardar,
-          icon: const Icon(Icons.chat_outlined),
-          label: const Text('Guardar y enviar por WhatsApp'),
-        ),
-      ]),
     );
   }
 }
@@ -1073,7 +1208,9 @@ class _PromocionPageState extends State<PromocionPage> {
   void initState() {
     super.initState();
     () async {
-      final ps = (await LocalDb.instance.productos()).where((x) => x.stock > 0).toList();
+      final ps = (await LocalDb.instance.productos())
+          .where((x) => x.stock > 0 || x.esServicio)
+          .toList();
       if (mounted) setState(() => _productos = ps);
     }();
   }
@@ -1088,13 +1225,14 @@ class _PromocionPageState extends State<PromocionPage> {
     super.dispose();
   }
 
-  TextEditingController _ctrl(ProductoStock p) =>
-      _precios.putIfAbsent(p.id, () => TextEditingController(text: cop(p.precio).substring(1)));
+  TextEditingController _ctrl(ProductoStock p) => _precios.putIfAbsent(
+      p.id, () => TextEditingController(text: cop(p.precio).substring(1)));
 
   Future<void> _compartir() async {
     final l = [
       for (final p in _productos)
-        if (_elegidos.contains(p.id)) (p.nombre, parseMonto(_ctrl(p).text) ?? p.precio)
+        if (_elegidos.contains(p.id))
+          (p.nombre, parseMonto(_ctrl(p).text) ?? p.precio)
     ];
     if (l.isEmpty) {
       avisar('Elige al menos un producto');
@@ -1104,7 +1242,9 @@ class _PromocionPageState extends State<PromocionPage> {
     final texto = textoPromocion(
         negocio: negocio,
         productos: l,
-        titulo: _titulo.text.trim().isEmpty ? 'Ofertas de hoy' : _titulo.text.trim(),
+        titulo: _titulo.text.trim().isEmpty
+            ? 'Ofertas de hoy'
+            : _titulo.text.trim(),
         nota: _nota.text);
     if (!mounted) return;
     await mostrarDocumento(context,
@@ -1121,59 +1261,73 @@ class _PromocionPageState extends State<PromocionPage> {
     final esquema = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: const Text('Promociones')),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 32), children: [
-        Text('Elige productos con existencias, ajusta el precio de oferta y '
-            'compártelo por WhatsApp.',
-            style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
-        const SizedBox(height: 14),
-        TextField(
-            controller: _titulo,
-            decoration: const InputDecoration(labelText: 'Título', hintText: 'Ofertas de hoy')),
-        const SizedBox(height: 10),
-        TextField(
-            controller: _nota,
-            maxLines: 2,
-            decoration: const InputDecoration(
-                labelText: 'Nota (opcional)', hintText: 'Ej.: solo hasta el sábado')),
-        const TituloSeccion('Productos'),
-        if (_productos.isEmpty)
-          Text('No hay productos con existencias. Agrégalos en Inventario.',
-              style: t.bodyMedium)
-        else
-          Card(
-            child: Column(children: [
-              for (final (i, p) in _productos.indexed) ...[
-                if (i > 0) const Divider(indent: 16),
-                CheckboxListTile(
-                  value: _elegidos.contains(p.id),
-                  onChanged: (v) => setState(() =>
-                      v == true ? _elegidos.add(p.id) : _elegidos.remove(p.id)),
-                  title: Text(p.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  subtitle: _elegidos.contains(p.id)
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: TextField(
-                            controller: _ctrl(p),
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            decoration: const InputDecoration(
-                                isDense: true, labelText: 'Precio de oferta', prefixText: r'$ '),
-                          ),
-                        )
-                      : Text('${cop(p.precio)} · hay ${cantidadTexto(p.stock)}'),
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
-              ],
-            ]),
-          ),
-        const SizedBox(height: 20),
-        FilledButton.icon(
-          style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF1C7A43), foregroundColor: Colors.white),
-          onPressed: _compartir,
-          icon: const Icon(Icons.campaign_outlined),
-          label: const Text('Ver y compartir por WhatsApp'),
-        ),
-      ]),
+      body: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          children: [
+            Text(
+                'Elige productos con existencias, ajusta el precio de oferta y '
+                'compártelo por WhatsApp.',
+                style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
+            const SizedBox(height: 14),
+            TextField(
+                controller: _titulo,
+                decoration: const InputDecoration(
+                    labelText: 'Título', hintText: 'Ofertas de hoy')),
+            const SizedBox(height: 10),
+            TextField(
+                controller: _nota,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                    labelText: 'Nota (opcional)',
+                    hintText: 'Ej.: solo hasta el sábado')),
+            const TituloSeccion('Productos'),
+            if (_productos.isEmpty)
+              Text('No hay productos con existencias. Agrégalos en Inventario.',
+                  style: t.bodyMedium)
+            else
+              Card(
+                child: Column(children: [
+                  for (final (i, p) in _productos.indexed) ...[
+                    if (i > 0) const Divider(indent: 16),
+                    CheckboxListTile(
+                      value: _elegidos.contains(p.id),
+                      onChanged: (v) => setState(() => v == true
+                          ? _elegidos.add(p.id)
+                          : _elegidos.remove(p.id)),
+                      title: Text(p.nombre,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      subtitle: _elegidos.contains(p.id)
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: TextField(
+                                controller: _ctrl(p),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
+                                decoration: const InputDecoration(
+                                    isDense: true,
+                                    labelText: 'Precio de oferta',
+                                    prefixText: r'$ '),
+                              ),
+                            )
+                          : Text(p.esServicio
+                              ? '${cop(p.precio)} · servicio'
+                              : '${cop(p.precio)} · hay ${cantidadTexto(p.stock)}'),
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ],
+                ]),
+              ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF1C7A43),
+                  foregroundColor: Colors.white),
+              onPressed: _compartir,
+              icon: const Icon(Icons.campaign_outlined),
+              label: const Text('Ver y compartir por WhatsApp'),
+            ),
+          ]),
     );
   }
 }

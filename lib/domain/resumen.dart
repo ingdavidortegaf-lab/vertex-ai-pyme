@@ -76,8 +76,10 @@ class ProductoStock {
     this.unidad = 'und',
   });
 
-  bool get agotado => stock <= 0;
-  bool get bajo => !agotado && minimo > 0 && stock <= minimo;
+  /// Los servicios no llevan inventario: nunca se agotan.
+  bool get esServicio => unidad == 'serv';
+  bool get agotado => !esServicio && stock <= 0;
+  bool get bajo => !esServicio && !agotado && minimo > 0 && stock <= minimo;
   double get margen => precio > 0 ? (precio - costo) / precio : 0;
 }
 

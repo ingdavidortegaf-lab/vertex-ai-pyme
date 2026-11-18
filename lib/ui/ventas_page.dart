@@ -65,7 +65,8 @@ class _VentasPageState extends State<VentasPage> {
       if (out.isEmpty || out.last.$1 != dia) out.add((dia, 0, []));
       final (d, vendido, lista) = out.removeLast();
       lista.add(v);
-      final suma = v['tipo'] == 'ingreso' ? (v['monto'] as num).toDouble() : 0.0;
+      final suma =
+          v['tipo'] == 'ingreso' ? (v['monto'] as num).toDouble() : 0.0;
       out.add((d, vendido + suma, lista));
     }
     return out;
@@ -76,7 +77,9 @@ class _VentasPageState extends State<VentasPage> {
     final hora = DateFormat('h:mm a', 'es_CO');
     final t = Theme.of(context).textTheme;
     final p = Paleta.of(context);
-    final dias = _cargado ? _dias() : const <(String, double, List<Map<String, Object?>>)>[];
+    final dias = _cargado
+        ? _dias()
+        : const <(String, double, List<Map<String, Object?>>)>[];
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => mostrarFormMovimiento(context),
@@ -106,8 +109,8 @@ class _VentasPageState extends State<VentasPage> {
                               Expanded(child: Text(dia, style: t.titleSmall)),
                               if (vendido > 0)
                                 Text('Vendido ${cop(vendido)}',
-                                    style: cifras(
-                                        t.labelLarge?.copyWith(color: p.ventas))),
+                                    style: cifras(t.labelLarge
+                                        ?.copyWith(color: p.ventas))),
                             ]),
                           ),
                           Card(
@@ -135,7 +138,10 @@ class FilaMovimiento extends StatelessWidget {
   final DateFormat fmt;
   final bool mostrarCliente;
   const FilaMovimiento(
-      {super.key, required this.v, required this.fmt, this.mostrarCliente = true});
+      {super.key,
+      required this.v,
+      required this.fmt,
+      this.mostrarCliente = true});
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +166,8 @@ class FilaMovimiento extends StatelessWidget {
       leading: IconoTipo(tipo: tipo, fiado: fiado),
       title: Text(v['concepto'] as String,
           maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(partes.join(' · '), maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(partes.join(' · '),
+          maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         Text('$signo${cop((v['monto'] as num).toDouble())}',
             style: cifras(t.titleSmall?.copyWith(color: color))),
@@ -221,7 +228,8 @@ class _Movimiento {
   final bool fiado;
   final String? clienteId;
   final List<ItemVenta> items;
-  const _Movimiento(this.concepto, this.monto, this.tipo, this.fiado, this.clienteId,
+  const _Movimiento(
+      this.concepto, this.monto, this.tipo, this.fiado, this.clienteId,
       [this.items = const []]);
 }
 
@@ -258,6 +266,12 @@ class _FormMovimientoState extends State<_FormMovimiento> {
     return null;
   }
 
+  /// ¿Se está vendiendo más de lo que hay? (los servicios no cuentan).
+  bool _falta(ItemVenta i) {
+    final p = _producto(i.productoId);
+    return p != null && !p.esServicio && p.stock < i.cantidad;
+  }
+
   List<ItemVenta> get _items => [
         for (final e in _carrito.entries)
           if (_producto(e.key) case final p?)
@@ -288,13 +302,15 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               labelText: 'Peso en ${p.unidad == 'kg' ? 'kilos' : 'libras'}',
               helperText: 'Lo que marca la gramera. Ej.: 0,750',
               suffixText: p.unidad),
-          onSubmitted: (v) => Navigator.pop(c, double.tryParse(v.replaceAll(',', '.'))),
+          onSubmitted: (v) =>
+              Navigator.pop(c, double.tryParse(v.replaceAll(',', '.'))),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
           FilledButton(
-              onPressed: () =>
-                  Navigator.pop(c, double.tryParse(ctrl.text.trim().replaceAll(',', '.'))),
+              onPressed: () => Navigator.pop(
+                  c, double.tryParse(ctrl.text.trim().replaceAll(',', '.'))),
               child: const Text('Agregar')),
         ],
       ),
@@ -355,7 +371,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
     return null;
   }
 
-  bool get _requiereCliente => _tipo == 'abono' || (_tipo == 'ingreso' && _fiado);
+  bool get _requiereCliente =>
+      _tipo == 'abono' || (_tipo == 'ingreso' && _fiado);
 
   Future<void> _elegirCliente() async {
     final lista = _tipo == 'abono'
@@ -367,43 +384,48 @@ class _FormMovimientoState extends State<_FormMovimiento> {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (c) => ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(c).height * 0.7),
-        child: ListView(shrinkWrap: true, padding: const EdgeInsets.only(bottom: 16), children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-            child: Text(_tipo == 'abono' ? '¿Quién abona?' : 'Elegir cliente',
-                style: Theme.of(c).textTheme.titleLarge),
-          ),
-          if (lista.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(_tipo == 'abono'
-                  ? 'Ningún cliente tiene saldo pendiente.'
-                  : 'Aún no hay clientes. Agrégalos en la pestaña Clientes.'),
-            ),
-          if (!_requiereCliente)
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              leading: const Icon(Icons.person_off_outlined),
-              title: const Text('Sin cliente'),
-              onTap: () => Navigator.pop(c, ''),
-            ),
-          for (final cl in lista)
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              leading: AvatarCliente(nombre: cl.nombre, clave: cl.nombre),
-              title: Text(cl.nombre),
-              trailing: cl.saldo > 0
-                  ? Text('Debe ${cop(cl.saldo)}',
-                      style: cifras(Theme.of(c)
-                          .textTheme
-                          .labelLarge
-                          ?.copyWith(color: p.fiado)))
-                  : null,
-              selected: cl.id == _clienteId,
-              onTap: () => Navigator.pop(c, cl.id),
-            ),
-        ]),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.sizeOf(c).height * 0.7),
+        child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.only(bottom: 16),
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                child: Text(
+                    _tipo == 'abono' ? '¿Quién abona?' : 'Elegir cliente',
+                    style: Theme.of(c).textTheme.titleLarge),
+              ),
+              if (lista.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(_tipo == 'abono'
+                      ? 'Ningún cliente tiene saldo pendiente.'
+                      : 'Aún no hay clientes. Agrégalos en la pestaña Clientes.'),
+                ),
+              if (!_requiereCliente)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  leading: const Icon(Icons.person_off_outlined),
+                  title: const Text('Sin cliente'),
+                  onTap: () => Navigator.pop(c, ''),
+                ),
+              for (final cl in lista)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  leading: AvatarCliente(nombre: cl.nombre, clave: cl.nombre),
+                  title: Text(cl.nombre),
+                  trailing: cl.saldo > 0
+                      ? Text('Debe ${cop(cl.saldo)}',
+                          style: cifras(Theme.of(c)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(color: p.fiado)))
+                      : null,
+                  selected: cl.id == _clienteId,
+                  onTap: () => Navigator.pop(c, cl.id),
+                ),
+            ]),
       ),
     );
     if (elegido == null) return;
@@ -424,7 +446,9 @@ class _FormMovimientoState extends State<_FormMovimiento> {
     }
     final conProductos = _tipo == 'ingreso' && _carrito.isNotEmpty;
     final monto = conProductos ? _totalCarrito : parseMonto(_monto.text);
-    if (_tipo == 'abono' && cliente != null && monto != null &&
+    if (_tipo == 'abono' &&
+        cliente != null &&
+        monto != null &&
         monto > cliente.saldo + 0.5) {
       errCliente = 'El abono supera lo que debe (${cop(cliente.saldo)})';
     }
@@ -432,8 +456,13 @@ class _FormMovimientoState extends State<_FormMovimiento> {
     if (!okForm || errCliente != null || monto == null || monto <= 0) return;
     Navigator.pop(
         context,
-        _Movimiento(_concepto.text.trim(), monto, _tipo, _tipo == 'ingreso' && _fiado,
-            _tipo == 'egreso' ? null : _clienteId, conProductos ? _items : const []));
+        _Movimiento(
+            _concepto.text.trim(),
+            monto,
+            _tipo,
+            _tipo == 'ingreso' && _fiado,
+            _tipo == 'egreso' ? null : _clienteId,
+            conProductos ? _items : const []));
   }
 
   @override
@@ -453,7 +482,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Form(
           key: _form,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Text('Registrar', style: t.headlineSmall),
             const SizedBox(height: 16),
             SegmentedButton<String>(
@@ -482,7 +512,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               onSelectionChanged: (s) => setState(() {
                 _tipo = s.first;
                 _errorCliente = null;
-                if (_tipo == 'abono' && (cliente == null || cliente.saldo <= 0)) {
+                if (_tipo == 'abono' &&
+                    (cliente == null || cliente.saldo <= 0)) {
                   _clienteId = null;
                 }
               }),
@@ -494,19 +525,21 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(children: [
                     Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(i.nombre,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: t.titleSmall),
-                        Text(
-                            '${i.unidad == 'und' ? '${cop(i.precio)} c/u' : '${cop(i.precio)}/${i.unidad}'}'
-                            '${(_producto(i.productoId)?.stock ?? 0) < i.cantidad ? ' · solo hay ${cantidadConUnidad(_producto(i.productoId)?.stock ?? 0, i.unidad)}' : ''}',
-                            style: t.bodySmall?.copyWith(
-                                color: (_producto(i.productoId)?.stock ?? 0) < i.cantidad
-                                    ? p.gastos
-                                    : esquema.onSurfaceVariant)),
-                      ]),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(i.nombre,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: t.titleSmall),
+                            Text(
+                                '${precioConUnidad(i.precio, i.unidad)}'
+                                '${_falta(i) ? ' · solo hay ${cantidadConUnidad(_producto(i.productoId)?.stock ?? 0, i.unidad)}' : ''}',
+                                style: t.bodySmall?.copyWith(
+                                    color: _falta(i)
+                                        ? p.gastos
+                                        : esquema.onSurfaceVariant)),
+                          ]),
                     ),
                     IconButton(
                       tooltip: 'Quitar',
@@ -515,15 +548,21 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                       icon: const Icon(Icons.remove_circle_outline),
                     ),
                     InkWell(
-                      onTap: esPorPeso(i.unidad) && _producto(i.productoId) != null
-                          ? () async {
-                              final v = await _pedirPeso(_producto(i.productoId)!,
-                                  actual: i.cantidad);
-                              if (v != null) setState(() => _carrito[i.productoId] = v);
-                            }
-                          : null,
+                      onTap:
+                          esPorPeso(i.unidad) && _producto(i.productoId) != null
+                              ? () async {
+                                  final v = await _pedirPeso(
+                                      _producto(i.productoId)!,
+                                      actual: i.cantidad);
+                                  if (v != null) {
+                                    setState(() => _carrito[i.productoId] = v);
+                                  }
+                                }
+                              : null,
                       child: Text(cantidadConUnidad(i.cantidad, i.unidad),
-                          style: cifras(esPorPeso(i.unidad) ? t.titleSmall : t.titleMedium)),
+                          style: cifras(esPorPeso(i.unidad)
+                              ? t.titleSmall
+                              : t.titleMedium)),
                     ),
                     IconButton(
                       tooltip: 'Agregar',
@@ -543,20 +582,25 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 onPressed: _agregarProducto,
                 icon: const Icon(Icons.add_shopping_cart),
                 label: Text(_carrito.isEmpty
-                    ? 'Elegir productos del inventario'
+                    ? (LocalDb.instance.modo.value.vendeServicios
+                        ? 'Elegir productos o servicios'
+                        : 'Elegir productos del inventario')
                     : 'Agregar otro producto'),
               ),
-              const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: _escanear,
-                icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Escanear código de barras'),
-              ),
+              if (LocalDb.instance.modo.value.codigos) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _escanear,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Escanear código de barras'),
+                ),
+              ],
             ],
             if (_tipo == 'ingreso' && _carrito.isNotEmpty) ...[
               const SizedBox(height: 14),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                     color: fondo, borderRadius: BorderRadius.circular(14)),
                 child: Row(children: [
@@ -567,23 +611,26 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 ]),
               ),
             ] else ...[
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _monto,
-              autofocus: _tipo != 'ingreso' || widget.productos.isEmpty,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: cifras(t.headlineMedium?.copyWith(color: tinta)),
-              decoration: InputDecoration(
-                labelText: 'Monto en pesos',
-                hintText: '25.000',
-                prefixText: r'$ ',
-                prefixStyle: t.headlineMedium?.copyWith(color: tinta),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _monto,
+                autofocus: _tipo != 'ingreso' || widget.productos.isEmpty,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                style: cifras(t.headlineMedium?.copyWith(color: tinta)),
+                decoration: InputDecoration(
+                  labelText: 'Monto en pesos',
+                  hintText: '25.000',
+                  prefixText: r'$ ',
+                  prefixStyle: t.headlineMedium?.copyWith(color: tinta),
+                ),
+                validator: (v) => parseMonto(v ?? '') == null
+                    ? 'Escribe un monto mayor a cero'
+                    : null,
               ),
-              validator: (v) =>
-                  parseMonto(v ?? '') == null ? 'Escribe un monto mayor a cero' : null,
-            ),
             ],
-            if (_tipo == 'ingreso') ...[
+            if (_tipo == 'ingreso' &&
+                (LocalDb.instance.modo.value.fia || _fiado)) ...[
               const SizedBox(height: 8),
               SwitchListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 4),
@@ -606,14 +653,21 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                           : esquema.outlineVariant),
                 ),
                 child: ListTile(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
                   leading: cliente == null
                       ? const Icon(Icons.person_outline)
-                      : AvatarCliente(nombre: cliente.nombre, clave: cliente.nombre, tam: 36),
+                      : AvatarCliente(
+                          nombre: cliente.nombre,
+                          clave: cliente.nombre,
+                          tam: 36),
                   title: Text(cliente?.nombre ??
-                      (_requiereCliente ? 'Elegir cliente' : 'Cliente (opcional)')),
+                      (_requiereCliente
+                          ? 'Elegir cliente'
+                          : 'Cliente (opcional)')),
                   subtitle: _errorCliente != null
-                      ? Text(_errorCliente!, style: TextStyle(color: esquema.error))
+                      ? Text(_errorCliente!,
+                          style: TextStyle(color: esquema.error))
                       : (cliente != null && cliente.saldo > 0
                           ? Text('Debe ${cop(cliente.saldo)}')
                           : null),
@@ -628,7 +682,9 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               textCapitalization: TextCapitalization.sentences,
               maxLength: 80,
               decoration: InputDecoration(
-                labelText: _tipo == 'egreso' ? 'En qué fue el gasto' : 'Concepto (opcional)',
+                labelText: _tipo == 'egreso'
+                    ? 'En qué fue el gasto'
+                    : 'Concepto (opcional)',
                 counterText: '',
                 hintText: switch (_tipo) {
                   'egreso' => 'Ej.: arriendo, mercancía',
@@ -645,9 +701,10 @@ class _FormMovimientoState extends State<_FormMovimiento> {
             FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: tinta,
-                foregroundColor: Theme.of(context).brightness == Brightness.light
-                    ? Colors.white
-                    : const Color(0xFF0B2018),
+                foregroundColor:
+                    Theme.of(context).brightness == Brightness.light
+                        ? Colors.white
+                        : const Color(0xFF0B2018),
               ),
               onPressed: _guardar,
               child: Text(switch (_tipo) {
@@ -680,41 +737,53 @@ class _ElegirProductoState extends State<ElegirProducto> {
     final f = _f.trim().toLowerCase();
     final lista = widget.productos
         .where((x) =>
-            f.isEmpty || x.nombre.toLowerCase().contains(f) || x.codigo.contains(f.trim()))
+            f.isEmpty ||
+            x.nombre.toLowerCase().contains(f) ||
+            x.codigo.contains(f.trim()))
         .toList();
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.75),
+        constraints:
+            BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.75),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('Elegir producto', style: t.titleLarge),
-              const SizedBox(height: 12),
-              TextField(
-                onChanged: (v) => setState(() => _f = v),
-                decoration: const InputDecoration(
-                    hintText: 'Buscar producto', prefixIcon: Icon(Icons.search)),
-              ),
-            ]),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Elegir producto', style: t.titleLarge),
+                  const SizedBox(height: 12),
+                  TextField(
+                    onChanged: (v) => setState(() => _f = v),
+                    decoration: const InputDecoration(
+                        hintText: 'Buscar producto',
+                        prefixIcon: Icon(Icons.search)),
+                  ),
+                ]),
           ),
           Flexible(
-            child: ListView(shrinkWrap: true, padding: const EdgeInsets.only(bottom: 16), children: [
-              if (lista.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text('Ningún producto coincide.', textAlign: TextAlign.center),
-                ),
-              for (final x in lista)
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  subtitle: Text(cop(x.precio)),
-                  trailing: EtiquetaStock(x: x),
-                  onTap: () => Navigator.pop(context, x),
-                ),
-            ]),
+            child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(bottom: 16),
+                children: [
+                  if (lista.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text('Ningún producto coincide.',
+                          textAlign: TextAlign.center),
+                    ),
+                  for (final x in lista)
+                    ListTile(
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20),
+                      title: Text(x.nombre,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      subtitle: Text(cop(x.precio)),
+                      trailing: EtiquetaStock(x: x),
+                      onTap: () => Navigator.pop(context, x),
+                    ),
+                ]),
           ),
         ]),
       ),

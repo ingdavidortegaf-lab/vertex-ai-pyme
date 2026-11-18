@@ -18,6 +18,8 @@ import 'package:vertex_ai_pyme/ui/comun.dart';
 import 'package:vertex_ai_pyme/ui/consent_gate.dart';
 import 'package:vertex_ai_pyme/ui/herramientas_page.dart';
 import 'package:vertex_ai_pyme/ui/home_page.dart';
+import 'package:vertex_ai_pyme/ui/oficina_page.dart';
+import 'package:vertex_ai_pyme/ui/registro_negocio_page.dart';
 import 'package:vertex_ai_pyme/ui/tema.dart';
 import '../test/soporte.dart';
 
@@ -328,5 +330,38 @@ void main() {
     await tester.tap(find.byTooltip('Agregar').first);
     await _esperar(tester);
     await captura(tester, 'phone-venta-productos');
+  });
+
+  testWidgets('registro guiado', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(RegistroNegocioPage(onListo: () {})));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-registro-1');
+    await tester.tap(find.text('Siguiente'));
+    await _esperar(tester);
+    await captura(tester, 'phone-registro-2');
+    await tester.tap(find.text('Siguiente'));
+    await _esperar(tester);
+    await captura(tester, 'phone-registro-3');
+  });
+
+  testWidgets('informes', (tester) async {
+    await tam(tester, 1100);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const InformesPage()));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-informes');
+  });
+
+  testWidgets('cartera', (tester) async {
+    await tam(tester, 890);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(_app(const CarteraPage()));
+    });
+    await _esperar(tester);
+    await captura(tester, 'phone-cartera');
   });
 }

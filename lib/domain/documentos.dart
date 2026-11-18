@@ -47,7 +47,7 @@ class LineaDoc {
   const LineaDoc(this.nombre, this.cantidad, this.precio, [this.unidad = 'und']);
   double get total => cantidad * precio;
   String get cantidadTexto => cantidadConUnidad(cantidad, unidad);
-  String get precioTexto => unidad == 'und' ? '${cop(precio)} c/u' : '${cop(precio)}/$unidad';
+  String get precioTexto => precioConUnidad(precio, unidad);
 }
 
 String cantidadDoc(double c) =>
@@ -71,9 +71,9 @@ String _encabezado(PerfilNegocio n) {
 
 String _lineas(List<LineaDoc> l) => [
       for (final x in l)
-        x.cantidad == 1 && x.unidad == 'und'
+        x.cantidad == 1 && !esPorPeso(x.unidad)
             ? '• ${x.nombre}: ${cop(x.total)}'
-            : x.unidad == 'und'
+            : !esPorPeso(x.unidad)
                 ? '• ${x.cantidadTexto} × ${x.nombre} (${x.precioTexto}): ${cop(x.total)}'
                 : '• ${x.nombre} ${x.cantidadTexto} (${x.precioTexto}): ${cop(x.total)}'
     ].join('\n');
