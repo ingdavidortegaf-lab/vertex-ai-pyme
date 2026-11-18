@@ -220,5 +220,22 @@ El equipo conserva la propiedad intelectual. La Gobernación recibe una **licenc
 
 ---
 
+## G. Lo nuevo: proveedores, promociones, seguimiento y la parte jurídica
+
+**¿Cómo maneja lo que la tienda le debe al proveedor?**
+Al recibir el pedido se elige si se pagó todo, una parte (por ejemplo la mitad) o todo fiado. Todo entra al inventario, el gasto se registra solo por lo pagado y el saldo queda en «Lo que debo» con su fecha límite. Los abonos se registran con el medio de pago y la app avisa 3 días antes del vencimiento.
+
+**¿La IA hace la promoción?**
+Sí. Con señal, la función de Supabase le pide el texto al modelo de IA. Solo viajan los nombres de los productos, los precios, el estilo y la ocasión, nunca datos de clientes. Sin señal, el celular redacta el texto con plantillas de mercadeo: gancho, ahorro, urgencia, llamado a la acción y etiquetas del municipio. Además arma una imagen cuadrada con el logo y los precios, lista para el estado de WhatsApp.
+
+**¿No es ilegal escribirles a los clientes por WhatsApp?**
+No, si autorizaron. La app pide la autorización con el formato oficial (Anexo 3), la guarda con fecha y medio, y solo muestra el botón «Escribirle» a quien autorizó. Además sugiere no escribir más de una vez por semana.
+
+**¿Dónde está el enlace a la política?**
+En la pantalla de bienvenida, en la casilla (sin premarcar): «…conforme a la Política de Tratamiento de Datos Personales», subrayado y tocable. La política completa se abre sin internet. También hay un enlace a www.casanare.gov.co y al correo del canal de derechos.
+
+**¿Sirve para otros negocios?**
+Sí. Hay 22 tipos (panadería, frutas, carnicería, ropa, celulares, peluquería, taller, transporte, hospedaje…). La app se ajusta sola: por ejemplo, si solo vende servicios, esconde el inventario y la gramera.
+
 ## Si te hace una pregunta que no sabes
 Di con calma: *"Le muestro dónde está en el código"* y abre el archivo de la carpeta que corresponde, o la **`GUIA_VISUAL.html`** en la sección más cercana. O: *"No lo tenemos todavía; está en nuestra lista de pendientes en la auditoría."*

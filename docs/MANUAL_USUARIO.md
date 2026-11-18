@@ -31,8 +31,10 @@ La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca
 ## 5. Herramientas (en Inicio)
 - **Comprobantes:** lista de ventas para enviar su comprobante por WhatsApp.
 - **Cotizaciones:** arma una con productos, envíala por WhatsApp y, cuando el cliente confirme, conviértela en venta de contado o fiada.
-- **Pedir mercancía:** la app sugiere qué pedir; agrega tu proveedor con su WhatsApp, envía el pedido y, cuando llegue, toca **Llegó el pedido** para sumarlo al inventario y registrar el gasto.
-- **Promociones:** elige productos, pon el precio de oferta y compártelo en tu estado, grupos o listas de difusión de WhatsApp.
+- **Pedir mercancía:** la app sugiere qué pedir; agrega tu proveedor con su WhatsApp, envía el pedido y, cuando llegue, toca **Llegó el pedido**. Elige si pagaste **todo**, **una parte** (botones 30 %, 50 % y 70 %) o **todo fiado**, y la fecha límite para el saldo (por defecto 15 días). Todo entra al inventario; el gasto se registra solo por lo que pagaste.
+- **Lo que debo:** lo que le debes a cada proveedor, cuánto has abonado y cuándo vence (en rojo si ya venció). Toca **Abonar** y elige con qué pagaste (efectivo, Nequi, etc.); cada abono queda como gasto del día. La app te avisa 3 días antes de que venza.
+- **Promociones:** elige productos y su precio de oferta, agrega una **foto o un video** (cámara o galería), elige el estilo (Alegre, Última oportunidad, De vecino a vecino, Combo o la temporada: quincena, fin de semana, viernes negro, Navidad) y toca **Redactar con IA**. **Otra versión** cambia la redacción. **Compartir imagen + texto** crea una imagen cuadrada con tu logo y los precios, lista para el estado de WhatsApp, Facebook o Instagram. El texto queda copiado: si no aparece junto a la imagen, mantén presionado y pega.
+- **Seguimiento:** a quién escribirle hoy. Grupos: **Hace rato no vienen**, **Mejores clientes**, **Clientes nuevos** y **Más de 3 meses sin venir**. Toca **Escribirle** y se abre WhatsApp con un mensaje sugerido. Solo aparece el botón para clientes que **autorizaron** el tratamiento de datos; a los demás, **Pedir autorización**.
 - **Informes:** elige semana, quincena o mes (el actual o el anterior) y toca **Generar informe en PDF**: estado de resultados, flujo de caja, ventas por día, gastos, cartera, inventario y el libro de movimientos para tu contador.
 - **Cartera:** quién te debe, desde cuándo y cuántos días; toca un cliente para su **cuenta de cobro en PDF**.
 - **Documentos:** todo lo emitido (comprobantes CV, cotizaciones CT, cuentas de cobro CC, pedidos PD e informes IN), cada uno con su número único. Búscalo, compártelo o imprímelo de nuevo. En el PC los PDF quedan en **Documentos\VERTEX_documentos**.
@@ -63,7 +65,9 @@ La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca
 - **Con errores:** tócala para reintentar. Nada se borra.
 
 ## 9. Avisos en el celular
-Si los activaste, la app te avisa cuando **se agota** o **se está acabando** un producto, cuando hay **clientes que deben hace más de 30 días** (una vez al día), cuando **cumples la meta del mes** y si hay **datos que no se pudieron subir**. En Android 13 o más, acepta el permiso la primera vez.
+Si los activaste, la app te avisa cuando **se agota** o **se está acabando** un producto, cuando hay **clientes que deben hace más de 30 días** (una vez al día), cuando **cumples la meta del mes**, cuando un **pago a proveedor vence en 3 días o menos** y si hay **datos que no se pudieron subir**. En Android 13 o más, acepta el permiso la primera vez.
 
 ## 10. Privacidad
+- **Clientes nuevos:** marca la casilla de autorización (no viene marcada) antes de guardar.
+- **Clientes de antes:** en su ficha toca **Formato de autorización de datos (Ley 1581)** para imprimirlo o enviarlo por WhatsApp. Cuando respondan «AUTORIZO», toca **Ya respondió «AUTORIZO»** y guarda el pantallazo.
 Menú ⋮ → **Privacidad y datos**: ver el aviso, escribir para ejercer tus derechos, revocar la autorización o borrar los datos de este celular.
