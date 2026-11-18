@@ -121,7 +121,10 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 
   --- lib/domain/  REGLAS DEL NEGOCIO (logica pura, facil de probar) ---
 
+  paises.dart             Indicativos de 28 paises (Colombia, Venezuela,
+                          EE. UU., Ecuador, Espana...) para los celulares.
   formato.dart (63)       Pesos colombianos ($25.000), leer montos escritos,
+                          celulares de cualquier pais con su indicativo,
                           validar y mostrar celulares (300 123 4567),
                           quitar tildes, primer nombre.
   resumen.dart (176)      Modelos de datos: Resumen del mes, ClienteSaldo,

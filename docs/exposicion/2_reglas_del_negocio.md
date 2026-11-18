@@ -23,7 +23,8 @@ Aquí están **las cuentas y las reglas**: cuánto se vendió, quién debe y des
 | `modo_negocio.dart` | **Cómo trabaja el negocio** (productos o servicios, si fía, gramera…) y los **22 tipos de negocio** con su sugerencia, para adaptar la app | "Sirve para cualquier negocio" |
 | `resumen.dart` | Los "moldes" de los datos: producto con su existencia, cliente con su deuda, resumen del periodo | |
 | `asistente_local.dart` | El **asistente sin internet**: entiende palabras clave ("vendí hoy", "me debe") y responde con los datos del celular | "Responde aunque no haya señal" |
-| `formato.dart` | Pesos colombianos ($25.000), celulares (300 123 4567), quitar tildes | |
+| `formato.dart` | Pesos colombianos ($25.000), celulares de **cualquier país** con su indicativo (300 123 4567, +1 305 123 4567), quitar tildes | |
+| `paises.dart` | Los **28 países** del selector de celular (Colombia, Venezuela, Estados Unidos, Ecuador, España…) | "Sirve también para clientes de otros países" |
 | `privacidad.dart` | **Borra nombres, números y correos** de una pregunta antes de mandarla a la IA | "Ley 1581: minimización" |
 
 ## Muestra este pedazo (el mejor para lucirse)

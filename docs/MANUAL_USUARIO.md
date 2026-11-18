@@ -45,12 +45,13 @@ La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca
 - Si tu gramera imprime etiquetas con código de barras (empiezan por 20 a 29), al escanear la etiqueta la app agrega el producto **con su peso**. En el producto, pon como código el número que la gramera le asigna (PLU).
 
 ## 5.2 Imprimir facturas y logo
-- En **Mi negocio** toca **Elegir imagen** para poner el logo de tu negocio.
+- En **Mi negocio** toca **Elegir imagen** para poner el logo de tu negocio (funciona también en la versión web, en iPhone o en el PC; la imagen debe pesar menos de 1 MB).
 - Al ver un comprobante o una cotización: **Imprimir** abre la impresión del celular (impresora Wi-Fi o Bluetooth, tirilla de 80 mm o carta, o «Guardar como PDF»); **PDF** lo comparte por WhatsApp, correo o Drive.
 - Para impresoras térmicas Bluetooth, el celular necesita el servicio de impresión del fabricante de la impresora.
 - El comprobante no es factura electrónica de la DIAN.
 
 ## 6. Clientes y cobros
+- **Celular de otro país:** en el campo del celular toca el país (🇨🇴 +57) y elige Estados Unidos, Venezuela, Ecuador, España u otro; o escribe el número completo con «+».
 - **Clientes:** busca por nombre o celular. En la ficha ves cuánto debe y su historial.
 - **Cobrar por WhatsApp:** la app arma un mensaje respetuoso con el saldo.
 - **Cuenta de cobro en PDF:** detalle de cada fiado, cada abono, el saldo después de cada movimiento, desde cuándo debe y la antigüedad (0-30, 31-60, 61-90, más de 90 días). Los abonos pagan primero lo más antiguo.
