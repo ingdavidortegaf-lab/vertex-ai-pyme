@@ -243,3 +243,72 @@ Future<Uint8List> pdfAutorizacion(AutorizacionCliente a, String numero) async {
   ));
   return doc.save();
 }
+
+/// Estado de la autorización del cliente: cuándo y cómo autorizó, o un botón
+/// para dejar registrado que respondió «AUTORIZO» por WhatsApp.
+class EstadoAutorizacion extends StatefulWidget {
+  final String clienteId;
+  const EstadoAutorizacion({super.key, required this.clienteId});
+  @override
+  State<EstadoAutorizacion> createState() => _EstadoAutorizacionState();
+}
+
+class _EstadoAutorizacionState extends State<EstadoAutorizacion> {
+  Map<String, dynamic>? _a;
+  var _cargado = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final a = await LocalDb.instance.autorizacionCliente(widget.clienteId);
+    if (mounted) {
+      setState(() {
+        _a = a;
+        _cargado = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_cargado) return const SizedBox.shrink();
+    final t = Theme.of(context).textTheme;
+    final a = _a;
+    if (a != null) {
+      final f = DateTime.tryParse(a['fecha'] as String? ?? '')?.toLocal();
+      return Row(children: [
+        Icon(Icons.verified_user, size: 18, color: Paleta.of(context).ventas),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text('Autorizó el tratamiento de datos${f == null ? '' : ' el ${_fecha.format(f)}'} (${a['medio']})',
+              style: t.bodySmall),
+        ),
+      ]);
+    }
+    return OutlinedButton.icon(
+      onPressed: () async {
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (d) => AlertDialog(
+            title: const Text('¿El cliente respondió AUTORIZO?'),
+            content: const Text('Guarde también el pantallazo del chat como prueba. '
+                'Queda registrado con la fecha de hoy.'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(d), child: const Text('Todavía no')),
+              FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('Sí, autorizó')),
+            ],
+          ),
+        );
+        if (ok != true) return;
+        await LocalDb.instance.registrarAutorizacionCliente(widget.clienteId, 'respondió AUTORIZO por WhatsApp');
+        _load();
+      },
+      icon: const Icon(Icons.how_to_reg_outlined),
+      label: const Text('Ya respondió «AUTORIZO»'),
+    );
+  }
+}

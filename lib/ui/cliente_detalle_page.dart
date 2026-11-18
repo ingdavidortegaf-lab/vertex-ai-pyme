@@ -236,6 +236,7 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
               icon: const Icon(Icons.verified_user_outlined),
               label: const Text('Formato de autorización de datos (Ley 1581)'),
             ),
+            EstadoAutorizacion(clienteId: widget.clienteId),
             const TituloSeccion('Historial'),
             if (_movs.isEmpty)
               Padding(

@@ -11,6 +11,7 @@ import '../pdf/archivo.dart';
 import 'oficina_page.dart';
 import 'pago_widget.dart';
 import 'promocion_page.dart';
+import 'seguimiento_page.dart';
 import '../domain/pagos.dart';
 import '../pdf/pdf_factura.dart';
 import '../domain/codigos.dart';
@@ -243,6 +244,14 @@ class HerramientasGrid extends StatelessWidget {
         p.gastosFondo,
         p.gastos,
         () => ir(const PromocionPage())
+      ),
+      (
+        Icons.connect_without_contact_outlined,
+        'Seguimiento',
+        'A quién escribirle hoy',
+        p.ventasFondo,
+        p.ventas,
+        () => ir(const SeguimientoPage())
       ),
       (
         Icons.insert_chart_outlined,

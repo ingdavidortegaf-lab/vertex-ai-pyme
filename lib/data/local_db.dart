@@ -8,6 +8,7 @@ import '../domain/documentos.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
 import '../domain/resumen.dart';
+import '../domain/seguimiento.dart';
 
 /// Base local CIFRADA (SQLCipher). La clave (256 bits aleatorios) se genera
 /// en el primer arranque y vive en el almacén seguro del sistema
@@ -421,6 +422,41 @@ class LocalDb {
   Future<List<Map<String, Object?>>> clientes() => db.rawQuery(
       'SELECT c.id, c.nombre, c.telefono, c.sync, $_saldoSql AS saldo '
       'FROM clientes c WHERE c.deleted = 0 ORDER BY c.nombre COLLATE NOCASE');
+
+  /// Compras de cada cliente (cuántas, cuánto, primera y última) para el
+  /// seguimiento por WhatsApp, más si autorizó y cuándo se le escribió.
+  Future<List<ResumenCliente>> resumenClientes() async {
+    final r = await db.rawQuery(
+        "SELECT c.id, c.nombre, c.telefono, $_saldoSql AS saldo, "
+        "(SELECT COUNT(*) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS compras, "
+        "(SELECT COALESCE(SUM(v.monto), 0) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS total, "
+        "(SELECT MIN(v.fecha) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS primera, "
+        "(SELECT MAX(v.fecha) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS ultima "
+        'FROM clientes c WHERE c.deleted = 0');
+    final ajustes = {
+      for (final a in await db.rawQuery(
+          "SELECT clave, valor FROM ajustes WHERE clave LIKE 'aut_cli_%' OR clave LIKE 'contacto_cli_%'"))
+        a['clave'] as String: a['valor'] as String
+    };
+    DateTime? fecha(Object? v) => v == null ? null : DateTime.tryParse(v as String)?.toLocal();
+    return [
+      for (final x in r)
+        ResumenCliente(
+          id: x['id'] as String,
+          nombre: x['nombre'] as String,
+          telefono: (x['telefono'] as String?) ?? '',
+          compras: (x['compras'] as num).toInt(),
+          total: _dbl(x['total']),
+          primera: fecha(x['primera']),
+          ultima: fecha(x['ultima']),
+          saldo: _dbl(x['saldo']),
+          autorizo: ajustes.containsKey('aut_cli_${x['id']}'),
+          contactado: fecha(ajustes['contacto_cli_${x['id']}']),
+        )
+    ];
+  }
+
+  Future<void> marcarContactado(String clienteId) => setAjuste('contacto_cli_$clienteId', _ahora());
 
   Future<Map<String, Object?>?> cliente(String id) async {
     final r = await db.rawQuery(
