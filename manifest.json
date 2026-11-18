@@ -1,0 +1,36 @@
+{
+    "name": "VERTEX AI Pyme",
+    "short_name": "VERTEX",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#17362C",
+    "theme_color": "#17362C",
+    "description": "El cuaderno de la tienda: ventas, fiados, inventario y documentos. Funciona sin señal.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "lang": "es"
+}
