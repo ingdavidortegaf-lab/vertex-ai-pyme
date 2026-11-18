@@ -1,4 +1,4 @@
-# Arma la carpeta para EXPLICAR el codigo (no para correrlo).
+﻿# Arma la carpeta para EXPLICAR el codigo (no para correrlo).
 # Copia cada archivo de codigo a su carpeta tematica con su EXPLICACION.md.
 # Uso, desde la carpeta del proyecto:
 #   powershell -ExecutionPolicy Bypass -File .\scripts\armar_exposicion.ps1
@@ -29,7 +29,7 @@ $carpetas = [ordered]@{
   '8_seguridad' = @()
   '10_base_de_datos' = Get-ChildItem "$proy\docs\base_de_datos\*" -File | Where-Object Name -ne 'LEEME_BASE_DE_DATOS.md' | ForEach-Object { $_.FullName }
   '9_documentos_convocatoria' = @('MANUAL_USUARIO.md','COMO_ESTA_CONSTRUIDO.txt','CONTABILIDAD_DOCUMENTOS_Y_ADAPTACION.md','AUDITORIA.md',
-                                  'LICENCIAS.md','POLITICA_TRATAMIENTO_DATOS.md','AVISO_PRIVACIDAD_Y_AUTORIZACION.md','PAGOS_Y_MODELO_DE_NEGOCIO.md','INSTALAR_EN_IPHONE_Y_ANDROID.md','QR_VERTEX_WEB.png') | ForEach-Object { "$proy\docs\$_" }
+                                  'LICENCIAS.md','POLITICA_TRATAMIENTO_DATOS.md','AVISO_PRIVACIDAD_Y_AUTORIZACION.md','PAGOS_Y_MODELO_DE_NEGOCIO.md','INSTALAR_EN_IPHONE_Y_ANDROID.md','QR_VERTEX_WEB.png','ANALISIS_MEJORAS_Y_TENDENCIAS.md','LOGO_VERTEX_1024.png') | ForEach-Object { "$proy\docs\$_" }
 }
 foreach ($c in $carpetas.Keys) {
   $d = New-Item -ItemType Directory "$Destino\$c"
