@@ -19,7 +19,7 @@ Es **multiplataforma compilada**: Flutter convierte el código Dart en código d
 **VS Code** como editor, **Flutter SDK 3.50**, **Android SDK**, **Git** para versiones y **Supabase** para la nube. Todo gratuito.
 
 **5. ¿Cuántas líneas de código tiene?**
-Unas **13.000** entre Dart, TypeScript y SQL, más 88 pruebas automáticas.
+Unas **13.000** entre Dart, TypeScript y SQL, más 93 pruebas automáticas.
 
 ---
 
@@ -138,6 +138,27 @@ La existencia **no se guarda como un número**: es la **suma de todos los movimi
 
 ---
 
+## E2. Pagos, escala y costos
+
+**E2.1 ¿Cómo manejan los pagos por Nequi, Bancolombia o tarjeta?**
+Cada venta guarda su **medio de pago**, y se puede **dividir**: una parte por Nequi y otra en efectivo. La app revisa que la suma dé el total, y el **servidor lo vuelve a validar** con una regla en PostgreSQL (`pagos_validos`). Con eso se hace el **cierre de caja**: cuánto efectivo debe haber y cuánto llegó a cada cuenta.
+
+**E2.2 ¿Tienen pasarela de pago?**
+Todavía no, y lo decimos claro. Hoy el cliente paga por transferencia a las cuentas del tendero, que salen en la cuenta de cobro, sin comisión. La siguiente fase es **Wompi** (Bancolombia): link y QR. Cada tienda tendría su propia cuenta, la llave privada estaría solo en una Edge Function y un webhook confirmaría el pago. **VERTEX nunca toca la plata.** Wompi cobra alrededor del 2,65 % + $700 + IVA por transacción, y el QR, 1 % + IVA.
+
+**E2.3 ¿Qué pasa con 100 tiendas? ¿Se satura?**
+No:
+- Cada tienda trabaja en su celular, así que si la nube se demora, la tienda no se detiene.
+- 100 tiendas generan unos 216 MB al mes; el plan Pro de Supabase (8 GB) alcanza para unos 3 años.
+- Implementamos **descarga adaptativa**: si no hay cambios, la app consulta cada vez menos, hasta cada 5 minutos. Bajamos de unas 27 a unas 3 consultas por segundo en horas tranquilas.
+- Para crecer más, se cambia el plan de la base, no el código.
+
+**E2.4 ¿Cuánto cuesta y cuánto ganan?**
+- La tecnología cuesta unos **$135.000 al mes** (Supabase Pro, IA y dominio).
+- Con **100 tiendas a $19.900** entran $1.990.000 al mes; menos tecnología y media persona de soporte, quedan unos **$455.000 al mes**.
+- El punto de equilibrio son **78 tiendas**.
+- Con 300 tiendas quedan unos $3 millones al mes. El detalle está en `docs/PAGOS_Y_MODELO_DE_NEGOCIO.md`.
+
 ## F. Seguridad, calidad y negocio
 
 **28. ¿Cómo protegen los datos?**
@@ -150,12 +171,12 @@ La existencia **no se guarda como un número**: es la **suma de todos los movimi
 - Sin copias de seguridad de Android.
 
 **29. ¿Cómo probaron la app?**
-- **88 pruebas automáticas** (`flutter test`): reglas, base de datos, sincronización con servidor simulado, caída de red, conflictos y PDF.
+- **93 pruebas automáticas** (`flutter test`): reglas, base de datos, sincronización con servidor simulado, caída de red, conflictos y PDF.
 - Prueba real en un Xiaomi 14T: modo avión y sincronización con Supabase sin duplicados.
 - Capturas de pantalla para revisar el diseño.
 
 **30. ¿Cuánto cuesta mantenerla?**
-**$0** en el plan gratuito de Supabase para el piloto. Al crecer, el plan pago de Supabase, sin cambiar código. Todas las librerías son gratuitas y de código abierto (149 paquetes con licencias libres).
+**$0** en el plan gratuito de Supabase para el piloto. Con 100 tiendas, unos **$135.000 al mes** (Supabase Pro de USD 25, IA y dominio), sin cambiar código. Todas las librerías son gratuitas y de código abierto (149 paquetes con licencias libres).
 
 **31. ¿Escala a muchas tiendas?**
 Sí:

@@ -12,10 +12,10 @@
 | 3:15 | *"En la nube, cada tienda solo ve sus datos gracias a RLS en PostgreSQL. La clave de la IA está escondida en el servidor."* | Sección **"El backend"**. VS Code: `4_nube_backend/supabase_schema.sql` → Ctrl+F `create policy "ventas ver"` |
 | 4:15 | *"Los PDF se dibujan en el mismo celular con el paquete pdf de Dart, llevan logo y número único, y quedan archivados para el contador."* | Sección **"Cómo nace un PDF"**. VS Code: `5_pdf_y_documentos/pdf_factura.dart` → Ctrl+F `pdfDocumento` |
 | 5:15 | *"La cuenta de cobro aplica los abonos a la deuda más antigua, como un contador: así sabemos desde cuándo debe cada cliente."* | VS Code: `2_reglas_del_negocio/contabilidad.dart` → Ctrl+F `estadoDeCuenta` |
-| 6:00 | *"Y para saber que todo funciona tenemos 88 pruebas automáticas, incluida una que corta internet a mitad del envío."* | Terminal en `C:\dev\vertex_ai_pyme`: `flutter test` → **All tests passed!** |
+| 6:00 | *"Y para saber que todo funciona tenemos 93 pruebas automáticas, incluida una que corta internet a mitad del envío."* | Terminal en `C:\dev\vertex_ai_pyme`: `flutter test` → **All tests passed!** |
 
 ## Si te cortan el tiempo (versión de 1 minuto)
-*"Es una app en **Flutter/Dart**, **offline-first**: guarda todo en una **SQLite cifrada** en el celular y una **cola transaccional** la sincroniza con **Supabase** (PostgreSQL con RLS por empresa) usando **upsert idempotente**. Los **PDF se generan en el dispositivo** con el paquete pdf, y la **IA (Gemini)** se llama desde una **Edge Function** para no exponer la clave. Tiene **88 pruebas automáticas**."*
+*"Es una app en **Flutter/Dart**, **offline-first**: guarda todo en una **SQLite cifrada** en el celular y una **cola transaccional** la sincroniza con **Supabase** (PostgreSQL con RLS por empresa) usando **upsert idempotente**. Los **PDF se generan en el dispositivo** con el paquete pdf, y la **IA (Gemini)** se llama desde una **Edge Function** para no exponer la clave. Tiene **93 pruebas automáticas**."*
 
 ## Antes de entrar (lista de chequeo)
 - [ ] Celular cargado, con la app abierta y en **modo avión** para la demo.

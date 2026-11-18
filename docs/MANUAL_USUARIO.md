@@ -10,12 +10,17 @@ Para el dueño de la tienda. Todo funciona sin señal; cuando vuelve internet, l
 ## 2. Vender
 - **Inicio → Venta.** Elige productos del inventario (el total se calcula solo) o escribe el monto.
 - **Fiado:** activa «Venta fiada» y elige el cliente.
+- **¿Cómo pagó?** Toca el medio: efectivo, Nequi, Daviplata, Bancolombia, otra transferencia (Bre-B) o tarjeta. Si paga una parte por Nequi y otra en efectivo, toca **Dividir el pago** y escribe cuánto en cada uno; la app avisa lo que falta o sobra, y el botón de la varita pone lo que falta.
 - Al guardar, toca **Enviar comprobante** para mandarlo por WhatsApp.
 - **Abono:** Inicio → Abono, elige el cliente y el valor.
 - **Gasto:** Inicio → Gasto y escribe en qué fue.
 
 ## 3. Caja
-La pestaña **Caja** muestra los movimientos por día. Toca una venta para ver y reenviar su comprobante.
+La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca una venta para ver y reenviar su comprobante.
+
+**Cierre de caja** (Inicio → Herramientas): cuánto entró hoy por cada medio, cuánto efectivo debería haber (base + efectivo recibido − gastos en efectivo) y si cuadra con lo que cuentas. Se puede enviar por WhatsApp.
+
+**Datos para recibir pagos** (menú ⋮): escribe tu Nequi, Daviplata, cuenta Bancolombia y llave Bre-B; salen en las cuentas de cobro y cotizaciones para que te paguen por transferencia, sin comisión.
 
 ## 4. Inventario (o Servicios / Catálogo)
 - **Producto:** nombre, precio de venta, costo, cuántos tienes y desde cuántos avisar.

@@ -32,8 +32,10 @@ async function marco(nombre, salida, { top = 0 } = {}) {
     ['phone-asistente', 'asistente'], ['phone-comprobante', 'comprobante'], ['phone-registro-1', 'registro1'],
     ['phone-registro-3', 'registro3'], ['phone-cliente', 'cliente'], ['phone-pedido', 'pedido'],
     ['phone-producto-peso', 'peso'], ['phone-bienvenida', 'bienvenida'], ['phone-movimientos', 'caja'],
+    ['phone-cierre-caja', 'cierre'],
   ];
   for (const [a, b] of lista) await marco(a, b);
+  await marco('phone-cobro-dividido', 'cobro_dividido', { top: 990 });
   // hoja de contacto
   const tiles = await Promise.all(lista.map(([, b]) => sharp(path.join(OUT, b + '.png')).resize(190).png().toBuffer()));
   const meta = await sharp(tiles[0]).metadata();

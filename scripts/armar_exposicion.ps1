@@ -28,7 +28,7 @@ $carpetas = [ordered]@{
                         "$proy\android\app\src\main\res\xml\data_extraction_rules.xml", "$proy\scripts\preparar_proyecto.ps1", "$proy\scripts\generar_licencias.ps1")
   '8_seguridad' = @()
   '9_documentos_convocatoria' = @('MANUAL_USUARIO.md','COMO_ESTA_CONSTRUIDO.txt','CONTABILIDAD_DOCUMENTOS_Y_ADAPTACION.md','AUDITORIA.md',
-                                  'LICENCIAS.md','POLITICA_TRATAMIENTO_DATOS.md','AVISO_PRIVACIDAD_Y_AUTORIZACION.md') | ForEach-Object { "$proy\docs\$_" }
+                                  'LICENCIAS.md','POLITICA_TRATAMIENTO_DATOS.md','AVISO_PRIVACIDAD_Y_AUTORIZACION.md','PAGOS_Y_MODELO_DE_NEGOCIO.md') | ForEach-Object { "$proy\docs\$_" }
 }
 foreach ($c in $carpetas.Keys) {
   $d = New-Item -ItemType Directory "$Destino\$c"

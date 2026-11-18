@@ -13,6 +13,7 @@ Lleva ventas, fiados, inventario, cobros, documentos e informes para el contador
 | Área | Funciones |
 |---|---|
 | **Caja** | Ventas de contado y fiadas, gastos y abonos; venta con productos, **código de barras** (cámara o lector USB) y **gramera** (kilos y libras) |
+| **Medios de pago** | Efectivo, Nequi, Daviplata, Bancolombia, Bre-B y tarjetas; **pago dividido** (parte Nequi, parte efectivo); **cierre de caja** con cuadre del efectivo |
 | **Clientes y cartera** | Saldo de cada cliente, **cuenta de cobro en PDF** con días de mora y antigüedad (0-30, 31-60, 61-90, +90) y cobro por WhatsApp |
 | **Inventario y servicios** | Existencias calculadas a partir de los movimientos, productos por reponer, pedido sugerido al proveedor y **servicios sin inventario** |
 | **Documentos** | Comprobantes, cotizaciones, cuentas de cobro, pedidos e informes en **PDF con logo y número único** (`CV-`, `CT-`, `CC-`, `PD-`, `IN-`), archivados en el equipo |
@@ -61,8 +62,8 @@ flowchart TB
 | `lib/data/` | Base local cifrada, cola y sincronización, conexión con Supabase |
 | `lib/pdf/` | Generación y archivo de PDF, informes contables |
 | `supabase/` | `supabase_schema.sql` (tablas, RLS, triggers) y `functions/asistente` (IA) |
-| `test/` | **88 pruebas automáticas**, incluida una caída de red a mitad del envío |
-| `docs/` | Manual, auditoría, política de datos (Ley 1581), licencias y guías de exposición |
+| `test/` | **93 pruebas automáticas**, incluida una caída de red a mitad del envío |
+| `docs/` | Manual, auditoría, política de datos (Ley 1581), licencias, [pagos y modelo de negocio](docs/PAGOS_Y_MODELO_DE_NEGOCIO.md) y guías de exposición |
 
 Cada carpeta de código trae un `LEEME.md` corto. La explicación completa está en [`docs/COMO_ESTA_CONSTRUIDO.txt`](docs/COMO_ESTA_CONSTRUIDO.txt) y en [`docs/exposicion/`](docs/exposicion/00_LEAME_PRIMERO.md).
 
@@ -75,7 +76,7 @@ Cada carpeta de código trae un `LEEME.md` corto. La explicación completa está
 ```powershell
 flutter pub get
 flutter analyze
-flutter test                 # 88 pruebas
+flutter test                 # 93 pruebas
 flutter run -d windows       # en el PC, modo solo local (sin nube)
 flutter run                  # en un celular Android conectado
 ```
@@ -117,7 +118,7 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 
 ## Estado y pendientes
 Probado:
-- 88 pruebas automáticas;
+- 93 pruebas automáticas;
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
 - versión de Windows compilada y ejecutada.
 

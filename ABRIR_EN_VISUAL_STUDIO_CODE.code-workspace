@@ -68,7 +68,7 @@
     "version": "2.0.0",
     "tasks": [
       {
-        "label": "Correr las 88 pruebas automáticas",
+        "label": "Correr las 93 pruebas automáticas",
         "type": "shell",
         "command": "C:\\dev\\flutter\\bin\\flutter.bat test",
         "options": { "cwd": "${workspaceFolder:0 - PROYECTO COMPLETO (para correr)}" },

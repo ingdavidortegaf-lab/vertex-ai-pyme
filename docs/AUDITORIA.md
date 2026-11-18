@@ -71,6 +71,9 @@
 | 41 | Reportes solo en pantalla | El contador necesita un soporte | Informes semanal, quincenal y mensual en PDF: resultados vs. periodo anterior, flujo de caja, gastos por concepto, cartera, inventario y libro de movimientos |
 | 42 | Solo negocios de productos | MiPymes de servicios quedaban por fuera | Unidad `serv` sin inventario (local y Supabase, migración v5_unidad_servicio) |
 | 43 | La app era igual para todos | Botones que no aplican confunden | Registro guiado en 5 pasos; la app esconde lo que el negocio no usa (fiado, gramera, códigos, pedidos) y renombra el catálogo |
+| 45 | No se sabía cómo se pagó | El efectivo no cuadra y el contador no puede conciliar | Medio de pago por movimiento (efectivo, Nequi, Daviplata, Bancolombia, Bre-B, tarjetas) y pago dividido; base local v6 y columna `pagos` en Supabase con validación en el servidor (`privado.pagos_validos`); cierre de caja e informe por medio |
+| 46 | Con muchas tiendas la nube recibía una consulta cada 30 s por celular aunque no hubiera cambios | Saturación y costo | Descarga adaptativa: 30 s a 5 min según haya o no cambios; lo guardado se sube de inmediato. Prueba `sync_adaptativo_test.dart` |
+| 47 | Pasarela de pago | Cobro con link o QR | **No implementada (siguiente fase):** requiere cuenta de comercio por tienda (Wompi) y llaves reales; se dejó el diseño (Edge Function + webhook) y los costos en `docs/PAGOS_Y_MODELO_DE_NEGOCIO.md`. Hoy: datos de pago del negocio en los documentos |
 | 44 | Sin avisos | El tendero se entera tarde de un agotado | Notificaciones locales (flutter_local_notifications, BSD-3) sin servidor: agotado, por acabarse, cartera vencida, meta y errores de envío; cada aviso una sola vez. Android compila con compileSdk 37 (el mínimo sigue en Android 12) |
 | 28 | Las cuentas solo se creaban desde el panel | El negocio no podía empezar solo | Pantalla «Tu cuenta»: entrar, crear cuenta (clave ≥ 8), perfil, cerrar sesión avisando lo pendiente; errores en español; bloqueo tras 5 intentos |
 
@@ -128,4 +131,5 @@ lógico, validación de montos colombianos, reintento por cambio de red,
 - La revocación y la supresión en la nube se atienden por correo (canal de derechos).
 - Nombre del modelo gratuito de IA: confirmarlo al desplegar (`GEMINI_MODEL`).
 - Si la red del evento es mala: demo en modo avión (es el punto fuerte) y video de respaldo.
+- Bloque del 18 nov. (medios de pago, cierre de caja, descarga adaptativa): 93 pruebas en verde, migración v6 aplicada y probada en Supabase con casos válidos e inválidos, capturas revisadas. Falta probarlo en el celular real.
 - Bloque del 17 nov. (documentos, cobro, informes, servicios, registro guiado, avisos): 88 pruebas en verde, PDF revisados a ojo, capturas en PC, APK y Windows compilados, base del PC migrada a v5. Falta en el celular: permiso y sonido de los avisos, compartir PDF por WhatsApp, registro guiado al tacto. Los avisos no salen con la app cerrada del todo. El archivo de documentos no se sincroniza a la nube.

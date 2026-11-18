@@ -1,7 +1,7 @@
-# 6 · Pruebas automáticas: 88 pruebas, todas pasan
+# 6 · Pruebas automáticas: 93 pruebas, todas pasan
 
 ## En una frase
-Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 88 en verde.
+Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 93 en verde.
 
 ## Por qué importan
 - Cada vez que cambiamos algo, las corremos: si algo se dañó, **una prueba se pone en rojo** y lo sabemos antes de entregar.
@@ -18,6 +18,8 @@ Son **programas que revisan solos que la app funcione**. Se corren con `flutter 
 | `contabilidad_test.dart` | **Cuenta de cobro**: abonos a lo más antiguo, días de mora, antigüedad; semanas, quincenas y meses; **número único de documentos** |
 | `informes_test.dart` | El **informe del mes y la cuenta de cobro en PDF** con datos reales |
 | `avisos_test.dart` | Avisos sin repetirse, meta, cartera, **servicios sin inventario**, adaptación al negocio |
+| `pagos_test.dart` | **Pago dividido** (la suma debe dar el total), ventas viejas leídas como efectivo, lo que viaja a la nube y el **cierre de caja** |
+| `sync_adaptativo_test.dart` | Que la app **consulte menos la nube** cuando no hay cambios y vuelva a 30 s cuando sí (para que 100 tiendas no la saturen) |
 | `codigos_test.dart` | Códigos de barras y **etiquetas de gramera** |
 | `documentos_test.dart` | Comprobante, cotización, pedido sugerido, promoción |
 | `pdf_test.dart` | La factura en PDF (tirilla y carta) |

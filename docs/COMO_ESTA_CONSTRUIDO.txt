@@ -156,6 +156,10 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   avisos.dart             REGLAS DE LOS AVISOS: que avisar (agotado, por
                           acabarse, cartera vencida, meta, errores) y como
                           no repetir un aviso (memoria de lo ya avisado).
+  pagos.dart              MEDIOS DE PAGO: efectivo, Nequi, Daviplata,
+                          Bancolombia, transferencia (Bre-B), tarjetas;
+                          pago dividido, validacion (la suma = total),
+                          totales por medio y cuadre del efectivo.
   modo_negocio.dart       COMO TRABAJA EL NEGOCIO (respuestas del registro
                           guiado): productos/servicios/ambos, fia, gramera,
                           codigos, pedidos, avisos. Sugerencias por tipo.
@@ -250,7 +254,7 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                      base salga del celular por copias de Android.
   (La carpeta ios/ tiene la configuracion de iPhone, iOS 16.)
 
-3.5  test/  - PRUEBAS AUTOMATICAS (88 pruebas, todas pasan)
+3.5  test/  - PRUEBAS AUTOMATICAS (93 pruebas, todas pasan)
   soporte.dart                 Base de pruebas y un servidor falso.
   sync_test.dart               Modo avion, envio unico, caida de red a mitad,
                                reintentos, sesion vencida, otro celular.
@@ -361,6 +365,18 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   ajustes (modo_*) y en LocalDb.modo (ValueNotifier): las pantallas se
   redibujan y esconden lo que no aplica.
 
+4.13 MEDIOS DE PAGO Y CIERRE DE CAJA
+  Cada movimiento guarda pagos = [{"medio","monto"}] (base local v6 y
+  columna jsonb en Supabase). El servidor valida con privado.pagos_validos:
+  la suma debe ser igual al monto, medios conocidos y el fiado sin pagos.
+  Cierre de caja: efectivo esperado = base + efectivo recibido - gastos en
+  efectivo. Detalle: docs/PAGOS_Y_MODELO_DE_NEGOCIO.md
+
+4.14 DESCARGA ADAPTATIVA (para que muchas tiendas no saturen la nube)
+  Si no llega nada nuevo, la siguiente consulta automatica espera el doble
+  (30 s, 1, 2, 4 hasta 5 min); cuando llega algo vuelve a 30 s. Lo que se
+  guarda se sube de inmediato.
+
 4.12 AVISOS
   notificaciones.dart escucha los cambios de la base, espera 2 s y llama
   a revisarAvisos (avisos.dart). Recuerda lo ya avisado en ajustes para
@@ -427,7 +443,7 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 -------------------------------------------------------------------------------
 7. QUE ESTA PROBADO Y QUE FALTA
 -------------------------------------------------------------------------------
-  Probado: 88 pruebas automaticas; app instalada en Xiaomi 14T; flujo
+  Probado: 93 pruebas automaticas; app instalada en Xiaomi 14T; flujo
   completo en modo avion; sincronizacion real con Supabase sin duplicados;
   actualizacion a la version con inventario conservando datos.
   Falta probar en el celular: version con herramientas, codigo de barras,

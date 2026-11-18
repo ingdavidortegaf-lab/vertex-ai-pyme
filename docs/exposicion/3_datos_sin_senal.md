@@ -11,12 +11,13 @@ La app guarda todo **primero en el celular**, en una base de datos con candado, 
 5. Si sale bien, lo marca como enviado. Si **no hay red**, no pasa nada: queda en la cola y se reintenta.
 6. Si falla, **espera cada vez más** antes de reintentar: 15 s, 30 s, 1 min… hasta 30 min (**backoff exponencial**). Después de 5 intentos lo aparta como "error", **pero nunca lo borra**.
 7. Después **descarga** lo que hicieron otros celulares de la misma tienda, en tandas de 500, solo lo nuevo desde la última vez.
+8. **Para que muchas tiendas no saturen la nube:** si no llega nada nuevo, la siguiente consulta automática espera el doble (30 s, 1, 2, 4… hasta 5 min); cuando llega algo, vuelve a 30 s. Lo que el tendero guarda se sube siempre de inmediato.
 
 ## Qué hace cada archivo
 
 | Archivo | Qué hace | Cómo decirlo |
 |---|---|---|
-| `local_db.dart` | **La base del celular**. Crea las tablas: clientes, ventas, productos, inventario, cola, cotizaciones, proveedores, documentos, ajustes. Va **cifrada con SQLCipher (AES-256)**; la clave se genera al azar y se guarda en el almacén seguro de Android. Las actualizaciones **conservan los datos** (vamos en la versión 5). También numera los documentos | "La memoria con candado" |
+| `local_db.dart` | **La base del celular**. Crea las tablas: clientes, ventas, productos, inventario, cola, cotizaciones, proveedores, documentos, ajustes. Va **cifrada con SQLCipher (AES-256)**; la clave se genera al azar y se guarda en el almacén seguro de Android. Las actualizaciones **conservan los datos** (vamos en la versión 6). También numera los documentos | "La memoria con candado" |
 | `sync_service.dart` | **El motor de sincronización**: cola, reintentos, descarga | "El mensajero que sube los datos" |
 | `remote_api.dart` | **La conexión con Supabase**: enviar, descargar y llamar a la IA. Traduce los errores (sin red, sesión vencida, dato rechazado) | "La ventanilla hacia la nube" |
 | `asistente_service.dart` | Decide si responde el **asistente local** (sin internet) o la **IA de la nube**. Si no hay señal, deja la pregunta en cola | |

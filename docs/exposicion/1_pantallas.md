@@ -19,8 +19,9 @@ Cada archivo de esta carpeta es **una pantalla o una pieza visual** de la app, h
 | `clientes_page.dart` | Lista de clientes con buscador | |
 | `cliente_detalle_page.dart` | Ficha del cliente: cuánto debe, cobrar, cuenta de cobro | |
 | `herramientas_page.dart` | Comprobantes, cotizaciones, pedidos al proveedor, promociones | "Todo lo que se manda por WhatsApp" |
-| `oficina_page.dart` | **Informes**, **Cartera** y **Documentos emitidos** | "La oficina del contador" |
+| `oficina_page.dart` | **Informes**, **Cartera**, **Documentos emitidos** y **Cierre de caja** | "La oficina del contador" |
 | `registro_negocio_page.dart` | Las **5 preguntas del inicio**; la app se adapta al negocio | "La app se moldea al negocio" |
+| `pago_widget.dart` | **¿Cómo pagó?**: elegir el medio o **dividir el pago**; datos del negocio para recibir transferencias | |
 | `notificaciones.dart` | Los **avisos** en el celular (se agotó, cobros vencidos) | |
 | `asistente_page.dart` | Chat con el asistente | |
 | `negocio_page.dart` | Mi negocio: nombre, NIT, dirección, logo | |

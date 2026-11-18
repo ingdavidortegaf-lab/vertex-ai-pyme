@@ -110,7 +110,7 @@ function palotes(s, x, y, color, nombre) {
     { x: 0.7, y: 6.6, w: 7, h: 0.4, fontSize: 13, color: C.accent5 });
   telefono(s, 'cartera', 9.55, 1.05, 5.7, 7, 'tel_atras');
   telefono(s, 'inicio', 7.75, 0.75, 6.0, -5, 'tel_frente');
-  s.addNotes('[0:00 – 0:20] Buenos días. Somos VERTEX TECH. Les presentamos VERTEX AI Pyme: el cuaderno de la tienda de barrio, ahora en el celular, y que funciona aunque no haya señal.');
+  s.addNotes('[0:00 – 0:15] Buenos días. Somos VERTEX TECH. Les presentamos VERTEX AI Pyme: el cuaderno de la tienda de barrio, ahora en el celular, y que funciona aunque no haya señal.');
 
   // ============================================================ 2 DOÑA MARTA
   pres.addSection({ title: 'Problema' });
@@ -127,7 +127,7 @@ function palotes(s, x, y, color, nombre) {
   n2.push(...await tarjetaIcono(s, { x: 7.1, y: 3.35, w: 5.6, h: 1.55, Comp: fa.FaWifi, color: THEME.colors.accent6, titulo: 'Se acaban los datos', cuerpo: 'Plan prepago y señal que falla en el barrio y en la vereda.', nombre: 'dolor2' }));
   n2.push(...await tarjetaIcono(s, { x: 7.1, y: 5.1, w: 5.6, h: 1.55, Comp: fa.FaCalculator, color: THEME.colors.accent4, titulo: 'Las cuentas, a ojo', cuerpo: 'No sabe qué pedirle al preventista ni cuánto ganó en el mes.', nombre: 'dolor3' }));
   animar.push({ slide: nSlide, grupos: [['dolor1', 'dolor1_c', 'dolor1_i', 'dolor1_t', 'dolor1_b'], ['dolor2', 'dolor2_c', 'dolor2_i', 'dolor2_t', 'dolor2_b'], ['dolor3', 'dolor3_c', 'dolor3_i', 'dolor3_t', 'dolor3_b']] });
-  s.addNotes('[0:20 – 0:50] Doña Marta representa a miles de tenderos de Casanare. Vende de todo un poco, fía a sus vecinos y lo anota en un cuaderno. Tiene tres dolores: el fiado se pierde, se le acaban los datos y lleva las cuentas a ojo.');
+  s.addNotes('[0:15 – 0:40] Doña Marta representa a miles de tenderos de Casanare. Vende de todo un poco, fía a sus vecinos y lo anota en un cuaderno. Tiene tres dolores: el fiado se pierde, se le acaban los datos y lleva las cuentas a ojo.');
 
   // ============================================================ 3 CIFRAS
   s = nueva('OSCURA', 'Problema');
@@ -151,7 +151,7 @@ function palotes(s, x, y, color, nombre) {
   texto(s, 'Fuentes: Fenalco, Día Nacional del Tendero (2026) y comunicados de 2024; Portafolio (encuesta de hogares); FAO, estudio sobre tenderos (40 % cuaderno, 56 % de memoria).',
     { x: 0.6, y: 6.35, w: 11.5, h: 0.5, fontSize: 11, color: C.accent5 });
   animar.push({ slide: nSlide, grupos: grupos3 });
-  s.addNotes('[0:50 – 1:10] No es un problema pequeño: según Fenalco hay unas 450.000 tiendas de barrio y mueven cerca de la mitad del consumo masivo. Nueve de cada diez hogares compran en ellas. Pero casi todas se administran con un cuaderno o de memoria.');
+  s.addNotes('[0:40 – 0:55] No es un problema pequeño: según Fenalco hay unas 450.000 tiendas de barrio y mueven cerca de la mitad del consumo masivo. Nueve de cada diez hogares compran en ellas. Pero casi todas se administran con un cuaderno o de memoria.');
 
   // ============================================================ 4 SOLUCION
   pres.addSection({ title: 'Solución' });
@@ -174,7 +174,7 @@ function palotes(s, x, y, color, nombre) {
     grupos4.push([`sol${i}`, `sol${i}t`, `sol${i}b`]);
   });
   animar.push({ slide: nSlide, grupos: grupos4 });
-  s.addNotes('[1:10 – 1:35] VERTEX AI Pyme pone ese cuaderno en el celular. Vende en segundos, incluso con código de barras o gramera; sabe quién le debe, cuánto y desde cuándo, y cobra por WhatsApp; y le entrega al contador informes en PDF. Todo funciona sin internet.');
+  s.addNotes('[0:55 – 1:15] VERTEX AI Pyme pone ese cuaderno en el celular. Vende en segundos, incluso con código de barras o gramera; sabe quién le debe, cuánto y desde cuándo, y cobra por WhatsApp; y le entrega al contador informes en PDF. Todo funciona sin internet.');
 
   // ============================================================ 5 UN DIA
   s = nueva('CONTENIDO', 'Solución');
@@ -205,7 +205,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.9, y: 5.55, w: 11.6, h: 0.95, fontSize: 17, color: C.text2, valign: 'middle', objectName: 'd_rest' });
   grupos5.push(['d_res', 'd_rest']);
   animar.push({ slide: nSlide, grupos: grupos5 });
-  s.addNotes('[1:35 – 2:15] Así es un día con VERTEX. A las 6:30 abre sin datos y vende. A las 10, don Pedro, productor de la vereda, fía purina: un toque y queda registrado. A las 3 de la tarde el celular le avisa que se agotó la sal. A las 6 cobra sin pena: la cuenta de cobro en PDF dice que debe desde agosto. Y el lunes le manda el informe al contador.');
+  s.addNotes('[1:15 – 1:50] Así es un día con VERTEX. A las 6:30 abre sin datos y vende. A las 10, don Pedro, productor de la vereda, fía purina: un toque y queda registrado. A las 3 de la tarde el celular le avisa que se agotó la sal. A las 6 cobra sin pena: la cuenta de cobro en PDF dice que debe desde agosto. Y el lunes le manda el informe al contador.');
 
   // ============================================================ 6 DOCUMENTOS
   s = nueva('CONTENIDO', 'Solución');
@@ -234,7 +234,27 @@ function palotes(s, x, y, color, nombre) {
   s.addImage({ path: path.join(__dirname, 'cobro.png'), x: 6.75, y: 1.55, w: pw, h: ph, rotate: -3, objectName: 'pdf_cob',
     shadow: { type: 'outer', color: '0B1A14', blur: 10, offset: 5, angle: 90, opacity: 0.3 } });
   animar.push({ slide: nSlide, grupos: [...grupos6, ['pdf_inf'], ['pdf_cob']] });
-  s.addNotes('[2:15 – 2:40] Y como un buen contador, cada documento sale con número único, logo y queda archivado: comprobantes, cotizaciones, cuentas de cobro, pedidos e informes semanal, quincenal y mensual. Somos honestos: no es factura electrónica DIAN, pero los datos quedan listos para conectarse con un proveedor autorizado.');
+  s.addNotes('[1:50 – 2:10] Y como un buen contador, cada documento sale con número único, logo y queda archivado: comprobantes, cotizaciones, cuentas de cobro, pedidos e informes semanal, quincenal y mensual. Somos honestos: no es factura electrónica DIAN, pero los datos quedan listos para conectarse con un proveedor autorizado.');
+
+  // ============================================================ 6b PAGOS
+  s = nueva('CONTENIDO', 'Solución');
+  s.addText('Efectivo, Nequi, Bancolombia o tarjeta', { placeholder: 'title' });
+  const gp = [];
+  const medios6 = [
+    [fa.FaMoneyBillWave, THEME.colors.accent1, 'Cobra como pague el cliente', 'Efectivo, Nequi, Daviplata, Bancolombia, Bre-B y tarjetas.'],
+    [fa.FaCodeBranch, THEME.colors.accent4, 'Pago dividido', 'Una parte por Nequi y otra en efectivo: la app avisa lo que falta.'],
+    [fa.FaCashRegister, THEME.colors.accent6, 'Cierre de caja', 'Cuánto efectivo debe haber, cuánto llegó a cada cuenta y si cuadra.'],
+  ];
+  for (let i = 0; i < medios6.length; i++) {
+    const [Comp, col, t1, t2] = medios6[i];
+    gp.push(await tarjetaIcono(s, { x: 0.6, y: 1.55 + i * 1.62, w: 6.3, h: 1.45, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `mp${i}` }));
+  }
+  texto(s, 'Sin comisiones: el cliente paga a la cuenta del tendero con los datos que salen en la cuenta de cobro. La pasarela (Wompi) es la siguiente fase.',
+    { x: 0.6, y: 6.4, w: 6.4, h: 0.6, fontSize: 12, color: C.text1, objectName: 'mp_nota' });
+  telefono(s, 'cobro_dividido', 7.55, 1.3, 5.45, -2, 'mp_tel1');
+  telefono(s, 'cierre', 10.15, 1.45, 5.3, 3, 'mp_tel2');
+  animar.push({ slide: nSlide, grupos: [...gp, ['mp_tel1'], ['mp_tel2'], ['mp_nota']] });
+  s.addNotes('[2:10 – 2:25] El cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber y cuánto llegó a cada cuenta.');
 
   // ============================================================ 7 DEMO
   pres.addSection({ title: 'Demo' });
@@ -286,7 +306,7 @@ function palotes(s, x, y, color, nombre) {
   s.addShape(pres.shapes.LINE, { x: 2.95, y: 4.4, w: 0, h: 0.55, line: { color: HEX.pizarra, width: 2, endArrowType: 'triangle' }, objectName: 'fl2' });
   s.addShape(pres.shapes.LINE, { x: 5.3, y: 3.82, w: 1.0, h: 0, line: { color: HEX.verde, width: 2.5, dashType: 'dash', endArrowType: 'triangle' }, objectName: 'fl3' });
   texto(s, 'con señal', { x: 5.3, y: 3.42, w: 1.0, h: 0.35, fontSize: 11, color: C.accent1, align: 'center', objectName: 'fl3t' });
-  const met = [['88', 'pruebas automáticas, incluida una caída de internet a mitad del envío'], ['0', 'duplicados en la prueba real con el celular y Supabase'], ['13.000', 'líneas de código propio'], ['$0', 'en licencias: todo es software libre']];
+  const met = [['93', 'pruebas automáticas, incluida una caída de internet a mitad del envío'], ['0', 'duplicados en la prueba real con el celular y Supabase'], ['13.000', 'líneas de código propio'], ['$0', 'en licencias: todo es software libre']];
   const g8b = [];
   met.forEach(([n, l], i) => {
     const y = 1.5 + i * 1.22;
@@ -295,7 +315,7 @@ function palotes(s, x, y, color, nombre) {
     g8b.push([`m${i}n`, `m${i}l`]);
   });
   animar.push({ slide: nSlide, grupos: [g8[0], ['fl1'], g8[1], ['fl2'], g8[2], ['fl3', 'fl3t'], g8[3], ...g8b] });
-  s.addNotes('[2:40 – 3:10] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 88 pruebas automáticas, incluida una que corta internet a mitad del envío.');
+  s.addNotes('[2:25 – 2:50] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 93 pruebas automáticas, incluida una que corta internet a mitad del envío.');
 
   // ============================================================ 9 DIFERENCIACION
   pres.addSection({ title: 'Mercado' });
@@ -321,7 +341,7 @@ function palotes(s, x, y, color, nombre) {
   texto(s, 'Las apps grandes sirven para todo el país. VERTEX está hecha para la tienda de aquí: la que vende de todo un poco, donde los datos se acaban y el fiado es con el vecino.',
     { x: 0.6, y: 5.75, w: 12.1, h: 0.9, fontSize: 17, italic: true, color: C.text2, objectName: 'dif_frase' });
   animar.push({ slide: nSlide, grupos: [['dif_frase']] });
-  s.addNotes('[3:10 – 3:30] La pregunta obvia: ¿por qué no una app gratuita? Porque las apps grandes sirven para todo el país, pero nosotros estamos hechos para la tienda de aquí: funciona sin datos todo el día, dice desde cuándo le deben, cobra con un PDF y tiene gente de Casanare que la instala.');
+  s.addNotes('[2:50 – 3:05] La pregunta obvia: ¿por qué no una app gratuita? Porque las apps grandes sirven para todo el país, pero nosotros estamos hechos para la tienda de aquí: funciona sin datos todo el día, dice desde cuándo le deben, cobra con un PDF y tiene gente de Casanare que la instala.');
 
   // ============================================================ 10 MARKETING
   s = nueva('CONTENIDO', 'Mercado');
@@ -349,7 +369,7 @@ function palotes(s, x, y, color, nombre) {
     g10[g10.length - 1].push(`can${i}x`, `can${i}y`);
   }
   animar.push({ slide: nSlide, grupos: g10 });
-  s.addNotes('[3:30 – 3:55] Nuestro mensaje es simple: que ningún fiado se pierda. Empezamos por las tiendas con más de 10 clientes debiendo, en Trinidad y Yopal. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda, con referidos entre tenderos, y con instalación en 20 minutos en la propia tienda.');
+  s.addNotes('[3:05 – 3:25] Nuestro mensaje es simple: que ningún fiado se pierda. Empezamos por las tiendas con más de 10 clientes debiendo, en Trinidad y Yopal. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda, con referidos entre tenderos, y con instalación en 20 minutos en la propia tienda.');
 
   // ============================================================ 11 NEGOCIO
   pres.addSection({ title: 'Negocio' });
@@ -357,7 +377,7 @@ function palotes(s, x, y, color, nombre) {
   s.addText('Modelo de negocio', { placeholder: 'title' });
   const planes = [
     ['MiPymes de Casanare', '$0', 'La opera la Gobernación: adopción sin costo para la tienda', C.accent1],
-    ['Plan Tienda', '$14.900/mes', 'Comercios fuera del programa (precio por validar en el piloto)', C.accent4],
+    ['Plan Tienda', '$19.900/mes', 'O $199.000 al año. Fuera del programa (se valida en el piloto)', C.accent4],
     ['Plan Red', 'Por tienda', 'El mayorista paga licencias para las tiendas que surte', C.accent6],
     ['Servicios', 'Por contrato', 'Implementación, capacitación y soporte tras 3 meses de garantía', C.accent3],
   ];
@@ -370,21 +390,58 @@ function palotes(s, x, y, color, nombre) {
     texto(s, t2, { x: x + 0.25, y: y + 1.25, w: 2.75, h: 0.95, fontSize: 13, color: C.text1, objectName: `pl${i}c` });
     g11.push([`pl${i}`, `pl${i}a`, `pl${i}b`, `pl${i}c`]);
   });
-  s.addChart(pres.charts.BAR, [{ name: 'Ingreso mensual (millones de pesos)', labels: ['50 tiendas', '150 tiendas', '300 tiendas'], values: [0.745, 2.235, 4.47] }], {
-    x: 7.6, y: 1.45, w: 5.1, h: 3.6, barDir: 'col', chartColors: ['1B7F45'],
-    showTitle: true, title: 'Plan Tienda: ingreso mensual (millones de $)', titleFontSize: 14, titleColor: THEME.colors.dk2, titleFontFace: '+mn-lt',
+  s.addChart(pres.charts.BAR, [
+    { name: 'Ingresos', labels: ['100 tiendas', '300 tiendas', '1.000 tiendas'], values: [1.99, 5.97, 19.9] },
+    { name: 'Queda', labels: ['100 tiendas', '300 tiendas', '1.000 tiendas'], values: [0.455, 3.035, 11.305] },
+  ], {
+    x: 7.6, y: 1.45, w: 5.1, h: 3.6, barDir: 'col', chartColors: ['1B7F45', 'F4C55A'],
+    showTitle: true, title: 'Plan Tienda al mes (millones de $)', titleFontSize: 14, titleColor: THEME.colors.dk2, titleFontFace: '+mn-lt',
     showValue: true, dataLabelPosition: 'outEnd', dataLabelFormatCode: '"$"0.00" M"', dataLabelFontSize: 13, dataLabelColor: THEME.colors.dk2, dataLabelFontFace: '+mn-lt',
     catAxisLabelColor: THEME.colors.dk1, catAxisLabelFontSize: 13, catAxisLabelFontFace: '+mn-lt',
-    valAxisHidden: true, valGridLine: { style: 'none' }, catGridLine: { style: 'none' }, showLegend: false, barGapWidthPct: 70,
+    valAxisHidden: true, valGridLine: { style: 'none' }, catGridLine: { style: 'none' }, showLegend: true, legendPos: 'b', legendFontSize: 12, legendFontFace: '+mn-lt', legendColor: THEME.colors.dk1, barGapWidthPct: 60,
     objectName: 'graf_ing',
   });
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 7.6, y: 5.2, w: 5.1, h: 1.45, rectRadius: 0.12, fill: { color: C.text2 }, line: { type: 'none' }, objectName: 'cuenta' });
   texto(s, [
-    { text: '300 tiendas × $14.900 = $4,47 M al mes ≈ $53,6 M al año', options: { bold: true, color: C.accent5, breakLine: true } },
-    { text: 'Tecnología casi en $0 al inicio (plan gratis de Supabase; USD 25/mes al crecer). Regla: el plan cuesta menos que un solo fiado recuperado.', options: { fontSize: 13, color: C.background1 } },
+    { text: 'Punto de equilibrio: 78 tiendas', options: { bold: true, color: C.accent5, breakLine: true } },
+    { text: 'La tecnología cuesta unos $135.000 al mes y casi no sube; lo que crece es el soporte. El plan cuesta menos que un fiado recuperado.', options: { fontSize: 13, color: C.background1 } },
   ], { x: 7.85, y: 5.3, w: 4.65, h: 1.3, fontSize: 15, valign: 'middle', objectName: 'cuentat' });
   animar.push({ slide: nSlide, grupos: [...g11, ['graf_ing'], ['cuenta', 'cuentat']] });
-  s.addNotes('[3:55 – 4:20] Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 14.900 pesos al mes, menos que un solo fiado recuperado. Los mayoristas pueden pagar por su red, y prestamos servicios de implementación y soporte. Con 300 tiendas son 4,47 millones al mes. La tecnología casi no cuesta al inicio. Son escenarios: el precio se valida en el piloto.');
+  s.addNotes('[3:25 – 3:45] Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 19.900 pesos al mes o 199.000 al año, menos que un fiado recuperado. Con 78 tiendas cubrimos los costos; con 300 quedan unos 3 millones al mes y con mil, unos 11 millones. La tecnología casi no cuesta: lo que crece es el soporte.');
+
+  // ============================================================ 11b 100 TIENDAS
+  s = nueva('CONTENIDO', 'Negocio');
+  s.addText('Con 100 tiendas: números y capacidad', { placeholder: 'title' });
+  const hd = (t) => ({ text: t, options: { bold: true, color: THEME.colors.dk2, fill: { color: 'EEF3EE' } } });
+  const fila100 = (a, b, c, neg) => [
+    { text: a, options: { bold: !!neg, color: THEME.colors.dk1 } },
+    { text: b, options: { align: 'right', bold: !!neg, color: neg ? '1B7F45' : THEME.colors.dk1 } },
+    { text: c, options: { align: 'right', bold: !!neg, color: neg ? '1B7F45' : THEME.colors.dk1 } },
+  ];
+  s.addTable([
+    [hd('Plan Tienda a $19.900'), { ...hd('Mes'), options: { ...hd('Mes').options, align: 'right' } }, { ...hd('Año'), options: { ...hd('Año').options, align: 'right' } }],
+    fila100('Ingresos (100 tiendas)', '$1.990.000', '$23.880.000'),
+    fila100('Nube, IA y dominio', '$135.000', '$1.620.000'),
+    fila100('Soporte e instalación (½ persona)', '$1.400.000', '$16.800.000'),
+    fila100('Queda', '$455.000', '$5.460.000', true),
+  ], { x: 0.6, y: 1.55, w: 6.6, colW: [3.4, 1.6, 1.6], rowH: 0.55, fontSize: 15, fontFace: THEME.bodyFontFace,
+    border: { type: 'solid', pt: 0.75, color: HEX.grisLinea }, valign: 'middle', objectName: 't100' });
+  texto(s, 'Con 100 tiendas el negocio se sostiene; desde 300 paga al equipo. Si la mensualidad se cobra por pasarela, la comisión es cerca del 7 %: mejor cobrar anual o por transferencia.',
+    { x: 0.6, y: 4.5, w: 6.6, h: 1.0, fontSize: 14, color: C.text1, objectName: 't100n' });
+  texto(s, 'Supuestos: dólar a $4.000, soporte con salario mínimo 2026 y sus prestaciones. Detalle en docs/PAGOS_Y_MODELO_DE_NEGOCIO.md.',
+    { x: 0.6, y: 5.6, w: 6.6, h: 0.6, fontSize: 11, color: C.accent1 });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 7.6, y: 1.55, w: 5.1, h: 5.0, rectRadius: 0.12, fill: { color: C.text2 }, line: { type: 'none' }, objectName: 'cap' });
+  texto(s, [
+    { text: '¿Se satura? No', options: { bold: true, fontSize: 20, color: C.accent5, breakLine: true } },
+    { text: ' ', options: { fontSize: 6, breakLine: true } },
+    { text: 'Cada tienda trabaja en su celular: si la nube se demora, la tienda no se detiene.', options: { bullet: true, breakLine: true } },
+    { text: '100 tiendas generan unos 216 MB al mes: el plan Pro (8 GB) alcanza para unos 3 años.', options: { bullet: true, breakLine: true } },
+    { text: 'Descarga adaptativa: de 27 a unas 3 consultas por segundo en horas tranquilas.', options: { bullet: true, breakLine: true } },
+    { text: 'Cada tienda separada (RLS) e índices por empresa y fecha.', options: { bullet: true, breakLine: true } },
+    { text: 'Para crecer, una base más grande: cambio de plan, no de código.', options: { bullet: true } },
+  ], { x: 7.85, y: 1.75, w: 4.65, h: 4.6, fontSize: 15, color: C.background1, paraSpaceAfter: 8, objectName: 'capt' });
+  animar.push({ slide: nSlide, grupos: [['t100'], ['t100n'], ['cap', 'capt']] });
+  s.addNotes('[3:45 – 4:05] Con 100 tiendas entran casi 2 millones al mes; la nube cuesta 135 mil y el soporte 1,4 millones: quedan unos 455 mil. Y no se satura: cada tienda trabaja en su celular, 100 tiendas generan unos 216 megas al mes y la app consulta la nube 10 veces menos cuando no hay cambios.');
 
   // ============================================================ 12 VALIDACION
   s = nueva('CONTENIDO', 'Negocio');
@@ -422,7 +479,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 8.85, y: 4.15, w: 3.7, h: 2.25, fontSize: 14, color: C.background1, paraSpaceAfter: 4, objectName: 'rutat' });
   g12.push(['ruta', 'rutat']);
   animar.push({ slide: nSlide, grupos: g12 });
-  s.addNotes('[4:20 – 4:40] Lo vamos a validar con un piloto de 8 semanas en 15 tiendas de Trinidad y Yopal, con metas medibles: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestas a pagar y cerrar un mayorista aliado. Después: Google Play, facturación electrónica con un proveedor autorizado y la versión para iPhone.');
+  s.addNotes('[4:05 – 4:25] Lo vamos a validar con un piloto de 8 semanas en 15 tiendas de Trinidad y Yopal, con metas medibles: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestas a pagar y cerrar un mayorista aliado. Después: Google Play, facturación electrónica con un proveedor autorizado y la versión para iPhone.');
 
   // ============================================================ 13 LEGAL
   s = nueva('CONTENIDO', 'Negocio');
@@ -442,7 +499,7 @@ function palotes(s, x, y, color, nombre) {
     g13.push(await tarjetaIcono(s, { x, y, w: 3.9, h: 2.15, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `lg${i}` }));
   }
   animar.push({ slide: nSlide, grupos: g13 });
-  s.addNotes('[4:40 – 4:50] En lo legal: cumplimos la Ley 1581 con autorización, aviso y derechos; la MiPyme es responsable y la Gobernación encargada; el equipo conserva la propiedad intelectual y la Gobernación recibe licencia gratuita e indefinida. Todo el software es libre y no prometemos lo que no es: no es factura electrónica.');
+  s.addNotes('[4:25 – 4:40] En lo legal: cumplimos la Ley 1581 con autorización, aviso y derechos; la MiPyme es responsable y la Gobernación encargada; el equipo conserva la propiedad intelectual y la Gobernación recibe licencia gratuita e indefinida. Todo el software es libre y no prometemos lo que no es: no es factura electrónica.');
 
   // ============================================================ 14 EQUIPO
   pres.addSection({ title: 'Cierre' });
@@ -470,7 +527,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.9, y: 5.3, w: 11.6, h: 1.25, fontSize: 18, valign: 'middle', objectName: 'aerot' });
   g14.push(['aero', 'aerot']);
   animar.push({ slide: nSlide, grupos: g14 });
-  s.addNotes('[4:50 – 4:55] Somos tres hermanos de Casanare: desarrollo, procesos y negocio, con el respaldo de la Asociación Aerollano.');
+  s.addNotes('[4:40 – 4:50] Somos tres hermanos de Casanare: desarrollo, procesos y negocio, con el respaldo de la Asociación Aerollano.');
 
   // ============================================================ 15 CIERRE
   s = nueva('PORTADA', 'Cierre');
@@ -485,7 +542,7 @@ function palotes(s, x, y, color, nombre) {
   telefono(s, 'comprobante', 9.45, 0.95, 5.85, 5, 'c_tel2');
   telefono(s, 'informes', 8.0, 0.7, 6.05, -4, 'c_tel1');
   animar.push({ slide: nSlide, grupos: [['c1'], ['c2'], ['c3']] });
-  s.addNotes('[4:55 – 5:00] Que ningún fiado se pierda. VERTEX AI Pyme: hecho en Casanare, para la tienda de Casanare. Gracias.');
+  s.addNotes('[4:50 – 5:00] Que ningún fiado se pierda. VERTEX AI Pyme: hecho en Casanare, para la tienda de Casanare. Gracias.');
 
   await pres.writeFile({ fileName: SALIDA });
   await applyTheme(SALIDA, THEME);

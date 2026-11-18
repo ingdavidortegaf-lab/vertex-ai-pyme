@@ -15,6 +15,7 @@ Aquí están **las cuentas y las reglas**: cuánto se vendió, quién debe y des
 | `conflictos.dart` | **Dos celulares sin señal cambian lo mismo**: gana el cambio más reciente **de cada dato** (nombre, teléfono, precio…), no de la ficha completa. También la espera entre reintentos | "Nadie pisa el trabajo del otro" |
 | `codigos.dart` | Códigos de barras: valida el dígito de control EAN, lee etiquetas de **gramera** (producto + peso) y convierte gramos a kilos o libras. Unidad "servicio" | |
 | `documentos.dart` | Los **mensajes de WhatsApp** (comprobante, cotización, pedido, promoción) y el **pedido sugerido** | |
+| `pagos.dart` | **Medios de pago**: efectivo, Nequi, Daviplata, Bancolombia, Bre-B y tarjetas. Revisa que el **pago dividido** sume el total y calcula el **cuadre de caja** | "Cobra como pague el cliente" |
 | `avisos.dart` | **Qué avisar y cuándo**, sin repetir el mismo aviso | |
 | `modo_negocio.dart` | **Cómo trabaja el negocio** (productos o servicios, si fía, gramera…) para adaptar la app | |
 | `resumen.dart` | Los "moldes" de los datos: producto con su existencia, cliente con su deuda, resumen del periodo | |
