@@ -25,6 +25,10 @@ Future<void> main() async {
     runApp(const _ErrorInicio());
     return;
   }
+  // Cómo trabaja el negocio y su tipo (para adaptar pantallas y ejemplos).
+  try {
+    await LocalDb.instance.cargarModo();
+  } catch (_) {}
 
   final sync = SyncService.instance;
   if (Config.nubeConfigurada) {

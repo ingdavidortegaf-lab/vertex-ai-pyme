@@ -186,4 +186,13 @@ void main() {
     expect(await v7.query('pagos_fijos'), isEmpty);
     await v7.close();
   });
+
+  test('el tipo de negocio se carga al abrir y cambia los ejemplos', () async {
+    final db = await baseDePrueba();
+    await db.setAjuste('negocio_tipo', 'Licorera');
+    db.tipoNegocio.value = '';
+    await db.cargarModo();
+    expect(db.tipoNegocio.value, 'Licorera');
+    expect(ejemplosPara(db.tipoNegocio.value).producto, contains('Aguardiente'));
+  });
 }
