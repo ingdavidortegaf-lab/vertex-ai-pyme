@@ -9,11 +9,14 @@ Para el dueño de la tienda. Todo funciona sin señal; cuando vuelve internet, l
 
 ## 2. Vender
 - **Inicio → Venta.** Elige productos del inventario (el total se calcula solo) o escribe el monto.
+- **Montos rápidos:** si no usas productos, toca **+$2.000**, **+$5.000**, **+$10.000**… y se van sumando, sin teclear.
 - **Fiado:** activa «Venta fiada» y elige el cliente.
+- **Cliente nuevo sin salir de la venta:** al elegir el cliente, la primera opción es **Nuevo cliente**. Lo registras y queda elegido en la venta.
 - **¿Cómo pagó?** Toca el medio: efectivo, Nequi, Daviplata, Bancolombia, otra transferencia (Bre-B) o tarjeta. Si paga una parte por Nequi y otra en efectivo, toca **Dividir el pago** y escribe cuánto en cada uno; la app avisa lo que falta o sobra, y el botón de la varita pone lo que falta.
 - Al guardar, toca **Enviar comprobante** para mandarlo por WhatsApp.
 - **Abono:** Inicio → Abono, elige el cliente y el valor.
-- **Gasto:** Inicio → Gasto y escribe en qué fue.
+- **Gasto:** Inicio → Gasto y escribe en qué fue. En **¿A quién le pagaste?** elige el proveedor, el arrendador, la empresa de servicios o el empleado (o créalo ahí mismo). Así el contador sabe a nombre de quién va cada gasto.
+- **Ejemplos a tu medida:** las casillas muestran ejemplos de tu tipo de negocio. Una licorera ve «Aguardiente Llanero 750 ml»; una droguería, «Acetaminofén 500 mg x 10».
 
 ## 3. Caja
 La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca una venta para ver y reenviar su comprobante.
@@ -29,6 +32,8 @@ La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca
 - El filtro **Por reponer** muestra lo agotado o bajo.
 
 ## 5. Herramientas (en Inicio)
+- **Pagos fijos:** arriendo, luz, agua, internet y los propios de tu negocio (la app sugiere, por ejemplo, «Música (derechos de autor)» a una licorera). Para cada uno: valor aproximado, día del mes en que se paga y a quién. La app muestra en Inicio los que **se pasaron** o **vencen en los próximos 5 días**. Toca **Pagar**, corrige el valor si el recibo cambió y elige con qué pagaste: queda como gasto, por ejemplo «Luz (noviembre 2026)».
+- **Proveedores y terceros:** todos a los que les compras o les pagas, con su **NIT o cédula** (el dígito de verificación del NIT se calcula solo), **celular** y **correo**. Se agrupan en proveedor, servicios, arrendador, empleado u otro. Ves cuánto le debes a cada uno y cuánto le has pagado.
 - **Comprobantes:** lista de ventas para enviar su comprobante por WhatsApp.
 - **Cotizaciones:** arma una con productos, envíala por WhatsApp y, cuando el cliente confirme, conviértela en venta de contado o fiada.
 - **Pedir mercancía:** la app sugiere qué pedir; agrega tu proveedor con su WhatsApp, envía el pedido y, cuando llegue, toca **Llegó el pedido**. Elige si pagaste **todo**, **una parte** (botones 30 %, 50 % y 70 %) o **todo fiado**, y la fecha límite para el saldo (por defecto 15 días). Todo entra al inventario; el gasto se registra solo por lo que pagaste.
@@ -52,7 +57,8 @@ La pestaña **Caja** muestra los movimientos por día con su medio de pago. Toca
 
 ## 6. Clientes y cobros
 - **Celular de otro país:** en el campo del celular toca el país (🇨🇴 +57) y elige Estados Unidos, Venezuela, Ecuador, España u otro; o escribe el número completo con «+».
-- **Clientes:** busca por nombre o celular. En la ficha ves cuánto debe y su historial.
+- **Datos del cliente:** **nombre completo** (o la **razón social** si es empresa), **celular**, **cédula o NIT** y **correo**. Toca **Agregar cédula o NIT y correo**; si eliges NIT, la app calcula el dígito de verificación y avisa si el que escribiste no cuadra. Son opcionales: sin ellos, el comprobante va a nombre del cliente sin documento. La ficha avisa cuando faltan.
+- **Clientes:** busca por nombre, celular o cédula. En la ficha ves cuánto debe, su documento, su correo y su historial.
 - **Cobrar por WhatsApp:** la app arma un mensaje respetuoso con el saldo.
 - **Cuenta de cobro en PDF:** detalle de cada fiado, cada abono, el saldo después de cada movimiento, desde cuándo debe y la antigüedad (0-30, 31-60, 61-90, más de 90 días). Los abonos pagan primero lo más antiguo.
 

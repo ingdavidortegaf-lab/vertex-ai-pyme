@@ -16,14 +16,15 @@ Lleva ventas, fiados, inventario, cobros, documentos e informes para el contador
 |---|---|
 | **Caja** | Ventas de contado y fiadas, gastos y abonos; venta con productos, **código de barras** (cámara o lector USB) y **gramera** (kilos y libras) |
 | **Medios de pago** | Efectivo, Nequi, Daviplata, Bancolombia, Bre-B y tarjetas; **pago dividido** (parte Nequi, parte efectivo); **cierre de caja** con cuadre del efectivo |
-| **Clientes y cartera** | Saldo de cada cliente, **cuenta de cobro en PDF** con días de mora y antigüedad (0-30, 31-60, 61-90, +90) y cobro por WhatsApp |
+| **Clientes y cartera** | Nombre completo o razón social, celular, **cédula o NIT** (con dígito de verificación DIAN) y **correo**; cliente nuevo **desde la venta**; saldo de cada cliente, **cuenta de cobro en PDF** con días de mora y antigüedad (0-30, 31-60, 61-90, +90) y cobro por WhatsApp |
 | **Seguimiento (CRM)** | Clientes que hace rato no vienen, mejores clientes, nuevos y perdidos, con mensaje de WhatsApp sugerido; solo a quien autorizó (Ley 1581) |
-| **Proveedores** | Pedido pagado **todo, en parte (30/50/70 %) o fiado**; **Lo que debo** con vencimientos, abonos por medio de pago y aviso 3 días antes |
+| **Proveedores y terceros** | Proveedores, arrendador, servicios y empleados con NIT o cédula, celular y correo; **gasto a nombre de quién se le pagó**; pedido pagado **todo, en parte (30/50/70 %) o fiado**; **Lo que debo** con vencimientos, abonos por medio de pago y aviso 3 días antes |
 | **Promociones** | **Foto o video**, **imagen lista para el estado** (logo y precios) y **texto redactado con IA**: 5 estilos y temporada (quincena, viernes negro, Navidad); funciona sin señal |
+| **Pagos fijos** | Arriendo, luz, agua, internet y los propios del negocio: día de pago, aviso de lo que vence y pago que queda como gasto |
 | **Inventario y servicios** | Existencias calculadas a partir de los movimientos, productos por reponer, pedido sugerido al proveedor y **servicios sin inventario** |
 | **Documentos** | Comprobantes, cotizaciones, cuentas de cobro, pedidos e informes en **PDF con logo y número único** (`CV-`, `CT-`, `CC-`, `PD-`, `IN-`, `AU-` para autorizaciones), archivados en el equipo |
 | **Informes para el contador** | Semanal, quincenal y mensual: estado de resultados, flujo de caja, gastos por concepto, cartera, inventario y libro de movimientos |
-| **A la medida del negocio** | Registro guiado al empezar; la app se adapta (productos, servicios, fiado, gramera, códigos de barras, pedidos) |
+| **A la medida del negocio** | Registro guiado al empezar; la app se adapta (productos, servicios, fiado, gramera, códigos de barras, pedidos) y **los ejemplos de cada casilla son del tipo de negocio** (licorera, droguería, ferretería…) |
 | **Avisos** | Notificaciones en el celular: producto agotado o por acabarse, cobros vencidos, pagos a proveedores por vencer, meta cumplida |
 | **Asistente** | Responde sin señal con los datos del celular; con señal, la IA (Gemini) da consejos y redacta promociones usando solo totales o productos y precios, nunca nombres de personas |
 
@@ -68,7 +69,7 @@ flowchart TB
 | `lib/data/` | Base local cifrada, cola y sincronización, conexión con Supabase |
 | `lib/pdf/` | Generación y archivo de PDF, informes contables |
 | `supabase/` | `supabase_schema.sql` (tablas, RLS, triggers) y `functions/asistente` (IA) |
-| `test/` | **106 pruebas automáticas**, incluida una caída de red a mitad del envío |
+| `test/` | **128 pruebas automáticas**, incluida una caída de red a mitad del envío |
 | `docs/base_de_datos/` | Base SQLite de ejemplo y consultas SQL probadas (SQLite, PostgreSQL y MySQL); [cómo mostrarla](docs/base_de_datos/LEEME_BASE_DE_DATOS.md) |
 | `docs/` | Manual, auditoría, política de datos (Ley 1581), licencias, [pagos y modelo de negocio](docs/PAGOS_Y_MODELO_DE_NEGOCIO.md) y guías de exposición |
 
@@ -83,7 +84,7 @@ Cada carpeta de código trae un `LEEME.md` corto. La explicación completa está
 ```powershell
 flutter pub get
 flutter analyze
-flutter test                 # 106 pruebas
+flutter test                 # 128 pruebas
 flutter run -d windows       # en el PC, modo solo local (sin nube)
 flutter run                  # en un celular Android conectado
 ```
@@ -125,7 +126,7 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 
 ## Estado y pendientes
 Probado:
-- 106 pruebas automáticas;
+- 128 pruebas automáticas;
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
 - versión de Windows compilada y ejecutada;
 - versión web publicada y probada en el navegador del computador.

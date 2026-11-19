@@ -7,7 +7,7 @@
 
 | Criterio (peso) | Diapositivas | La frase que no puede faltar |
 |---|---|---|
-| **Tecnología (25)** | 4, 8 (demo), 9 | "Funciona en modo avión y sincroniza sin perder ni duplicar nada; 106 pruebas automáticas." |
+| **Tecnología (25)** | 4, 8 (demo), 9 | "Funciona en modo avión y sincroniza sin perder ni duplicar nada; 128 pruebas automáticas." |
 | **Emprendimiento (20)** | 2, 14, 16 | "Piloto de 8 semanas en 15 tiendas, con metas medibles." |
 | **Marketing (20)** | 3, 5, 7, 10, 11 | "Que ningún fiado se pierda. Llegamos por la Gobernación, los mayoristas y el voz a voz entre tenderos." |
 | **Financiera (20)** | 12, 13 | "Gratis para la MiPyme; $19.900 al mes fuera del programa. Equilibrio con 78 tiendas; con 100 quedan unos $455.000 al mes." |
@@ -65,7 +65,7 @@ Pon el celular en **modo avión** frente al jurado y sigue los 5 pasos de la dia
 - **Seguimiento**: *"Estos clientes hace rato no vienen; con un toque les escribo por WhatsApp, solo si autorizaron."*
 
 **9 · Tecnología (2:25–2:50)**
-"Es una sola app en Flutter y Dart, para Android y Windows. Todo se guarda primero en una base cifrada en el celular, y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 106 pruebas automáticas, incluida una que corta internet a mitad del envío."
+"Es una sola app en Flutter y Dart, para Android y Windows. Todo se guarda primero en una base cifrada en el celular, y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío."
 
 **10 · Por qué nosotros (2:50–3:05)**
 "¿Por qué no una app gratuita? Porque las apps grandes sirven para todo el país; nosotros estamos hechos para la tienda de aquí: funciona sin datos todo el día, dice desde cuándo le deben, cobra con un PDF y hay gente de Casanare que la instala."

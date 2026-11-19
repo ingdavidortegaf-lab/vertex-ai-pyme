@@ -1,7 +1,7 @@
-# 6 · Pruebas automáticas: 106 pruebas, todas pasan
+# 6 · Pruebas automáticas: 128 pruebas, todas pasan
 
 ## En una frase
-Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 106 en verde.
+Son **programas que revisan solos que la app funcione**. Se corren con `flutter test` y en unos 15 segundos salen las 128 en verde.
 
 ## Por qué importan
 - Cada vez que cambiamos algo, las corremos: si algo se dañó, **una prueba se pone en rojo** y lo sabemos antes de entregar.

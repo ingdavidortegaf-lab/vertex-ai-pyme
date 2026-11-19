@@ -13,7 +13,7 @@
 | 4:15 | *"Los PDF se dibujan en el mismo celular con el paquete pdf de Dart, llevan logo y número único, y quedan archivados para el contador."* | Sección **"Cómo nace un PDF"**. VS Code: `5_pdf_y_documentos/pdf_factura.dart` → Ctrl+F `pdfDocumento` |
 | 5:15 | *"La cuenta de cobro aplica los abonos a la deuda más antigua, como un contador: así sabemos desde cuándo debe cada cliente."* | VS Code: `2_reglas_del_negocio/contabilidad.dart` → Ctrl+F `estadoDeCuenta` |
 | 5:40 | *"Lo nuevo: el tendero le paga la mitad al proveedor y el resto lo saca fiado, y la app lleva esa cuenta. La IA le redacta la promoción, y la app le dice a qué clientes escribirles, solo si autorizaron (Ley 1581, Anexo 3)."* | Guía visual, sección **"Lo nuevo"**. VS Code: `2_reglas_del_negocio/promocion.dart` → Ctrl+F `redactarPromocion` |
-| 6:20 | *"Y para saber que todo funciona tenemos 106 pruebas automáticas, incluida una que corta internet a mitad del envío."* | Terminal en `C:\dev\vertex_ai_pyme`: `flutter test` → **All tests passed!** |
+| 6:20 | *"Y para saber que todo funciona tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío."* | Terminal en `C:\dev\vertex_ai_pyme`: `flutter test` → **All tests passed!** |
 
 ## Si piden ver la base de datos (2 minutos)
 Abre **DBeaver → VERTEX demo** y sigue el guion de `10_base_de_datos/EXPLICACION.md`:
@@ -26,7 +26,7 @@ Abre **DBeaver → VERTEX demo** y sigue el guion de `10_base_de_datos/EXPLICACI
 7. En Supabase, consulta 5: sin duplicados.
 
 ## Si te cortan el tiempo (versión de 1 minuto)
-*"Es una app en **Flutter/Dart**, **offline-first**: guarda todo en una **SQLite cifrada** en el celular y una **cola transaccional** la sincroniza con **Supabase** (PostgreSQL con RLS por empresa) usando **upsert idempotente**. Los **PDF se generan en el dispositivo** con el paquete pdf, y la **IA (Gemini)** se llama desde una **Edge Function** para no exponer la clave. Tiene **106 pruebas automáticas**. Además lleva lo que se le debe al proveedor, redacta promociones con IA y cumple la Ley 1581 con los formatos oficiales."*
+*"Es una app en **Flutter/Dart**, **offline-first**: guarda todo en una **SQLite cifrada** en el celular y una **cola transaccional** la sincroniza con **Supabase** (PostgreSQL con RLS por empresa) usando **upsert idempotente**. Los **PDF se generan en el dispositivo** con el paquete pdf, y la **IA (Gemini)** se llama desde una **Edge Function** para no exponer la clave. Tiene **128 pruebas automáticas**. Además lleva lo que se le debe al proveedor, redacta promociones con IA y cumple la Ley 1581 con los formatos oficiales."*
 
 ## Antes de entrar (lista de chequeo)
 - [ ] Celular cargado, con la app abierta y en **modo avión** para la demo.

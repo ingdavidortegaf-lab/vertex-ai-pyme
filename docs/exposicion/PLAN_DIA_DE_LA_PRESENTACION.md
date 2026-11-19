@@ -36,7 +36,7 @@ El video abre la presentación. Mientras corre, **nadie habla**: los tres de pie
 | 1:55–2:10 | 6 Documentos | Carlos | Número único, logo, archivo. **No es factura DIAN (dígalo usted antes que el jurado)** |
 | 2:10–2:20 | 7 Pagos | Carlos | Nequi, efectivo, pago dividido **y al proveedor: la mitad y el resto fiado**. *"José."* |
 | 2:20–2:25 | 8 Demo | José | "En 5 minutos lo ven en vivo, en modo avión." |
-| 2:25–2:50 | 9 Tecnología | José | Flutter, base cifrada, cola sin duplicados, Supabase con RLS, **112 pruebas** |
+| 2:25–2:50 | 9 Tecnología | José | Flutter, base cifrada, cola sin duplicados, Supabase con RLS, **128 pruebas** |
 | 2:50–3:05 | 10 Por qué nosotros | José | Hecha para la tienda de aquí. *"Ángel."* |
 | 3:05–3:25 | 11 Marketing | Ángel | Gobernación, mayoristas, referidos, instalación en 20 min **y la IA que hace promociones y le escribe a los clientes** |
 | 3:25–3:45 | 12 Modelo de negocio | Ángel | Gratis en el programa; $19.900/mes; equilibrio con 78 tiendas |
@@ -61,7 +61,7 @@ El video abre la presentación. Mientras corre, **nadie habla**: los tres de pie
 | 2:10–2:50 | **Promociones** → arroz con precio de oferta → **Redactar con IA** → **imagen para el estado** | "La IA le escribe la promoción. Sin señal, la redacta el mismo celular." |
 | 2:50–3:15 | **Seguimiento** → "Hace rato no vienen" | "A quién escribirle hoy, **solo si autorizó**: Ley 1581." |
 | 3:15–3:45 | **Quita el modo avión** → la barra dice **Sincronizado** | "Volvió la señal: subió todo, sin perder ni duplicar nada." |
-| 3:45–4:40 | Diapositiva de tecnología (o la guía visual) | Offline-first, base cifrada AES-256, cola transaccional con upsert por id, Supabase PostgreSQL con RLS por tienda, IA desde una Edge Function sin datos personales, **112 pruebas automáticas** |
+| 3:45–4:40 | Diapositiva de tecnología (o la guía visual) | Offline-first, base cifrada AES-256, cola transaccional con upsert por id, Supabase PostgreSQL con RLS por tienda, IA desde una Edge Function sin datos personales, **128 pruebas automáticas** |
 | 4:40–5:00 | Muestra el **QR** | "Y no nos crean a nosotros: escaneen el QR y pruébenla ya en su celular." |
 
 **Si algo falla en la demo:** José dice *"esto es software real, por eso falla en vivo"*, sonríe y pasa al **video** o a las **capturas del pitch**. Nunca se pelea con el celular más de 10 segundos.
@@ -133,7 +133,7 @@ Más preguntas con su respuesta: `docs/exposicion/PREGUNTAS_DEL_JURADO.md` (39 p
 
 | Criterio (peso) | Dónde lo ganamos |
 |---|---|
-| Tecnología (25) | Demo en modo avión, sincronización sin duplicados, 112 pruebas, seguridad |
+| Tecnología (25) | Demo en modo avión, sincronización sin duplicados, 128 pruebas, seguridad |
 | Emprendimiento (20) | Doña Marta, piloto de 8 semanas, 22 tipos de negocio |
 | Marketing (20) | Video, "que ningún fiado se pierda", promociones con IA, seguimiento, QR para probarla ya |
 | Financiera (20) | $19.900/mes, equilibrio con 78 tiendas, $455.000/mes con 100 |

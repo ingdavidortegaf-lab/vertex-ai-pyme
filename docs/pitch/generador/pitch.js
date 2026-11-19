@@ -306,7 +306,7 @@ function palotes(s, x, y, color, nombre) {
   s.addShape(pres.shapes.LINE, { x: 2.95, y: 4.4, w: 0, h: 0.55, line: { color: HEX.pizarra, width: 2, endArrowType: 'triangle' }, objectName: 'fl2' });
   s.addShape(pres.shapes.LINE, { x: 5.3, y: 3.82, w: 1.0, h: 0, line: { color: HEX.verde, width: 2.5, dashType: 'dash', endArrowType: 'triangle' }, objectName: 'fl3' });
   texto(s, 'con señal', { x: 5.3, y: 3.42, w: 1.0, h: 0.35, fontSize: 11, color: C.accent1, align: 'center', objectName: 'fl3t' });
-  const met = [['106', 'pruebas automáticas, incluida una caída de internet a mitad del envío'], ['0', 'duplicados en la prueba real con el celular y Supabase'], ['13.000', 'líneas de código propio'], ['$0', 'en licencias: todo es software libre']];
+  const met = [['128', 'pruebas automáticas, incluida una caída de internet a mitad del envío'], ['0', 'duplicados en la prueba real con el celular y Supabase'], ['13.000', 'líneas de código propio'], ['$0', 'en licencias: todo es software libre']];
   const g8b = [];
   met.forEach(([n, l], i) => {
     const y = 1.5 + i * 1.22;
@@ -315,7 +315,7 @@ function palotes(s, x, y, color, nombre) {
     g8b.push([`m${i}n`, `m${i}l`]);
   });
   animar.push({ slide: nSlide, grupos: [g8[0], ['fl1'], g8[1], ['fl2'], g8[2], ['fl3', 'fl3t'], g8[3], ...g8b] });
-  s.addNotes('[2:25 – 2:50] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 106 pruebas automáticas, incluida una que corta internet a mitad del envío.');
+  s.addNotes('[2:25 – 2:50] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío.');
 
   // ============================================================ 9 DIFERENCIACION
   pres.addSection({ title: 'Mercado' });

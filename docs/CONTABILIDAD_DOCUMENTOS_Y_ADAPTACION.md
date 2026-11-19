@@ -184,12 +184,41 @@ La app es **primero sin internet**: se usa sin cuenta y el registro del negocio 
 
 ---
 
+## 7.1 Datos de clientes y terceros, pagos fijos y ejemplos por negocio (18 nov., noche)
+
+### Qué hace
+- **Clientes con identificación:** tipo de documento (cédula, NIT, cédula de extranjería, PPT o pasaporte), número y correo, además del nombre completo y el celular. El NIT se guarda con su **dígito de verificación** (algoritmo módulo 11 de la DIAN): se calcula solo y, si el que se escribió no cuadra, la app lo dice.
+- **Terceros:** los proveedores pasan a ser «Proveedores y terceros». Cada uno es proveedor, servicios (luz, agua, internet), arrendador, empleado u otro, con NIT o cédula, celular y correo.
+- **Gasto a nombre de alguien:** al registrar un gasto se puede elegir a quién se le pagó.
+- **Pagos fijos:** arriendo, luz, agua, internet y los de cada tipo de negocio. Cada uno tiene valor aproximado, día del mes y tercero. Estados: vencido, vence pronto (5 días), pendiente y pagado. Al pagar queda el gasto con su medio de pago.
+- **Libro de movimientos del informe:** la columna «Cliente o tercero» muestra el nombre con su documento («Inmobiliaria Los Llanos · NIT 900.373.913-4»). El comprobante PDF de una venta lleva la cédula o NIT del cliente si la tiene.
+- **Ejemplos según el tipo de negocio:** cada casilla (producto, venta, gasto, proveedor, empresa) muestra un ejemplo del negocio elegido, y los pagos fijos sugeridos cambian (licorera: música y licencia; droguería: regente; transporte: cuota de la moto…).
+- **Venta más ágil:** «Nuevo cliente» dentro del selector de cliente y montos rápidos que se suman.
+
+### Cómo funciona por dentro
+- Esquema local **v8** (`lib/data/local_db.dart`, `agregarTerceros`): columnas `tipo_doc`, `documento`, `correo`, `datos_ts` en `clientes`; `tipo_doc`, `documento`, `correo`, `clase` en `proveedores`; `tercero_id` en `ventas` (solo en el equipo, no viaja a la nube); tablas `pagos_fijos` y `pagos_fijos_hechos`.
+- **Sincronización de clientes:** documento y correo forman un bloque «datos» con su propia marca de tiempo. Gana el cambio más reciente del bloque, igual que el nombre o el celular (`lib/domain/conflictos.dart`). En Supabase se agregaron las columnas y el trigger `merge_cliente` las une (`supabase/supabase_schema.sql`). La versión anterior de la app no las envía y sigue funcionando.
+- Reglas en `lib/domain/identificacion.dart` (documentos y correo), `lib/domain/obligaciones.dart` (pagos fijos) y `lib/domain/ejemplos.dart` (ejemplos por tipo de negocio).
+- Pantallas: `lib/ui/campos_identificacion.dart`, `lib/ui/terceros_page.dart`, `lib/ui/pagos_fijos_page.dart`.
+
+### Por qué así
+- Cédula y correo son **opcionales**: una venta de mostrador no puede frenarse pidiendo datos, y la Ley 1581 pide recoger solo lo necesario. Cuando el cliente pide factura a su nombre, se agregan en segundos.
+- Los terceros y los pagos fijos viven en el equipo (como los proveedores). Los gastos que generan sí se sincronizan.
+
+### Qué NO hace
+- No emite factura electrónica de la DIAN: guarda los datos que esa factura necesita.
+- Los terceros y los pagos fijos no se copian a otros celulares de la misma tienda.
+
+---
+
 ## 8. Pruebas que lo respaldan
-`flutter test` corre **106 pruebas**, todas en verde. Las de este documento son:
+`flutter test` corre **128 pruebas**, todas en verde. Las de este documento son:
 - `test/contabilidad_test.dart`: FIFO de abonos, días de mora, rangos de antigüedad, periodos (semana, quincena y mes) y numeración única con reimpresión.
 - `test/informes_test.dart`: gastos por concepto, variación frente al periodo anterior, y el informe y la cuenta de cobro generados en PDF con datos reales.
 - `test/avisos_test.dart`: avisos que no se repiten, meta del mes, cartera una vez al día, servicios sin inventario y el modo del negocio.
 - `test/proveedores_test.dart`: pedido pagado a medias o todo fiado, abonos hasta saldar y aviso de pagos por vencer.
+- `test/terceros_test.dart`: dígito de verificación del NIT, cédula y correo, ejemplos por negocio, estados de los pagos fijos, cliente con documento que se une por fecha entre celulares, gasto a nombre de un tercero, pago fijo que queda como gasto y la subida de la base de v7 a v8.
+- `test/campos_identificacion_test.dart`: las casillas de documento y correo en pantalla (dígito calculado, errores y datos opcionales).
 
 **Probado en este PC (17 nov.):** el análisis de código sin errores, las pruebas de entonces, el PDF del informe y de la cuenta de cobro revisados a ojo, las capturas de las pantallas nuevas, el APK compilado, y la app de Windows abierta con su base actualizada a la versión 5.
 **Falta probar en el celular real:** los avisos (permiso y sonido), los PDF compartidos por WhatsApp y el registro guiado tocado con el dedo.
@@ -207,3 +236,9 @@ La app es **primero sin internet**: se usa sin cuenta y el registro del negocio 
 | `lib/ui/registro_negocio_page.dart` | Registro guiado en 5 pasos |
 | `lib/ui/notificaciones.dart` | Avisos en el celular |
 | `lib/ui/oficina_page.dart` → `CuentasPagarPage` | «Lo que debo» a proveedores (18 nov.) |
+| `lib/domain/identificacion.dart` | Cédula, NIT con dígito de verificación, correo y clases de terceros |
+| `lib/domain/obligaciones.dart` | Pagos fijos: vencimiento, estado y orden |
+| `lib/domain/ejemplos.dart` | Ejemplos de las casillas y pagos fijos sugeridos por tipo de negocio |
+| `lib/ui/campos_identificacion.dart` | Casillas de documento y correo |
+| `lib/ui/terceros_page.dart` | Proveedores y terceros, y el selector «¿A quién le pagaste?» |
+| `lib/ui/pagos_fijos_page.dart` | Pagos fijos del mes |
