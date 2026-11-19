@@ -21,14 +21,13 @@ Future<void> main() async {
 
   try {
     await LocalDb.instance.open();
-  } catch (_) {
+  } catch (e, st) {
+    // Queda en la consola (navegador o depuración) para diagnosticar.
+    debugPrint('VERTEX: no se pudo abrir la base local: $e');
+    debugPrint('$st');
     runApp(const _ErrorInicio());
     return;
   }
-  // Cómo trabaja el negocio y su tipo (para adaptar pantallas y ejemplos).
-  try {
-    await LocalDb.instance.cargarModo();
-  } catch (_) {}
 
   final sync = SyncService.instance;
   if (Config.nubeConfigurada) {

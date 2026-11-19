@@ -11,9 +11,9 @@
 
 | Hermano | Papel en el escenario | Habla en | Responde preguntas de |
 |---|---|---|---|
-| **Ángel Elías** · negocio | Abre y cierra. Es la voz del emprendedor: cuenta la historia y las cifras de Casanare | 1 Portada, 2 Historia, 3 Casanare, 4 Cierran a ciegas, 5 Quiénes son, 14 Negocio, 15 Con 100 tiendas, 16 Impacto, 19 Equipo, 20 Cierre | Mercado, precio, competencia, ventas, impacto |
-| **Carlos Andrés** · procesos | Explica cómo cambia el día del negocio | 6 Solución, 7 Un día con VERTEX, 8 Cualquier negocio, 9 Pagos, 13 Marketing, 17 Piloto, 18 Legal | Ley 1581, piloto, soporte, capacitación, operación |
-| **José David** · desarrollo | Maneja el celular y la tecnología | 12 Tecnología, y **todo el bloque de demo** (10 Video y 11 Demo) | Arquitectura, sin internet, seguridad, IA, base de datos |
+| **Ángel Elías** · negocio | Abre y cierra. Es la voz del emprendedor: cuenta la historia y las cifras de Casanare | 1 Portada, 2 Historia, 3 Casanare, 4 Cierran a ciegas, 5 Quiénes son, 12 Negocio, 13 Con 100 tiendas, 14 Impacto, 17 Equipo, 18 Cierre | Mercado, precio, competencia, ventas, impacto |
+| **Carlos Andrés** · procesos | Explica cómo cambia el día del negocio | 6 Solución, 7 Un día con VERTEX, 8 Cualquier negocio, 9 Pagos, 11 Marketing, 15 Piloto, 16 Legal; en la demo ayuda al público con el QR | Ley 1581, piloto, soporte, capacitación, operación |
+| **José David** · desarrollo | Maneja el celular y la tecnología | 10 Tecnología, y **todo el bloque de demo** (19 Video, 20 Dinámica con QR, 21 Demo, 22 Arquitectura) | Arquitectura, sin internet, seguridad, IA, base de datos |
 
 **Cómo pasar la palabra sin perder tiempo:** cada uno termina con el nombre del siguiente tema, no con "bueno…". Ejemplo: *"…y eso nos lleva a cómo lo construimos. José."*
 
@@ -34,17 +34,17 @@ El pitch arranca con una persona, no con la app. **Hablen despacio en la histori
 | 2:05–2:30 | 7 Un día con VERTEX | Carlos | Cliente nuevo desde la venta, aviso de la luz, cobro con PDF. **"Se acuesta sabiendo cuánto ganó."** |
 | 2:30–2:45 | 8 Cualquier negocio | Carlos | 22 tipos, productos o servicios; ejemplos de su propio negocio |
 | 2:45–2:55 | 9 Pagos | Carlos | Nequi, efectivo, pago dividido, cierre de caja. *"José."* |
-| 2:55–3:15 | 12 Tecnología | José | Sin internet, base cifrada, sin duplicados, Supabase con RLS, **128 pruebas**. *"Carlos."* |
-| 3:15–3:35 | 13 Marketing | Carlos | "Que ningún fiado se pierda"; Gobernación, mayoristas, referidos; por qué nosotros. *"Ángel."* |
-| 3:35–3:55 | 14 Modelo de negocio | Ángel | Gratis en el programa; $19.900/mes; equilibrio con 78 tiendas |
-| 3:55–4:05 | 15 Con 100 tiendas | Ángel | Quedan unos $455.000/mes y no se satura |
-| 4:05–4:20 | 16 Impacto en Casanare | Ángel | 1.000 negocios: $600 millones al año, 150.000 horas, crédito formal. *"Carlos."* |
-| 4:20–4:30 | 17 Piloto | Carlos | 8 semanas, 15 negocios, metas medibles |
-| 4:30–4:40 | 18 Legal | Carlos | Ley 1581, Anexo 3, MiPyme responsable, Gobernación encargada. *"Ángel."* |
-| 4:40–4:45 | 19 Somos de aquí | Ángel | "No venimos de afuera: venimos a darle herramientas." |
-| 4:45–5:00 | 20 Cierre | Ángel, y los tres juntos la última frase | **"Doña Marta no necesita lástima. Necesita herramientas."** |
+| 2:55–3:15 | 10 Tecnología | José | Sin internet, base cifrada, sin duplicados, Supabase con RLS, **128 pruebas**. *"Carlos."* |
+| 3:15–3:35 | 11 Marketing | Carlos | "Que ningún fiado se pierda"; Gobernación, mayoristas, referidos; por qué nosotros. *"Ángel."* |
+| 3:35–3:55 | 12 Modelo de negocio | Ángel | Gratis en el programa; $19.900/mes; equilibrio con 78 tiendas |
+| 3:55–4:05 | 13 Con 100 tiendas | Ángel | Quedan unos $455.000/mes y no se satura |
+| 4:05–4:20 | 14 Impacto en Casanare | Ángel | 1.000 negocios: $600 millones al año, 150.000 horas, crédito formal. *"Carlos."* |
+| 4:20–4:30 | 15 Piloto | Carlos | 8 semanas, 15 negocios, metas medibles |
+| 4:30–4:40 | 16 Legal | Carlos | Ley 1581, Anexo 3, MiPyme responsable, Gobernación encargada. *"Ángel."* |
+| 4:40–4:45 | 17 Somos de aquí | Ángel | "No venimos de afuera: venimos a darle herramientas." |
+| 4:45–5:00 | 18 Cierre | Ángel, y los tres juntos la última frase | **"Doña Marta no necesita lástima. Necesita herramientas."** |
 
-Las diapositivas 10 (video) y 11 (demo) se **saltan** en el pitch y se usan en el bloque 2.
+El pitch son las diapositivas **1 a 18**, seguidas. La demo usa de la **19 a la 22**, las preguntas la **23**, y los **anexos 24 a 31** son de apoyo.
 
 ---
 
@@ -54,15 +54,14 @@ Las diapositivas 10 (video) y 11 (demo) se **saltan** en el pitch y se usan en e
 
 | Tiempo | Qué toca José | Qué dice |
 |---|---|---|
-| 0:00–0:30 | **Diapositiva 10: video de 30 s** (clic sobre el video). Mientras corre, pone el **modo avión** | Nadie habla |
-| 0:30–0:45 | Muestra el **avión** en la barra del celular | "Sin señal, como en la vereda. Todo lo que van a ver funciona así." |
-| 0:45–1:20 | **Venta** de $25.000 → **Dividir el pago**: $20.000 Nequi + $5.000 efectivo | "El cliente paga como quiera. Al final, el cierre de caja cuadra solo." |
-| 1:20–2:05 | **Venta fiada** → Elegir cliente → **Nuevo cliente** con su cédula → queda elegido → guardar → ficha → **Cuenta de cobro en PDF** | "El cliente nuevo se registra sin salir de la venta. Y el cobro sale en PDF, sin pena." |
-| 2:05–2:40 | Inicio → **Pagos fijos por vencer** → **Pagar** la luz con Nequi → Caja | "Le avisa antes de que venza la luz. Al pagar, queda como gasto." |
-| 2:40–3:15 | **Promociones** → precio de oferta → **Redactar con IA** → imagen para el estado | "La IA le escribe la promoción. Sin señal, la redacta el mismo celular." |
-| 3:15–3:40 | **Quita el modo avión** → la barra dice **Sincronizado** | "Volvió la señal: subió todo, sin perder ni duplicar nada." |
-| 3:40–4:40 | Diapositiva de tecnología (o la guía visual) | Base cifrada AES-256, cola con upsert por id, Supabase PostgreSQL con RLS por negocio, IA desde una Edge Function sin datos personales, **128 pruebas automáticas** |
-| 4:40–5:00 | Muestra el **QR** | "Y no nos crean a nosotros: escaneen el QR y pruébenla ya en su celular." |
+| 0:00–0:32 | **19 · Video** (clic sobre el video). Termina con el QR. José pone su celular en **modo avión** | Nadie habla |
+| 0:32–2:00 | **20 · Pruébala ya, todos juntos**: el público escanea y hace su primera venta | Ver `DINAMICA_EN_VIVO.md`. Carlos ayuda entre la gente |
+| 2:00–2:20 | **21 · Demo**: muestra el **avión** y hace una venta con **pago dividido** | "Ahora lo que hace el dueño todos los días, sin señal." |
+| 2:20–2:55 | **Venta fiada** → Elegir cliente → **Nuevo cliente** con su cédula → queda elegido → guardar → ficha → **Cuenta de cobro en PDF** | "El cliente nuevo se registra sin salir de la venta. Y el cobro sale en PDF, sin pena." |
+| 2:55–3:20 | Inicio → **Pagos fijos por vencer** → **Pagar** la luz con Nequi → Caja | "Le avisa antes de que venza la luz. Al pagar, queda como gasto." |
+| 3:20–3:45 | **Quita el modo avión** → la barra dice **Sincronizado** | "Volvió la señal: subió todo, sin perder ni duplicar nada." |
+| 3:45–4:40 | **22 · Cómo está construido el sistema** | Base cifrada AES-256, cola con upsert por id, Supabase PostgreSQL con RLS por negocio, IA desde una Edge Function sin datos personales, **128 pruebas automáticas** |
+| 4:40–5:00 | **23 · ¿Preguntas?** (con el QR) | "Sigan usándola mientras tanto: ya es de ustedes." |
 
 **Si algo falla en la demo:** José dice *"esto es software real, por eso falla en vivo"*, sonríe y pasa a las **capturas del pitch**. Nunca se pelea con el celular más de 10 segundos.
 
@@ -114,7 +113,7 @@ Más preguntas con su respuesta: `docs/exposicion/PREGUNTAS_DEL_JURADO.md` (39 p
 
 ### Mañana antes de las 9:30
 - [ ] Entregar el PowerPoint (y el PDF de respaldo) en la memoria USB **y** por correo.
-- [ ] Probar en el computador del evento que **el video suena y se ve** en la diapositiva 10 (abre la demo).
+- [ ] Probar en el computador del evento que **el video suena y se ve** en la diapositiva 19 (abre la demo).
 - [ ] Probar el cable o la duplicación de pantalla del celular.
 - [ ] Modo avión activado, notificaciones silenciadas, app abierta en Inicio.
 - [ ] Ropa del mismo color los tres (verde o blanco: los colores de la marca).
@@ -122,10 +121,11 @@ Más preguntas con su respuesta: `docs/exposicion/PREGUNTAS_DEL_JURADO.md` (39 p
 ### Plan B
 | Si falla… | Hacemos esto |
 |---|---|
-| El video no reproduce | José sigue directo con la demo; nadie lo menciona |
+| El video no reproduce | Pasen a la 20: tiene el mismo QR |
 | No se puede proyectar el celular | Demo en el PC (programa de Windows) o con las capturas del pitch |
 | No hay internet en el evento | Mejor: la demo es en modo avión. Solo se omite el paso de "Sincronizado" |
-| Se acaba el tiempo del pitch | Saltar la 9 (pagos) y la 15 (100 tiendas). Nunca saltar la historia ni el cierre |
+| Se acaba el tiempo del pitch | Saltar la 9 (pagos) y la 13 (100 tiendas). Nunca saltar la historia ni el cierre |
+| El QR no abre la app en los celulares | Saltar la 20 y hacer la demo con el celular del equipo |
 
 ---
 

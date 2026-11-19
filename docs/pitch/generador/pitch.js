@@ -1,4 +1,4 @@
-// Pitch de VERTEX AI Pyme para CreaTIC Casanare 2026 (PowerPoint, 16:9).
+﻿// Pitch de VERTEX AI Pyme para CreaTIC Casanare 2026 (PowerPoint, 16:9).
 const pptxgen = require('pptxgenjs');
 const React = require('react');
 const RDS = require('react-dom/server');
@@ -318,36 +318,6 @@ function palotes(s, x, y, color, nombre) {
   animar.push({ slide: nSlide, grupos: [...gp, ['mp_tel1'], ['mp_tel2'], ['mp_nota']] });
   s.addNotes('[CARLOS · 2:45 – 2:55] Y el cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber.');
 
-  // ============================================================ 9b VIDEO
-  pres.addSection({ title: 'Demo' });
-  s = nueva('OSCURA', 'Demo');
-  s.addText('VERTEX en 30 segundos', { placeholder: 'title' });
-  s.addMedia({ type: 'video', path: path.join(__dirname, '..', 'video', 'VERTEX_AI_Pyme_30s.mp4'), cover: POSTER,
-    x: 1.67, y: 1.45, w: 10.0, h: 5.625, objectName: 'video30' });
-  s.addNotes('[JOSÉ · abre los 5 minutos de demo] Hagan clic sobre el video para que empiece (30 segundos, con sonido). Mientras corre, José pone el celular en modo avión. Si el video no suena en el equipo del evento, sigan directo con la demo: no pierdan tiempo.');
-
-  // ============================================================ 7 DEMO
-  s = nueva('OSCURA', 'Demo');
-  s.addText('Demo en vivo, en modo avión', { placeholder: 'title' });
-  const pasos = [
-    'Venta de todo un poco: arroz, acetaminofén y sal mineralizada',
-    'Cliente nuevo desde la venta, con su cédula, y fiado',
-    'Cobro por WhatsApp con la cuenta de cobro en PDF',
-    'Pagos fijos: la luz vence pronto, se paga y queda como gasto',
-    'Vuelve la señal: todo se sincroniza, sin duplicar nada',
-  ];
-  const grupos7 = [];
-  pasos.forEach((p, i) => {
-    const y = 1.75 + i * 0.95;
-    s.addShape(pres.shapes.OVAL, { x: 0.6, y, w: 0.62, h: 0.62, fill: { color: C.accent5 }, line: { type: 'none' }, objectName: `p${i}c` });
-    texto(s, String(i + 1), { x: 0.6, y, w: 0.62, h: 0.62, fontSize: 20, bold: true, color: C.text2, align: 'center', valign: 'middle', objectName: `p${i}n` });
-    texto(s, p, { x: 1.45, y, w: 6.9, h: 0.62, fontSize: 20, color: C.background1, valign: 'middle', objectName: `p${i}t` });
-    grupos7.push([`p${i}c`, `p${i}n`, `p${i}t`]);
-  });
-  telefono(s, 'inicio_oscuro', 9.35, 0.85, 5.95, -3, 'demo_tel');
-  animar.push({ slide: nSlide, grupos: grupos7 });
-  s.addNotes('[JOSÉ · demo, 5 min] Celular en modo avión frente al jurado. Sigan los 5 pasos. Frase al empezar: «Todo lo que van a ver funciona sin internet». Al final quiten el modo avión y muestren la píldora «Sincronizado».');
-
   // ============================================================ 8 TECNOLOGIA
   pres.addSection({ title: 'Tecnología' });
   s = nueva('CONTENIDO', 'Tecnología');
@@ -375,7 +345,7 @@ function palotes(s, x, y, color, nombre) {
   s.addShape(pres.shapes.LINE, { x: 2.95, y: 4.4, w: 0, h: 0.55, line: { color: HEX.pizarra, width: 2, endArrowType: 'triangle' }, objectName: 'fl2' });
   s.addShape(pres.shapes.LINE, { x: 5.3, y: 3.82, w: 1.0, h: 0, line: { color: HEX.verde, width: 2.5, dashType: 'dash', endArrowType: 'triangle' }, objectName: 'fl3' });
   texto(s, 'con señal', { x: 5.3, y: 3.42, w: 1.0, h: 0.35, fontSize: 11, color: C.accent1, align: 'center', objectName: 'fl3t' });
-  const met = [['128', 'pruebas automáticas, incluida una caída de internet a mitad del envío'], ['0', 'duplicados en la prueba real con el celular y Supabase'], ['13.000', 'líneas de código propio'], ['$0', 'en licencias: todo es software libre']];
+  const met = [['128', 'pruebas automáticas, incluida una caída de internet a mitad del envío'], ['0', 'duplicados en la prueba real con el celular y Supabase'], ['20.000', 'líneas de código propio: app, pruebas y nube'], ['$0', 'en licencias: todo es software libre']];
   const g8b = [];
   met.forEach(([n, l], i) => {
     const y = 1.5 + i * 1.22;
@@ -615,6 +585,319 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.7, y: 6.05, w: 11.9, h: 0.85, fontSize: 17, bold: true, color: C.accent5, objectName: 'c4' });
   animar.push({ slide: nSlide, grupos: [['c1'], ['c2'], ['c3'], ['c4']] });
   s.addNotes('[ÁNGEL · 4:45 – 5:00] (Despacio. Es el momento más importante.) Doña Marta no necesita que le tengan lástima. Necesita herramientas. Que ningún fiado se pierda. Que ningún negocio cierre a ciegas. Que el que se atrevió a emprender en Casanare tenga la misma claridad que una gran empresa. Hoy les pedimos 15 negocios para el piloto, y que la Gobernación nos acompañe a llegar a todas las MiPymes del departamento. VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias. (Silencio de dos segundos antes de sentarse.)');
+
+  // ============================================================ 19 VIDEO (bloque de demo)
+  pres.addSection({ title: 'Demo en vivo' });
+  s = nueva('OSCURA', 'Demo en vivo');
+  s.addText('VERTEX en 30 segundos', { placeholder: 'title' });
+  s.addMedia({ type: 'video', path: path.join(__dirname, '..', 'video', 'VERTEX_AI_Pyme_30s.mp4'), cover: POSTER,
+    x: 1.67, y: 1.45, w: 10.0, h: 5.625, objectName: 'video30' });
+  s.addNotes('[JOSÉ · demo 0:00 – 0:32] Clic sobre el video para que empiece (32 segundos, con música). Termina con el código QR en pantalla: dejen que la gente lo escanee. Mientras corre, José pone su celular en modo avión. Si el video no arranca, pasen a la siguiente diapositiva: tiene el mismo QR.');
+
+  // ============================================================ 20 PRUEBALA YA (dinámica)
+  s = nueva('OSCURA', 'Demo en vivo');
+  s.addText('Pruébala ya, todos juntos', { placeholder: 'title' });
+  const pasosQR = [
+    'Escanea el código con la cámara del celular',
+    'Toca «Aceptar y continuar»',
+    'Escribe el nombre de tu negocio y elige su tipo',
+    'Toca «Siguiente» hasta «Empezar a usar la app»',
+    'Toca «Venta», luego «+$5.000» y «Guardar venta»',
+  ];
+  const gq = [];
+  pasosQR.forEach((p, i) => {
+    const y = 1.6 + i * 0.86;
+    s.addShape(pres.shapes.OVAL, { x: 0.6, y, w: 0.6, h: 0.6, fill: { color: C.accent2 }, line: { type: 'none' }, objectName: `q${i}c` });
+    texto(s, String(i + 1), { x: 0.6, y, w: 0.6, h: 0.6, fontSize: 20, bold: true, color: C.text2, align: 'center', valign: 'middle', objectName: `q${i}n` });
+    texto(s, p, { x: 1.4, y, w: 6.6, h: 0.6, fontSize: 20, color: C.background1, valign: 'middle', objectName: `q${i}t` });
+    gq.push([`q${i}c`, `q${i}n`, `q${i}t`]);
+  });
+  texto(s, [
+    { text: '¡Listo! Arriba dice «Hoy vendiste $5.000».', options: { bold: true, color: C.accent5, breakLine: true } },
+    { text: 'Gratis, sin crear cuenta y sin descargar nada. Lo que registres queda solo en tu celular.', options: { color: C.background2 } },
+  ], { x: 0.6, y: 6.0, w: 7.4, h: 0.85, fontSize: 15, objectName: 'q_fin' });
+  gq.push(['q_fin']);
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.45, y: 1.35, w: 4.25, h: 5.05, rectRadius: 0.2, fill: { color: 'FFFFFF' }, line: { color: C.accent5, width: 4 }, objectName: 'qr_caja' });
+  s.addImage({ path: path.join(__dirname, 'qr_limpio.png'), x: 8.7, y: 1.6, w: 3.75, h: 3.75, objectName: 'qr_img' });
+  texto(s, 'Apunta la cámara aquí', { x: 8.45, y: 5.42, w: 4.25, h: 0.45, fontSize: 18, bold: true, color: C.text2, align: 'center', objectName: 'qr_t' });
+  texto(s, 'ingdavidortegaf-lab.github.io/vertex-ai-pyme', { x: 8.45, y: 5.85, w: 4.25, h: 0.35, fontSize: 11, color: C.text1, align: 'center', objectName: 'qr_url' });
+  s.addNotes('[JOSÉ guía, CARLOS ayuda al público · demo 0:32 – 2:00]\n\nJOSÉ (con energía, mirando al público): «No nos crean a nosotros: saquen su celular. Apunten la cámara al código y toquen el enlace que aparece.» (Esperen 10 segundos: es el momento en que más gente se engancha.)\n\nJOSÉ, paso a paso, haciéndolo él mismo en el celular proyectado: «Toquen Aceptar y continuar. Escriban el nombre de su negocio, o uno inventado, y elijan qué tipo de negocio es… Toquen Siguiente, Siguiente… y Empezar a usar la app.»\n\nJOSÉ: «Ahora hagamos nuestra primera venta: toquen Venta, el botón +5.000 y Guardar venta.» (Pausa.) «¿Ven arriba? Hoy vendiste 5.000 pesos. Acaban de registrar su primera venta en 30 segundos, y sin internet funcionaría igual.»\n\nCARLOS: camina entre la gente y ayuda a quien se quede trabado. No se queden esperando a todos: cuando la mitad levante la mano, sigan con la demo.\n\nSi la red del lugar está lenta: «La primera vez descarga la app; después funciona sin señal.» Que la sigan probando mientras ustedes continúan.');
+
+  // ============================================================ 21 DEMO
+  s = nueva('OSCURA', 'Demo en vivo');
+  s.addText('Demo en vivo, en modo avión', { placeholder: 'title' });
+  const pasos = [
+    'Venta de todo un poco con pago dividido: Nequi y efectivo',
+    'Cliente nuevo desde la venta, con su cédula, y fiado',
+    'Cobro por WhatsApp con la cuenta de cobro en PDF',
+    'Pagos fijos: la luz vence pronto, se paga y queda como gasto',
+    'Vuelve la señal: todo se sincroniza, sin duplicar nada',
+  ];
+  const g21 = [];
+  pasos.forEach((p, i) => {
+    const y = 1.75 + i * 0.95;
+    s.addShape(pres.shapes.OVAL, { x: 0.6, y, w: 0.62, h: 0.62, fill: { color: C.accent5 }, line: { type: 'none' }, objectName: `p${i}c` });
+    texto(s, String(i + 1), { x: 0.6, y, w: 0.62, h: 0.62, fontSize: 20, bold: true, color: C.text2, align: 'center', valign: 'middle', objectName: `p${i}n` });
+    texto(s, p, { x: 1.45, y, w: 7.0, h: 0.62, fontSize: 20, color: C.background1, valign: 'middle', objectName: `p${i}t` });
+    g21.push([`p${i}c`, `p${i}n`, `p${i}t`]);
+  });
+  telefono(s, 'inicio_oscuro', 9.35, 0.85, 5.95, -3, 'demo_tel');
+  animar.push({ slide: nSlide, grupos: g21 });
+  s.addNotes('[JOSÉ · demo 2:00 – 3:45] Frase al empezar: «Ahora lo que hace el dueño del negocio todos los días, y en modo avión.» Sigan los 5 pasos. Al final quiten el modo avión y muestren la píldora «Sincronizado». Si algo falla: «esto es software real, por eso falla en vivo», sonrían y sigan con la siguiente diapositiva. Nunca más de 10 segundos peleando con el celular.');
+
+  // ============================================================ 22 ARQUITECTURA
+  s = nueva('CONTENIDO', 'Demo en vivo');
+  s.addText('Cómo está construido el sistema', { placeholder: 'title' });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y: 1.45, w: 6.9, h: 4.85, rectRadius: 0.15, fill: { color: C.accent1, transparency: 92 }, line: { color: C.accent1, width: 1.5 }, objectName: 'ar_cel' });
+  texto(s, 'En el celular, la tablet o el PC · funciona sin internet', { x: 0.85, y: 1.55, w: 6.5, h: 0.45, fontSize: 15, bold: true, color: C.accent1, objectName: 'ar_celt' });
+  const capas = [
+    [THEME.colors.accent1, 'Pantallas', 'Flutter y Dart: venta, clientes, inventario, pagos fijos, informes'],
+    [THEME.colors.accent4, 'Reglas del negocio', 'Fiado y abonos (lo más antiguo primero), NIT con dígito de verificación, pagos fijos'],
+    [THEME.colors.accent6, 'Base de datos cifrada', 'SQLite con SQLCipher (AES-256) · 14 tablas · la clave en el almacén seguro'],
+    [THEME.colors.accent3, 'Cola de envío', 'Cada cambio se guarda junto con su envío pendiente y se reintenta hasta que llega'],
+  ];
+  const gar = [['ar_cel', 'ar_celt']];
+  capas.forEach(([col, t1, t2], i) => {
+    const y = 2.1 + i * 1.03;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.85, y, w: 6.4, h: 0.88, rectRadius: 0.1, fill: { color: 'FFFFFF' }, line: { color: col, width: 2 }, objectName: `ca${i}` });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.85, y, w: 0.14, h: 0.88, fill: { color: col }, line: { type: 'none' }, objectName: `ca${i}b` });
+    texto(s, [{ text: t1, options: { bold: true, fontSize: 16, color: C.text2, breakLine: true } }, { text: t2, options: { fontSize: 12, color: C.text1 } }],
+      { x: 1.15, y: y + 0.06, w: 6.0, h: 0.78, valign: 'middle', objectName: `ca${i}t` });
+    gar.push([`ca${i}`, `ca${i}b`, `ca${i}t`]);
+  });
+  s.addShape(pres.shapes.LINE, { x: 7.55, y: 3.85, w: 1.1, h: 0, line: { color: HEX.verde, width: 3, dashType: 'dash', endArrowType: 'triangle', beginArrowType: 'triangle' }, objectName: 'ar_fl' });
+  texto(s, 'con señal · HTTPS', { x: 7.45, y: 3.35, w: 1.3, h: 0.45, fontSize: 11, color: C.accent1, align: 'center', objectName: 'ar_flt' });
+  gar.push(['ar_fl', 'ar_flt']);
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.7, y: 1.45, w: 4.0, h: 4.85, rectRadius: 0.15, fill: { color: C.text2 }, line: { type: 'none' }, objectName: 'ar_nube' });
+  texto(s, [
+    { text: 'En la nube: Supabase', options: { bold: true, fontSize: 17, color: C.accent5, breakLine: true } },
+    { text: ' ', options: { fontSize: 6, breakLine: true } },
+    { text: 'Usuarios con clave cifrada', options: { bullet: true, breakLine: true } },
+    { text: 'PostgreSQL: 6 tablas y 12 reglas de seguridad (RLS): cada negocio ve solo lo suyo', options: { bullet: true, breakLine: true } },
+    { text: 'Clientes y productos: gana el cambio más reciente de cada campo', options: { bullet: true, breakLine: true } },
+    { text: 'Función en TypeScript que llama a la IA (Gemini); la clave nunca sale del servidor', options: { bullet: true } },
+  ], { x: 8.95, y: 1.65, w: 3.55, h: 4.5, fontSize: 13, color: C.background1, paraSpaceAfter: 6, objectName: 'ar_nubet' });
+  gar.push(['ar_nube', 'ar_nubet']);
+  texto(s, [
+    { text: 'Un solo código ', options: { bold: true, color: C.accent1 } },
+    { text: 'para Android, Windows, la web y el iPhone (por el navegador) · 60 archivos · unas 20.000 líneas · 128 pruebas automáticas' },
+  ], { x: 0.6, y: 6.45, w: 12.1, h: 0.45, fontSize: 14, color: C.text2, objectName: 'ar_pie' });
+  gar.push(['ar_pie']);
+  animar.push({ slide: nSlide, grupos: gar });
+  s.addNotes('[JOSÉ · demo 3:45 – 4:40] «Así está construido por dentro. Todo pasa primero en el celular, en cuatro capas: las pantallas; las reglas del negocio, como cobrar primero lo más antiguo o calcular el dígito del NIT; una base de datos cifrada; y una cola de envío. Cuando hay señal, la cola sube los cambios por HTTPS a Supabase. Allá cada negocio solo ve sus propios datos, por reglas de la misma base de datos, no solo de la app. Y la inteligencia artificial se llama desde el servidor, así que la clave nunca está en el celular.»\n\nSi preguntan más: los anexos (diapositivas 24 a 31) tienen el viaje de una venta, la base de datos, la seguridad, los costos y la hoja de ruta.');
+
+  // ============================================================ 23 PREGUNTAS
+  pres.addSection({ title: 'Preguntas' });
+  s = nueva('PORTADA', 'Preguntas');
+  palotes(s, 0.8, 1.0, C.accent5, 'pq');
+  texto(s, '¿Preguntas?', { x: 0.7, y: 1.7, w: 7, h: 1.3, fontSize: 60, bold: true, color: C.background1, fontFace: THEME.headFontFace, objectName: 'pq1' });
+  texto(s, [
+    { text: 'Mientras tanto, sigan usándola: ya es de ustedes.', options: { breakLine: true } },
+    { text: 'Hagan una venta fiada, creen un cliente con su cédula o agreguen la luz en Pagos fijos.', options: { color: C.background2 } },
+  ], { x: 0.7, y: 3.2, w: 7.2, h: 1.6, fontSize: 21, color: C.accent5, objectName: 'pq2' });
+  texto(s, [
+    { text: 'VERTEX AI Pyme · Hecho en Casanare', options: { bold: true, color: C.accent5, breakLine: true } },
+    { text: 'contacto@vertextechco.online', options: { color: C.background1 } },
+  ], { x: 0.7, y: 5.6, w: 7.2, h: 0.9, fontSize: 18, objectName: 'pq3' });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.55, y: 1.15, w: 4.15, h: 4.95, rectRadius: 0.2, fill: { color: 'FFFFFF' }, line: { color: C.accent5, width: 4 } });
+  s.addImage({ path: path.join(__dirname, 'qr_limpio.png'), x: 8.8, y: 1.4, w: 3.65, h: 3.65 });
+  texto(s, 'Pruébala aquí', { x: 8.55, y: 5.15, w: 4.15, h: 0.45, fontSize: 18, bold: true, color: C.text2, align: 'center' });
+  texto(s, 'ingdavidortegaf-lab.github.io/vertex-ai-pyme', { x: 8.55, y: 5.58, w: 4.15, h: 0.35, fontSize: 11, color: C.text1, align: 'center' });
+  s.addNotes('[LOS TRES · 5 minutos de preguntas] Dejen esta diapositiva en pantalla: el QR sigue disponible. Regla: responde una sola persona, en máximo 20 segundos, con la respuesta corta primero. Si piden detalle técnico, vayan a los anexos (24 a 31). Si nadie sabe: «Buena pregunta; hoy no lo tenemos medido y lo incluimos en el piloto.» La chuleta completa está en CHULETA_DE_RESPUESTAS.md y en la página del plan.');
+
+  // ============================================================ 24 ANEXOS (portada)
+  pres.addSection({ title: 'Anexos' });
+  s = nueva('OSCURA', 'Anexos');
+  s.addText('Anexos: respuestas de apoyo', { placeholder: 'title' });
+  texto(s, 'No se muestran en el pitch. Úsenlas si el jurado pide detalle.', { x: 0.6, y: 1.45, w: 12, h: 0.5, fontSize: 18, italic: true, color: C.accent5 });
+  const indice = [
+    ['25', 'Así viaja una venta', 'Sin internet, la cola y por qué no se duplica'],
+    ['26', 'La base de datos', 'Qué se guarda en el celular y qué en la nube'],
+    ['27', 'Seguridad y datos personales', 'Cifrado, RLS, IA sin datos personales, Ley 1581'],
+    ['28', '¿Por qué no otra app?', 'Cuaderno, app gratuita genérica y VERTEX'],
+    ['29', 'Costos, escala y riesgos', 'Cuánto cuesta crecer y qué puede salir mal'],
+    ['30', 'Hoja de ruta', 'Qué sigue después del piloto'],
+    ['31', 'Preguntas difíciles', 'Factura DIAN, celular perdido, IA y más'],
+  ];
+  indice.forEach(([n, t1, t2], i) => {
+    const x = 0.6 + (i % 2) * 6.15, y = 2.2 + Math.floor(i / 2) * 1.15;
+    texto(s, n, { x, y, w: 0.9, h: 0.9, fontSize: 34, bold: true, color: C.accent2, fontFace: THEME.bodyFontFace });
+    texto(s, [{ text: t1, options: { bold: true, fontSize: 18, color: C.background1, breakLine: true } }, { text: t2, options: { fontSize: 13, color: C.background2 } }],
+      { x: x + 0.95, y: y + 0.05, w: 5.0, h: 0.85 });
+  });
+  s.addNotes('Índice de los anexos. Para saltar directo a una diapositiva en PowerPoint: escriban su número y Enter (por ejemplo 27 y Enter). Para volver a la de preguntas: 23 y Enter.');
+
+  // ============================================================ 25 ASI VIAJA UNA VENTA
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · Así viaja una venta', { placeholder: 'title' });
+  const viaje = [
+    [fa.FaHandPointer, THEME.colors.accent1, 'Toca «Guardar»', 'La venta tiene un id único desde el primer segundo.'],
+    [fa.FaLock, THEME.colors.accent4, 'Base cifrada', 'Venta y envío pendiente se guardan juntos: o queda todo o nada.'],
+    [fa.FaListCheck, THEME.colors.accent6, 'Cola de envío', 'Espera la señal. Si falla, reintenta: 15 s, 30 s, 1 min… hasta 30 min.'],
+    [fa.FaCloudArrowUp, THEME.colors.accent3, 'Llega a la nube', 'Se envía con su id: si ya había llegado, no se duplica.'],
+    [fa.FaMobileScreen, THEME.colors.accent1, 'Otros celulares', 'Los demás equipos del negocio la descargan solos.'],
+  ];
+  s.addShape(pres.shapes.LINE, { x: 1.4, y: 2.15, w: 10.5, h: 0, line: { color: HEX.grisLinea, width: 3, dashType: 'dash' } });
+  for (let i = 0; i < viaje.length; i++) {
+    const [Comp, col, t1, t2] = viaje[i];
+    const cx = 1.4 + i * 2.625;
+    s.addShape(pres.shapes.OVAL, { x: cx - 0.5, y: 1.65, w: 1.0, h: 1.0, fill: { color: col }, line: { color: 'FFFFFF', width: 3 } });
+    s.addImage({ data: await icono(Comp, 'FFFFFF'), x: cx - 0.25, y: 1.9, w: 0.5, h: 0.5 });
+    texto(s, `${i + 1}. ${t1}`, { x: cx - 1.25, y: 2.85, w: 2.5, h: 0.5, fontSize: 16, bold: true, color: C.text2, align: 'center' });
+    texto(s, t2, { x: cx - 1.2, y: 3.35, w: 2.4, h: 1.2, fontSize: 13, color: C.text1, align: 'center' });
+  }
+  const reglas = [
+    ['Ventas, gastos y abonos', 'Solo se agregan: nunca se editan ni se borran. La nube rechaza cambios y borrados.'],
+    ['Clientes y productos', 'Si dos celulares cambian el mismo cliente, gana el cambio más reciente de cada campo.'],
+    ['Inventario', 'No se guarda el número: se suman los movimientos (venta, entrada, ajuste), así nunca choca.'],
+  ];
+  reglas.forEach(([t1, t2], i) => {
+    const x = 0.6 + i * 4.07;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 4.85, w: 3.9, h: 1.55, rectRadius: 0.12, fill: { color: C.accent1, transparency: 88 }, line: { type: 'none' } });
+    texto(s, [{ text: t1, options: { bold: true, fontSize: 15, color: C.text2, breakLine: true } }, { text: t2, options: { fontSize: 12, color: C.text1 } }],
+      { x: x + 0.2, y: 4.95, w: 3.5, h: 1.4 });
+  });
+  s.addNotes('Respuesta corta: «Todo se guarda primero en el celular, junto con su envío pendiente, en una sola operación. Cuando vuelve la señal se envía con su id único; si ya había llegado, la nube lo ignora. Por eso no se pierde ni se duplica.» Prueba: test/sync_test.dart corta la red a mitad del envío y verifica que no haya duplicados.');
+
+  // ============================================================ 26 BASE DE DATOS
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · La base de datos', { placeholder: 'title' });
+  const local = [
+    ['clientes', 'nombre, celular, cédula o NIT y correo'], ['ventas', 'ventas, gastos y abonos, con medio de pago'],
+    ['productos', 'precio, costo, mínimo, código de barras y unidad'], ['inventario', 'movimientos: venta, entrada o ajuste'],
+    ['proveedores', 'proveedores y terceros, con NIT o cédula'], ['cuentas_pagar y pagos_proveedor', 'lo que se le debe al proveedor y los abonos'],
+    ['pagos_fijos y pagos_fijos_hechos', 'arriendo, luz, internet y sus pagos'], ['documentos', 'comprobantes, cotizaciones e informes con número único'],
+    ['cotizaciones', 'precios enviados antes de vender'], ['cola_sync', 'lo que falta subir a la nube'],
+    ['preguntas_ia y ajustes', 'preguntas al asistente y configuración'],
+  ];
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y: 1.45, w: 7.4, h: 5.0, rectRadius: 0.12, fill: { color: C.accent1, transparency: 92 }, line: { color: C.accent1, width: 1.2 } });
+  texto(s, 'En el celular: 14 tablas, cifradas (SQLCipher AES-256)', { x: 0.85, y: 1.55, w: 7, h: 0.45, fontSize: 16, bold: true, color: C.accent1 });
+  local.forEach(([t1, t2], i) => {
+    texto(s, [{ text: t1 + '  ', options: { bold: true, color: C.text2, fontFace: 'Courier New' } }, { text: t2, options: { color: C.text1 } }],
+      { x: 0.85, y: 2.05 + i * 0.39, w: 7.0, h: 0.38, fontSize: 12.5, valign: 'middle' });
+  });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.35, y: 1.45, w: 4.35, h: 3.2, rectRadius: 0.12, fill: { color: C.text2 }, line: { type: 'none' } });
+  texto(s, [
+    { text: 'En la nube: 6 tablas (PostgreSQL)', options: { bold: true, fontSize: 16, color: C.accent5, breakLine: true } },
+    { text: ' ', options: { fontSize: 6, breakLine: true } },
+    { text: 'empresas y miembros: cada usuario pertenece a un negocio', options: { bullet: true, breakLine: true } },
+    { text: 'clientes, ventas, productos e inventario', options: { bullet: true, breakLine: true } },
+    { text: 'Cada fila lleva su empresa; las reglas RLS filtran por ella', options: { bullet: true } },
+  ], { x: 8.55, y: 1.6, w: 3.95, h: 2.95, fontSize: 13, color: C.background1, paraSpaceAfter: 5 });
+  texto(s, [
+    { text: '¿Por qué no todo sube a la nube? ', options: { bold: true, color: C.accent1 } },
+    { text: 'Proveedores, documentos y pagos fijos son el trabajo del día del dueño. Los gastos que generan sí suben. Así la nube es pequeña y barata.' },
+  ], { x: 8.35, y: 4.85, w: 4.35, h: 1.6, fontSize: 13, color: C.text2 });
+  s.addNotes('Si piden verla en vivo: en el PC, la carpeta 10_base_de_datos de la exposición tiene la explicación y las consultas. La base local va en la versión 8 del esquema y cada versión nueva conserva los datos (hay una prueba que sube una base de la v7 a la v8).');
+
+  // ============================================================ 27 SEGURIDAD
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · Seguridad y datos personales', { placeholder: 'title' });
+  const seg = [
+    [fa.FaLock, THEME.colors.accent1, 'Cifrado en el equipo', 'SQLCipher AES-256. La clave vive en el almacén seguro de Android o iOS, no en el código.'],
+    [fa.FaShieldHalved, THEME.colors.accent4, 'Cada negocio ve lo suyo', '12 reglas RLS en PostgreSQL: aunque alguien modifique la app, la base no le entrega datos ajenos.'],
+    [fa.FaKey, THEME.colors.accent6, 'Claves fuera del código', 'La clave de la IA es un secreto del servidor. En la app solo va la clave pública de Supabase.'],
+    [fa.FaUserSecret, THEME.colors.accent3, 'La IA no ve personas', 'Solo recibe totales o productos y precios. Nunca nombres, celulares ni cédulas.'],
+    [fa.FaClock, THEME.colors.accent4, 'Sesión que caduca', 'Si la app no se usa, se cierra la sesión de la nube. Los datos locales siguen cifrados.'],
+    [fa.FaScaleBalanced, THEME.colors.accent1, 'Ley 1581 de 2012', 'Aviso de privacidad, casilla sin marcar, Anexo 3 por cliente y supresión de datos desde la app.'],
+  ];
+  for (let i = 0; i < seg.length; i++) {
+    const [Comp, col, t1, t2] = seg[i];
+    const x = 0.6 + (i % 3) * 4.07, y = 1.5 + Math.floor(i / 3) * 2.45;
+    await tarjetaIcono(s, { x, y, w: 3.9, h: 2.25, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `sg${i}` });
+  }
+  s.addNotes('Respuesta corta: «Los datos están cifrados en el celular, viajan por HTTPS y en la nube cada negocio solo ve lo suyo por reglas de la base de datos. La IA nunca recibe datos personales.» Base: OWASP Mobile (almacenamiento seguro, sesión que caduca).');
+
+  // ============================================================ 28 POR QUE NO OTRA APP
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · ¿Por qué no otra app?', { placeholder: 'title' });
+  const SI = { text: 'Sí', options: { color: THEME.colors.accent1, bold: true, align: 'center' } };
+  const NO = { text: 'No', options: { color: THEME.colors.accent3, bold: true, align: 'center' } };
+  const AV = () => ({ text: 'A veces', options: { color: THEME.colors.accent6, align: 'center' } });
+  const head = (t, fill, col) => ({ text: t, options: { bold: true, color: col, fill: { color: fill }, align: 'center', valign: 'middle' } });
+  const filasDif = [
+    ['Funciona todo el día sin datos', SI, AV()],
+    ['Dice quién debe, cuánto y desde cuándo', NO, AV()],
+    ['Cuenta de cobro en PDF y cobro por WhatsApp', NO, AV()],
+    ['Clientes y terceros con cédula o NIT; pagos fijos con aviso', NO, AV()],
+    ['Informes listos para el contador', NO, AV()],
+    ['Se adapta a 22 tipos de negocio, productos o servicios', NO, AV()],
+    ['Gente de Casanare que instala y acompaña', NO, NO],
+  ];
+  s.addTable([
+    [head('Lo que necesita el negocio', 'EEF3EE', THEME.colors.dk2), head('Cuaderno', 'EEF3EE', THEME.colors.dk2), head('App gratuita genérica', 'EEF3EE', THEME.colors.dk2), head('VERTEX AI Pyme', THEME.colors.dk2, 'FFFFFF')],
+    ...filasDif.map((f) => [{ text: f[0], options: { color: THEME.colors.dk1 } }, f[1], f[2], { text: 'Sí', options: { color: '1B7F45', bold: true, align: 'center', fill: { color: 'DDF3E5' } } }]),
+  ], { x: 0.6, y: 1.5, w: 12.1, colW: [5.5, 2.0, 2.3, 2.3], rowH: 0.52, fontSize: 15, fontFace: THEME.bodyFontFace,
+    border: { type: 'solid', pt: 0.75, color: HEX.grisLinea }, valign: 'middle' });
+  texto(s, 'Las apps grandes sirven para todo el país. VERTEX está hecha para el negocio de aquí: el que vende de todo un poco, donde los datos se acaban y el fiado es con el vecino.',
+    { x: 0.6, y: 5.85, w: 12.1, h: 0.8, fontSize: 16, italic: true, color: C.text2 });
+  s.addNotes('No hablen mal de ninguna app por su nombre. Si preguntan por una en particular: «Es buena para lo que hace; nosotros nos enfocamos en lo que más le duele al negocio de aquí: el fiado, la falta de señal y tener a alguien de Casanare que lo acompañe.»');
+
+  // ============================================================ 29 COSTOS Y RIESGOS
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · Costos, escala y riesgos', { placeholder: 'title' });
+  const cost = [
+    ['$135.000', 'al mes: nube, IA y dominio (casi no sube con más negocios)'],
+    ['216 MB', 'al mes generan 100 tiendas: el plan Pro (8 GB) alcanza para unos 3 años'],
+    ['27 → 3', 'consultas por segundo en horas tranquilas: la app consulta menos si no hay cambios'],
+  ];
+  cost.forEach(([n, l], i) => {
+    texto(s, n, { x: 0.6, y: 1.5 + i * 1.6, w: 4.6, h: 0.75, fontSize: 38, bold: true, color: C.accent1, fontFace: THEME.bodyFontFace });
+    texto(s, l, { x: 0.6, y: 2.25 + i * 1.6, w: 4.6, h: 0.75, fontSize: 14, color: C.text1 });
+  });
+  const riesgos = [
+    ['Que no la usen', 'Instalación en 20 minutos en el negocio, pasando el cuaderno a la app, y seguimiento por WhatsApp.'],
+    ['Competencia gratuita', 'Nos enfocamos en el fiado, la falta de señal y el acompañamiento local.'],
+    ['Que se pierda el celular', 'Con cuenta, los datos están en la nube y bajan al celular nuevo al iniciar sesión.'],
+    ['Depender de Supabase', 'Es PostgreSQL estándar y código abierto: se puede llevar a otro servidor.'],
+  ];
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 5.6, y: 1.45, w: 7.1, h: 5.05, rectRadius: 0.12, fill: { color: C.accent3, transparency: 92 }, line: { color: C.accent3, width: 1.2 } });
+  texto(s, 'Riesgo → cómo lo manejamos', { x: 5.85, y: 1.55, w: 6.6, h: 0.45, fontSize: 16, bold: true, color: C.accent3 });
+  riesgos.forEach(([t1, t2], i) => {
+    texto(s, [{ text: t1, options: { bold: true, fontSize: 15, color: C.text2, breakLine: true } }, { text: t2, options: { fontSize: 13, color: C.text1 } }],
+      { x: 5.85, y: 2.1 + i * 1.08, w: 6.6, h: 1.0 });
+  });
+  s.addNotes('Detalle de costos en docs/PAGOS_Y_MODELO_DE_NEGOCIO.md. Supuestos: dólar a $4.000 y soporte con el salario mínimo de 2026. Punto de equilibrio: 78 tiendas en el plan de $19.900.');
+
+  // ============================================================ 30 HOJA DE RUTA
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · Hoja de ruta', { placeholder: 'title' });
+  const ruta = [
+    ['1 · Piloto', 'Piloto de 8 semanas en 15 negocios', 'Trinidad y Yopal: medir uso y fiado recuperado'],
+    ['2', 'Publicar en Google Play', 'Hoy se instala con el APK o por la web'],
+    ['3', 'Factura electrónica DIAN', 'Con un proveedor tecnológico autorizado; los datos ya están listos'],
+    ['4', 'Pagos en línea', 'Pasarela (Wompi) para cobrar con enlace'],
+    ['5', 'App nativa para iPhone', 'Hoy funciona en Safari; el código ya está listo'],
+    ['6', 'Vendedor y administrador', 'Roles para negocios con empleados'],
+  ];
+  ruta.forEach(([cuando, t1, t2], i) => {
+    const y = 1.5 + i * 0.85;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y, w: 2.3, h: 0.7, rectRadius: 0.1, fill: { color: i === 0 ? C.accent1 : C.text2 }, line: { type: 'none' } });
+    texto(s, cuando, { x: 0.6, y, w: 2.3, h: 0.7, fontSize: 15, bold: true, color: C.background1, align: 'center', valign: 'middle' });
+    texto(s, [{ text: t1 + '  ', options: { bold: true, color: C.text2 } }, { text: t2, options: { color: C.text1, fontSize: 14 } }],
+      { x: 3.15, y, w: 9.5, h: 0.7, fontSize: 17, valign: 'middle' });
+  });
+  s.addNotes('El orden es la intención del equipo después del piloto; las fechas se definen con los resultados. Lo que ya existe hoy: Android (APK), Windows y la web, que funciona también en iPhone.');
+
+  // ============================================================ 31 PREGUNTAS DIFICILES
+  s = nueva('CONTENIDO', 'Anexos');
+  s.addText('Anexo · Preguntas difíciles', { placeholder: 'title' });
+  const dificiles = [
+    ['¿Es factura electrónica?', 'No, y cada documento lo dice. Guarda los datos que la factura necesita (cédula o NIT y correo) para conectarse con un proveedor autorizado.'],
+    ['¿Y si pierdo el celular?', 'Con cuenta, todo está en la nube y baja al celular nuevo. Sin cuenta, los datos viven solo en ese equipo.'],
+    ['¿La IA ve a mis clientes?', 'No. Solo totales o productos y precios. Sin señal, el asistente responde con los datos del propio celular.'],
+    ['¿Las cifras de impacto son reales?', 'Son un escenario que vamos a medir en el piloto. Las cifras de Casanare y del DANE sí son oficiales.'],
+    ['¿Qué pasa si VERTEX se acaba?', 'La Gobernación tiene licencia gratuita e indefinida y los datos están en PostgreSQL estándar, que se puede exportar.'],
+    ['¿Por qué es gratis?', 'Para la MiPyme del programa la opera la Gobernación. Fuera de él cuesta $19.900 al mes, menos que un fiado recuperado.'],
+  ];
+  for (let i = 0; i < dificiles.length; i++) {
+    const [p, r] = dificiles[i];
+    const x = 0.6 + (i % 2) * 6.15, y = 1.45 + Math.floor(i / 2) * 1.75;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w: 5.95, h: 1.6, rectRadius: 0.12, fill: { color: i % 3 === 0 ? C.accent1 : (i % 3 === 1 ? C.accent4 : C.accent6), transparency: 88 }, line: { type: 'none' } });
+    texto(s, [{ text: p, options: { bold: true, fontSize: 16, color: C.text2, breakLine: true } }, { text: r, options: { fontSize: 13, color: C.text1 } }],
+      { x: x + 0.25, y: y + 0.12, w: 5.5, h: 1.4 });
+  }
+  s.addNotes('Más respuestas en docs/exposicion/CHULETA_DE_RESPUESTAS.md y PREGUNTAS_DEL_JURADO.md.');
 
   await pres.writeFile({ fileName: SALIDA });
   await applyTheme(SALIDA, THEME);

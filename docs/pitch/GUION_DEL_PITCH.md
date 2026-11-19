@@ -1,7 +1,7 @@
 # Guion del pitch — VERTEX AI Pyme (5 minutos + 5 de demo + 5 de preguntas)
 
 > El PowerPoint trae **este mismo texto en las notas del orador** (en PowerPoint: **Presentación con diapositivas → Usar vista Moderador**, y lo ve solo quien presenta).
-> Las diapositivas se arman solas: los elementos aparecen uno tras otro, no hay que hacer clic dentro de cada diapositiva.
+> Diapositivas: **1 a 18 el pitch**, **19 a 23 la demo y las preguntas**, **24 a 31 anexos de apoyo**. Las diapositivas se arman solas: los elementos aparecen uno tras otro, no hay que hacer clic dentro de cada diapositiva.
 
 ## La idea del discurso
 
@@ -18,20 +18,20 @@ El orden es el de un buen discurso: **una persona → los números de Casanare �
 
 | Hermano | Diapositivas | Tiempo |
 |---|---|---|
-| **Ángel** (negocio) | 1 a 5 (historia y cifras), 14 a 16 (negocio e impacto), 19 y 20 (equipo y cierre) | unos 2:50 |
-| **Carlos** (procesos) | 6 a 9 (solución), 13 (marketing), 17 y 18 (piloto y legal) | unos 1:50 |
-| **José** (tecnología) | 12 (tecnología); 10 y 11 (video y demo, en los 5 minutos de demo) | unos 0:20 + la demo |
+| **Ángel** (negocio) | 1 a 5 (historia y cifras), 12 a 14 (negocio e impacto), 17 y 18 (equipo y cierre) | unos 2:50 |
+| **Carlos** (procesos) | 6 a 9 (solución), 11 (marketing), 15 y 16 (piloto y legal) | unos 1:50 |
+| **José** (tecnología) | 10 (tecnología); 19 a 22 (video, dinámica con QR, demo y arquitectura, en los 5 minutos de demo) | unos 0:20 + la demo |
 
 ## Cómo califica el jurado y dónde lo cubrimos
 
 | Criterio (peso) | Diapositivas | La frase que no puede faltar |
 |---|---|---|
-| **Tecnología (25)** | 6, 11 (demo), 12 | "Funciona en modo avión y sincroniza sin perder ni duplicar nada; 128 pruebas automáticas." |
-| **Emprendimiento (20)** | 2 a 5, 16, 17 | "En Casanare se abren casi 11 negocios al día y salen unos 13. Queremos que dejen de cerrar a ciegas." |
-| **Marketing (20)** | 1, 8, 13 | "Que ningún fiado se pierda. Llegamos por la Gobernación, los mayoristas y el voz a voz entre tenderos." |
-| **Financiera (20)** | 14, 15, 16 | "Gratis para la MiPyme; $19.900 al mes fuera del programa. Equilibrio con 78 tiendas." |
-| **Jurídica (15)** | 18 | "Ley 1581, la Gobernación encargada, el equipo dueño del código y licencia gratuita e indefinida." |
-| **Bonificación MiPyme TIC** | 1, 19 | "Respaldo de la Asociación Aerollano." |
+| **Tecnología (25)** | 6, 10, 21 (demo), 22 (arquitectura) | "Funciona en modo avión y sincroniza sin perder ni duplicar nada; 128 pruebas automáticas." |
+| **Emprendimiento (20)** | 2 a 5, 14, 15 | "En Casanare se abren casi 11 negocios al día y salen unos 13. Queremos que dejen de cerrar a ciegas." |
+| **Marketing (20)** | 1, 8, 11, 20 (dinámica con QR) | "Que ningún fiado se pierda. Llegamos por la Gobernación, los mayoristas y el voz a voz entre tenderos." |
+| **Financiera (20)** | 12, 13, 14 | "Gratis para la MiPyme; $19.900 al mes fuera del programa. Equilibrio con 78 tiendas." |
+| **Jurídica (15)** | 16 | "Ley 1581, la Gobernación encargada, el equipo dueño del código y licencia gratuita e indefinida." |
+| **Bonificación MiPyme TIC** | 1, 17 | "Respaldo de la Asociación Aerollano." |
 
 **Recuerden: "se califica lo que se demuestra".** Por eso la demo va en **modo avión**.
 
@@ -89,35 +89,35 @@ Todo funciona sin internet."
 **9 · Medios de pago · Carlos (2:45–2:55)**
 "Y el cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber."
 
-**12 · Tecnología · José (2:55–3:15)**
+**10 · Tecnología · José (2:55–3:15)**
 "¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android, Windows y la web. Todo se guarda primero en una base cifrada en el celular, y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada negocio solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío."
 
-**13 · Cómo llegamos a cada negocio · Carlos (3:15–3:35)**
+**11 · Cómo llegamos a cada negocio · Carlos (3:15–3:35)**
 "¿Cómo llegamos? Con un mensaje que cualquiera entiende: que ningún fiado se pierda. Empezamos por las tiendas de Trinidad y Yopal con más de 10 clientes debiendo. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda cada semana, con tenderos que recomiendan a otros tenderos, y con instalación en 20 minutos en el propio negocio.
 ¿Por qué nosotros y no una app gratuita? Porque las apps grandes sirven para todo el país; nosotros somos de aquí: funciona sin datos todo el día, dice desde cuándo le deben, y hay gente de Casanare que la instala y responde por WhatsApp."
 
-**14 · Modelo de negocio · Ángel (3:35–3:55)**
+**12 · Modelo de negocio · Ángel (3:35–3:55)**
 "Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 19.900 pesos al mes, menos que un fiado recuperado. Con 78 tiendas cubrimos los costos; con 300 quedan unos 3 millones al mes, y con mil, unos 11 millones."
 
-**15 · Con 100 tiendas · Ángel (3:55–4:05)**
+**13 · Con 100 tiendas · Ángel (3:55–4:05)**
 "Con 100 tiendas quedan unos 455 mil pesos al mes, y no se satura: cada negocio trabaja en su celular."
 
-**16 · Si 1.000 negocios de Casanare usan VERTEX · Ángel (4:05–4:20)**
+**14 · Si 1.000 negocios de Casanare usan VERTEX · Ángel (4:05–4:20)**
 "¿Y qué gana Casanare? Hagamos la cuenta con mil negocios, menos del cinco por ciento de los que hay registrados.
 - Si cada uno recupera apenas 50 mil pesos de fiado al mes, son 600 millones de pesos al año que se quedan en las familias de Casanare.
 - Si cada uno se ahorra media hora diaria de cuentas, son 150 mil horas para vender o para estar con sus hijos.
 - Y son mil negocios con sus números en orden para pedir un crédito de verdad, y no caer en el gota a gota."
 
-**17 · Piloto · Carlos (4:20–4:30)**
+**15 · Piloto · Carlos (4:20–4:30)**
 "Lo vamos a medir con un piloto de 8 semanas en 15 negocios de Trinidad y Yopal: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestos a pagar y cerrar un mayorista aliado."
 
-**18 · Legal · Carlos (4:30–4:40)**
+**16 · Legal · Carlos (4:30–4:40)**
 "Cumplimos la Ley 1581 con los formatos oficiales: la casilla viene sin marcar y cada cliente autoriza con el Anexo 3. La MiPyme es responsable de los datos y la Gobernación es encargada. El equipo conserva el código y la Gobernación recibe una licencia gratuita e indefinida."
 
-**19 · Somos de aquí · Ángel (4:40–4:45)**
+**17 · Somos de aquí · Ángel (4:40–4:45)**
 "Somos tres hermanos de Casanare. Crecimos viendo estos negocios por dentro. No venimos de afuera a explicarle a nadie su negocio: venimos a darle herramientas."
 
-**20 · Cierre · Ángel (4:45–5:00)**
+**18 · Cierre · Ángel (4:45–5:00)**
 (Despacio. Es el momento más importante.)
 "Doña Marta no necesita que le tengan lástima. Necesita herramientas.
 Que ningún fiado se pierda. Que ningún negocio cierre a ciegas. Que el que se atrevió a emprender en Casanare tenga la misma claridad que una gran empresa.
@@ -129,14 +129,20 @@ VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias."
 
 ## Los 5 minutos de demo · José
 
-**10 · Video de 30 segundos.** Hagan clic sobre el video para que empiece (tiene sonido). Mientras corre, José pone el celular en modo avión. Si el video no suena en el equipo del evento, sigan directo con la demo.
+**19 · Video (32 segundos, con música).** Clic sobre el video. Termina con el **código QR**: déjenlo en pantalla. Mientras corre, José pone su celular de la demo en modo avión.
 
-**11 · Demo en vivo, en modo avión.** Frase al empezar: *"Todo lo que van a ver funciona sin internet."*
-1. Venta de todo un poco (arroz, acetaminofén, sal mineralizada).
+**20 · Pruébala ya, todos juntos (unos 90 segundos).** El público escanea el QR y hace su primera venta. Guion completo, frase por frase, en `docs/exposicion/DINAMICA_EN_VIVO.md`.
+
+**21 · Demo en vivo, en modo avión.** Frase al empezar: *"Ahora lo que hace el dueño del negocio todos los días, y en modo avión."*
+1. Venta de todo un poco con pago dividido: Nequi y efectivo.
 2. Cliente nuevo desde la venta, con su cédula, y venta fiada.
 3. Cobro por WhatsApp con la cuenta de cobro en PDF.
 4. Pagos fijos: la luz vence pronto, se paga y queda como gasto.
 5. Quita el modo avión: la píldora dice **"Sincronizado"**.
+
+**22 · Cómo está construido el sistema.** Las cuatro capas en el celular (pantallas, reglas, base cifrada, cola de envío) y la nube (usuarios, PostgreSQL con reglas por negocio, IA desde el servidor).
+
+**23 · ¿Preguntas?** Queda en pantalla con el QR durante las preguntas. Para detalle técnico, los **anexos 24 a 31** (en PowerPoint: escriban el número y Enter).
 
 **Si sobra un minuto:**
 - **Llegó el pedido → «Una parte» (50 %)**: entra todo al inventario y el saldo aparece en **Lo que debo**. Frase: *"Así trabaja el tendero con el proveedor: paga la mitad y la otra mitad fiada."*
