@@ -2,7 +2,7 @@
 /// - Ventas, gastos y abonos: SOLO se agregan; nunca se editan ni se borran.
 ///   Si llega dos veces el mismo id, se ignora (sin duplicados).
 /// - Clientes: gana el cambio MÁS RECIENTE DE CADA CAMPO (nombre, teléfono,
-///   borrado). Si en un celular cambian el teléfono y en otro el nombre, se
+///   datos de identificación y correo, borrado). Si en un celular cambian el teléfono y en otro el nombre, se
 ///   conservan los dos cambios.
 ///
 /// La misma regla corre en el servidor (trigger `merge_cliente` en
@@ -23,7 +23,18 @@ class ClienteCampos {
   final bool deleted;
   final DateTime deletedTs;
 
-  const ClienteCampos({
+  /// Identificación (tipo y número de documento) y correo. Se mueven juntos
+  /// como un solo bloque «datos» con su propia marca de tiempo.
+  final String tipoDoc;
+  final String documento;
+  final String correo;
+  final DateTime datosTs;
+
+  /// Fecha para campos que no existían en versiones anteriores: cualquier
+  /// cambio real gana sobre ella al unir.
+  static final inicio = DateTime.utc(1970);
+
+  ClienteCampos({
     required this.id,
     required this.nombre,
     required this.nombreTs,
@@ -31,12 +42,17 @@ class ClienteCampos {
     required this.telefonoTs,
     required this.deleted,
     required this.deletedTs,
-  });
+    this.tipoDoc = 'CC',
+    this.documento = '',
+    this.correo = '',
+    DateTime? datosTs,
+  }) : datosTs = datosTs ?? inicio;
 
   DateTime get updatedAt {
     var m = nombreTs;
     if (telefonoTs.isAfter(m)) m = telefonoTs;
     if (deletedTs.isAfter(m)) m = deletedTs;
+    if (datosTs.isAfter(m)) m = datosTs;
     return m;
   }
 
@@ -45,6 +61,7 @@ class ClienteCampos {
     final n = otro.nombreTs.isAfter(nombreTs);
     final t = otro.telefonoTs.isAfter(telefonoTs);
     final d = otro.deletedTs.isAfter(deletedTs);
+    final x = otro.datosTs.isAfter(datosTs);
     return ClienteCampos(
       id: id,
       nombre: n ? otro.nombre : nombre,
@@ -53,8 +70,14 @@ class ClienteCampos {
       telefonoTs: t ? otro.telefonoTs : telefonoTs,
       deleted: d ? otro.deleted : deleted,
       deletedTs: d ? otro.deletedTs : deletedTs,
+      tipoDoc: x ? otro.tipoDoc : tipoDoc,
+      documento: x ? otro.documento : documento,
+      correo: x ? otro.correo : correo,
+      datosTs: x ? otro.datosTs : datosTs,
     );
   }
+
+  static DateTime _ts(Object? v) => v is String ? DateTime.parse(v) : inicio;
 
   /// Fila de la base local (deleted como 0/1, fechas como texto ISO UTC).
   factory ClienteCampos.fromLocal(Map<String, Object?> r) => ClienteCampos(
@@ -65,6 +88,10 @@ class ClienteCampos {
         telefonoTs: DateTime.parse(r['telefono_ts'] as String),
         deleted: (r['deleted'] as int? ?? 0) == 1,
         deletedTs: DateTime.parse(r['deleted_ts'] as String),
+        tipoDoc: (r['tipo_doc'] as String?) ?? 'CC',
+        documento: (r['documento'] as String?) ?? '',
+        correo: (r['correo'] as String?) ?? '',
+        datosTs: _ts(r['datos_ts']),
       );
 
   /// Fila que llega de Supabase (deleted como bool).
@@ -76,6 +103,10 @@ class ClienteCampos {
         telefonoTs: DateTime.parse(r['telefono_ts'] as String),
         deleted: r['deleted'] == true,
         deletedTs: DateTime.parse(r['deleted_ts'] as String),
+        tipoDoc: (r['tipo_doc'] as String?) ?? 'CC',
+        documento: (r['documento'] as String?) ?? '',
+        correo: (r['correo'] as String?) ?? '',
+        datosTs: _ts(r['datos_ts']),
       );
 
   Map<String, Object?> toLocalRow() => {
@@ -86,6 +117,10 @@ class ClienteCampos {
         'telefono_ts': isoUtc(telefonoTs),
         'deleted': deleted ? 1 : 0,
         'deleted_ts': isoUtc(deletedTs),
+        'tipo_doc': tipoDoc,
+        'documento': documento,
+        'correo': correo,
+        'datos_ts': isoUtc(datosTs),
         'updated_at': isoUtc(updatedAt),
       };
 
@@ -97,6 +132,10 @@ class ClienteCampos {
         'telefono_ts': isoUtc(telefonoTs),
         'deleted': deleted,
         'deleted_ts': isoUtc(deletedTs),
+        'tipo_doc': tipoDoc,
+        'documento': documento,
+        'correo': correo,
+        'datos_ts': isoUtc(datosTs),
         'updated_at': isoUtc(updatedAt),
       };
 }

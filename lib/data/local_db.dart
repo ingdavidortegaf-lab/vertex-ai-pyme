@@ -5,6 +5,8 @@ import 'abrir_base.dart' as base_abrir show abrirBase, esEscritorio;
 import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
 import '../domain/documentos.dart';
+import '../domain/identificacion.dart';
+import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
 import '../domain/resumen.dart';
@@ -41,6 +43,10 @@ class LocalDb {
   /// Cómo trabaja el negocio (respuestas del registro guiado). Las pantallas
   /// lo escuchan para adaptarse.
   final modo = ValueNotifier<ModoNegocio>(const ModoNegocio());
+
+  /// Tipo de negocio (licorera, droguería…): de ahí salen los ejemplos de
+  /// las casillas.
+  final tipoNegocio = ValueNotifier<String>('');
   void _avisar() => cambios.value++;
 
   /// En el PC (Windows) se usa SQLite por FFI en la carpeta privada de la
@@ -103,10 +109,11 @@ class LocalDb {
     await crearDocumentos(d);
     await agregarPagos(d);
     await crearCuentasPagar(d);
+    await agregarTerceros(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 7;
+  static const versionEsquema = 8;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
@@ -116,6 +123,39 @@ class LocalDb {
     if (viejo < 5) await crearDocumentos(d); // v5: archivo de documentos
     if (viejo < 6) await agregarPagos(d); // v6: medios de pago
     if (viejo < 7) await crearCuentasPagar(d); // v7: lo que se le debe a proveedores
+    if (viejo < 8) await agregarTerceros(d); // v8: documentos, correo, terceros y pagos fijos
+  }
+
+  /// v8: identificación y correo de clientes y terceros (proveedores,
+  /// arrendador, empresas de servicios, empleados), a quién se le pagó cada
+  /// gasto, y los pagos fijos del mes (arriendo, luz, internet…).
+  static Future<void> agregarTerceros(Database d) async {
+    const inicio = '1970-01-01T00:00:00.000Z';
+    await d.execute("ALTER TABLE clientes ADD COLUMN tipo_doc TEXT NOT NULL DEFAULT 'CC'");
+    await d.execute("ALTER TABLE clientes ADD COLUMN documento TEXT NOT NULL DEFAULT ''");
+    await d.execute("ALTER TABLE clientes ADD COLUMN correo TEXT NOT NULL DEFAULT ''");
+    await d.execute("ALTER TABLE clientes ADD COLUMN datos_ts TEXT NOT NULL DEFAULT '$inicio'");
+    await d.execute("ALTER TABLE proveedores ADD COLUMN tipo_doc TEXT NOT NULL DEFAULT 'NIT'");
+    await d.execute("ALTER TABLE proveedores ADD COLUMN documento TEXT NOT NULL DEFAULT ''");
+    await d.execute("ALTER TABLE proveedores ADD COLUMN correo TEXT NOT NULL DEFAULT ''");
+    await d.execute("ALTER TABLE proveedores ADD COLUMN clase TEXT NOT NULL DEFAULT 'proveedor'");
+    await d.execute('ALTER TABLE ventas ADD COLUMN tercero_id TEXT');
+    await d.execute('''CREATE TABLE pagos_fijos(
+      id TEXT PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      monto REAL NOT NULL DEFAULT 0,
+      dia INTEGER NOT NULL CHECK (dia BETWEEN 1 AND 31),
+      tercero_id TEXT,
+      activo INTEGER NOT NULL DEFAULT 1,
+      creado TEXT NOT NULL)''');
+    await d.execute('''CREATE TABLE pagos_fijos_hechos(
+      id TEXT PRIMARY KEY,
+      fijo_id TEXT NOT NULL REFERENCES pagos_fijos(id),
+      periodo TEXT NOT NULL,
+      monto REAL NOT NULL CHECK (monto > 0),
+      egreso_id TEXT,
+      fecha TEXT NOT NULL)''');
+    await d.execute('CREATE INDEX pagos_fijos_hechos_idx ON pagos_fijos_hechos(fijo_id, periodo)');
   }
 
   /// v7: cuentas por pagar a proveedores (la tienda paga una parte del
@@ -248,7 +288,12 @@ class LocalDb {
     return r.isEmpty ? null : r.first['valor'] as String;
   }
 
-  Future<void> setAjuste(String clave, String valor) => db.insert(
+  Future<void> setAjuste(String clave, String valor) {
+    if (clave == 'negocio_tipo') tipoNegocio.value = valor;
+    return _guardarAjuste(clave, valor);
+  }
+
+  Future<void> _guardarAjuste(String clave, String valor) => db.insert(
       'ajustes', {'clave': clave, 'valor': valor},
       conflictAlgorithm: ConflictAlgorithm.replace);
 
@@ -350,7 +395,7 @@ class LocalDb {
   /// Crea o edita. En una edición solo cambia la marca de tiempo de los
   /// campos que realmente cambiaron (conflictos por campo).
   Future<String> saveCliente(String nombre, String telefono,
-      {String? id}) async {
+      {String? id, String? tipoDoc, String? documento, String? correo}) async {
     final cid = id ?? newId();
     final ts = _ahora();
     var cambio = false;
@@ -367,6 +412,10 @@ class LocalDb {
           'telefono_ts': ts,
           'deleted': 0,
           'deleted_ts': ts,
+          'tipo_doc': tipoDoc ?? 'CC',
+          'documento': documento ?? '',
+          'correo': correo ?? '',
+          'datos_ts': ts,
           'updated_at': ts,
           'sync': 'pendiente',
         };
@@ -381,6 +430,16 @@ class LocalDb {
         if (row['telefono'] != telefono) {
           row['telefono'] = telefono;
           row['telefono_ts'] = ts;
+          cambio = true;
+        }
+        final datos = {
+          if (tipoDoc != null) 'tipo_doc': tipoDoc,
+          if (documento != null) 'documento': documento,
+          if (correo != null) 'correo': correo,
+        };
+        if (datos.entries.any((e) => row[e.key] != e.value)) {
+          row.addAll(datos);
+          row['datos_ts'] = ts;
           cambio = true;
         }
         if (!cambio) return;
@@ -420,7 +479,8 @@ class LocalDb {
 
   /// Clientes activos con su saldo pendiente.
   Future<List<Map<String, Object?>>> clientes() => db.rawQuery(
-      'SELECT c.id, c.nombre, c.telefono, c.sync, $_saldoSql AS saldo '
+      'SELECT c.id, c.nombre, c.telefono, c.tipo_doc, c.documento, c.correo, c.sync, '
+      '$_saldoSql AS saldo '
       'FROM clientes c WHERE c.deleted = 0 ORDER BY c.nombre COLLATE NOCASE');
 
   /// Compras de cada cliente (cuántas, cuánto, primera y última) para el
@@ -460,8 +520,8 @@ class LocalDb {
 
   Future<Map<String, Object?>?> cliente(String id) async {
     final r = await db.rawQuery(
-        'SELECT c.id, c.nombre, c.telefono, c.sync, c.deleted, '
-        '$_saldoSql AS saldo FROM clientes c WHERE c.id = ?',
+        'SELECT c.id, c.nombre, c.telefono, c.tipo_doc, c.documento, c.correo, '
+        'c.sync, c.deleted, $_saldoSql AS saldo FROM clientes c WHERE c.id = ?',
         [id]);
     return r.isEmpty ? null : r.first;
   }
@@ -483,6 +543,7 @@ class LocalDb {
       {String tipo = 'ingreso',
       bool credito = false,
       String? clienteId,
+      String? terceroId,
       List<Pago>? pagos}) async {
     if (!tiposMovimiento.contains(tipo)) throw ArgumentError('tipo');
     if (!monto.isFinite || monto <= 0) throw ArgumentError('monto');
@@ -506,6 +567,8 @@ class LocalDb {
       await t.insert('ventas', {
         ...row,
         'pagos': medios == null ? null : codificarPagos(medios),
+        // A quién se le pagó el gasto: solo en este dispositivo.
+        if (tipo == 'egreso' && terceroId != null) 'tercero_id': terceroId,
         'sync': 'pendiente'
       });
       await _enqueue(t, 'ventas', id, {
@@ -797,6 +860,7 @@ class LocalDb {
     final m = ModoNegocio.deAjustes(
         {for (final x in r) x['clave'] as String: x['valor'] as String?});
     modo.value = m;
+    tipoNegocio.value = await ajuste('negocio_tipo') ?? '';
     return m;
   }
 
@@ -865,14 +929,42 @@ class LocalDb {
     return [LineaDoc(v['concepto'] as String, 1, _dbl(v['monto']))];
   }
 
-  Future<List<Map<String, Object?>>> proveedores() =>
-      db.query('proveedores', orderBy: 'nombre COLLATE NOCASE');
+  /// Proveedores y demás terceros (arrendador, servicios, empleados), con
+  /// lo que se les debe y lo que se les ha pagado en gastos.
+  Future<List<Map<String, Object?>>> proveedores({String? clase}) => db.rawQuery(
+      'SELECT p.*, '
+      'COALESCE((SELECT SUM(c.total - COALESCE((SELECT SUM(x.monto) FROM pagos_proveedor x '
+      'WHERE x.cuenta_id = c.id), 0)) FROM cuentas_pagar c WHERE c.proveedor_id = p.id), 0) AS debo, '
+      "COALESCE((SELECT SUM(v.monto) FROM ventas v WHERE v.tercero_id = p.id AND v.tipo = 'egreso'), 0) AS pagado "
+      'FROM proveedores p ${clase == null ? '' : 'WHERE p.clase = ? '}'
+      'ORDER BY p.nombre COLLATE NOCASE',
+      [if (clase != null) clase]);
 
-  Future<String> saveProveedor(String nombre, String telefono, {String? id}) async {
+  Future<Map<String, Object?>?> proveedor(String id) async {
+    final r = await db.query('proveedores', where: 'id = ?', whereArgs: [id]);
+    return r.isEmpty ? null : r.first;
+  }
+
+  Future<String> saveProveedor(String nombre, String telefono,
+      {String? id,
+      String tipoDoc = 'NIT',
+      String documento = '',
+      String correo = '',
+      String clase = 'proveedor'}) async {
     final pid = id ?? newId();
+    final prev = id == null ? null : await proveedor(id);
     await db.insert(
         'proveedores',
-        {'id': pid, 'nombre': nombre.trim(), 'telefono': telefono, 'creado': _ahora()},
+        {
+          'id': pid,
+          'nombre': nombre.trim(),
+          'telefono': telefono,
+          'tipo_doc': tipoDoc,
+          'documento': documento,
+          'correo': correo,
+          'clase': clasesTercero.containsKey(clase) ? clase : 'otro',
+          'creado': prev?['creado'] ?? _ahora(),
+        },
         conflictAlgorithm: ConflictAlgorithm.replace);
     _avisar();
     return pid;
@@ -881,6 +973,104 @@ class LocalDb {
   Future<void> deleteProveedor(String id) async {
     await db.delete('proveedores', where: 'id = ?', whereArgs: [id]);
     _avisar();
+  }
+
+  // ------------------------------------------------------------ pagos fijos
+  /// Pagos fijos activos con el último periodo pagado.
+  Future<List<PagoFijo>> pagosFijos() async {
+    final hoy = periodoDe(reloj());
+    final r = await db.rawQuery(
+        'SELECT f.*, p.nombre AS tercero_nombre, '
+        '(SELECT MAX(h.periodo) FROM pagos_fijos_hechos h WHERE h.fijo_id = f.id) AS ultimo, '
+        '(SELECT COALESCE(SUM(h.monto), 0) FROM pagos_fijos_hechos h '
+        'WHERE h.fijo_id = f.id AND h.periodo = ?) AS este_mes '
+        'FROM pagos_fijos f LEFT JOIN proveedores p ON p.id = f.tercero_id '
+        'WHERE f.activo = 1 ORDER BY f.dia',
+        [hoy]);
+    return [
+      for (final x in r)
+        PagoFijo(
+          id: x['id'] as String,
+          nombre: x['nombre'] as String,
+          monto: _dbl(x['monto']),
+          dia: (x['dia'] as num).toInt(),
+          terceroId: x['tercero_id'] as String?,
+          terceroNombre: x['tercero_nombre'] as String?,
+          ultimoPeriodo: x['ultimo'] as String?,
+          pagadoEsteMes: _dbl(x['este_mes']),
+        )
+    ];
+  }
+
+  Future<String> saveFijo(String nombre, double monto, int dia,
+      {String? id, String? terceroId}) async {
+    final n = nombre.trim();
+    if (n.isEmpty) throw ArgumentError('nombre');
+    if (dia < 1 || dia > 31) throw ArgumentError('dia');
+    if (!monto.isFinite || monto < 0) throw ArgumentError('monto');
+    final fid = id ?? newId();
+    final prev = await db.query('pagos_fijos', where: 'id = ?', whereArgs: [fid]);
+    await db.insert(
+        'pagos_fijos',
+        {
+          'id': fid,
+          'nombre': n.length > 80 ? n.substring(0, 80) : n,
+          'monto': monto,
+          'dia': dia,
+          'tercero_id': terceroId,
+          'activo': 1,
+          'creado': prev.isEmpty ? _ahora() : prev.first['creado'],
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    _avisar();
+    return fid;
+  }
+
+  /// Se deja de usar (los pagos hechos se conservan en la historia).
+  Future<void> deleteFijo(String id) async {
+    await db.update('pagos_fijos', {'activo': 0}, where: 'id = ?', whereArgs: [id]);
+    _avisar();
+  }
+
+  /// Pagar un pago fijo de este mes: queda como gasto (se sincroniza) con
+  /// su medio de pago y a quién se le pagó.
+  Future<String> pagarFijo(String fijoId, double monto, List<Pago> pagos) async {
+    final r = await db.query('pagos_fijos', where: 'id = ?', whereArgs: [fijoId]);
+    if (r.isEmpty) throw ArgumentError('fijo');
+    if (!monto.isFinite || monto <= 0) throw ArgumentError('monto');
+    final f = r.first;
+    final medios = _pagosDe('egreso', false, monto, pagos)!;
+    final ahora = reloj();
+    final id = newId();
+    await db.transaction((t) async {
+      final row = <String, Object?>{
+        'id': id,
+        'cliente_id': null,
+        'concepto': conceptoFijo(f['nombre'] as String, ahora),
+        'monto': monto,
+        'tipo': 'egreso',
+        'credito': 0,
+        'fecha': _ahora(),
+      };
+      await t.insert('ventas', {
+        ...row,
+        'pagos': codificarPagos(medios),
+        'tercero_id': f['tercero_id'],
+        'sync': 'pendiente'
+      });
+      await _enqueue(t, 'ventas', id,
+          {...row, 'credito': false, 'pagos': medios.map((p) => p.aMapa()).toList()});
+      await t.insert('pagos_fijos_hechos', {
+        'id': newId(),
+        'fijo_id': fijoId,
+        'periodo': periodoDe(ahora),
+        'monto': monto,
+        'egreso_id': id,
+        'fecha': _ahora(),
+      });
+    });
+    _avisar();
+    return id;
   }
 
   /// Llegó la mercancía: entrada de inventario por cada producto y, si se
@@ -1402,7 +1592,9 @@ class LocalDb {
         'proveedores',
         'documentos',
         'pagos_proveedor',
-        'cuentas_pagar'
+        'cuentas_pagar',
+        'pagos_fijos_hechos',
+        'pagos_fijos'
       ]) {
         await t.delete(tabla);
       }
