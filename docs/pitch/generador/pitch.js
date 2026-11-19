@@ -111,7 +111,7 @@ function palotes(s, x, y, color, nombre) {
     { x: 0.7, y: 6.6, w: 7, h: 0.4, fontSize: 13, color: C.accent5 });
   telefono(s, 'cartera', 9.55, 1.05, 5.7, 7, 'tel_atras');
   telefono(s, 'inicio', 7.75, 0.75, 6.0, -5, 'tel_frente');
-  s.addNotes('[ÁNGEL · 0:00 – 0:10] (Pausa. Miren al jurado antes de hablar.) Buenos días. Antes de hablarles de tecnología, quiero hablarles de una persona.');
+  s.addNotes('[DAVID · 0:00 – 0:20]\n(Entre al centro. Tres segundos de silencio mirando al público. Nadie habla.)\nLevante la mano quien alguna vez le haya fiado algo a un vecino… o quien tenga en la familia una tienda, una peluquería, un taller, un puesto en la plaza. (Levante usted la mano primero. Espere.)\nCasi todos. Porque en Casanare todos venimos de alguien que se atrevió.\nSoy José David Ortega. Con mis hermanos Carlos y Ángel no venimos a hablarles de una aplicación. Venimos a hablarles de esa gente.');
 
   // ============================================================ 2 LA HISTORIA
   pres.addSection({ title: 'La historia' });
@@ -139,7 +139,7 @@ function palotes(s, x, y, color, nombre) {
     { x: 0.6, y: 6.15, w: 11, h: 0.4, fontSize: 13, italic: true, color: C.accent5, objectName: 'hnota' });
   gh.push(['hnota']);
   animar.push({ slide: nSlide, grupos: gh });
-  s.addNotes('[ÁNGEL · 0:10 – 0:45] (Despacio, como contando algo que les pasó a ustedes.) Son las 5:30 de la mañana en Trinidad. Doña Marta sube la persiana de su tienda. Lleva 18 años detrás del mismo mostrador. Le fía al vecino, al productor que paga en cosecha, a la familia que llegó sin nada. Todo lo anota en un cuaderno; ya va por la tercera libreta. Un día un aguacero le mojó una página, y con esa página se fue más de un millón de pesos que nadie le volvió a pagar. (Pausa.) No fue por mala gente. Fue porque nadie se acordaba de cuánto debía.\n\nNOTA: Doña Marta es un personaje que reúne lo que viven muchos tenderos. Si ustedes conocen un caso real (un familiar, un vecino), cuéntenlo con su nombre y su pueblo: pega más. No digan que es real si no lo es.');
+  s.addNotes('[DAVID · 0:20 – 0:50]\n(Más despacio. Como si lo hubiera visto con sus ojos.)\nSon las cinco y media de la mañana en Trinidad. Doña Marta sube la persiana de su tienda, como hace 18 años.\nLe fía al vecino, al productor que paga en cosecha, a la familia que llegó sin nada. Todo va en un cuaderno.\nUn día, un aguacero le mojó una página. Y con esa página se fue más de un millón de pesos.\n(Pausa.) No fue por mala gente. Fue porque nadie se acordaba de cuánto debía.');
 
   // ============================================================ 3 CASANARE EMPRENDE
   pres.addSection({ title: 'El problema' });
@@ -164,7 +164,7 @@ function palotes(s, x, y, color, nombre) {
   texto(s, 'Fuente: Cámara de Comercio de Casanare, Informe Estudio Económico 2025 (30 de enero de 2026), con datos del Registro Mercantil (RUES).',
     { x: 0.6, y: 6.35, w: 11.5, h: 0.5, fontSize: 11, color: C.accent5 });
   animar.push({ slide: nSlide, grupos: g3 });
-  s.addNotes('[ÁNGEL · 0:45 – 1:05] Doña Marta no está sola. En Casanare hay 21.613 empresas registradas, y 96 de cada 100 son microempresas. En casi todas trabajan entre una y cuatro personas: el dueño, la esposa, el hijo. Y cada día se abren casi 11 negocios nuevos. Casanare es tierra de gente que se atreve. Detrás de cada número hay una familia que puso sus ahorros y su nombre en un negocio.');
+  s.addNotes('[DAVID · 0:50 – 1:05]\n(Con orgullo, subiendo la voz.)\nY Doña Marta no está sola. En Casanare hay 21.613 empresas, y 96 de cada 100 son microempresas: la mamá, el papá y el hijo detrás del mostrador.\nCada día se abren casi 11 negocios nuevos. Esta es tierra de gente berraca, que madruga y se le mide.');
 
   // ============================================================ 4 CIERRAN A CIEGAS
   s = nueva('CONTENIDO', 'El problema');
@@ -184,7 +184,7 @@ function palotes(s, x, y, color, nombre) {
   texto(s, 'Fuentes: Cámara de Comercio de Casanare, Informe 2025 (incluye cancelaciones y matrículas no renovadas). DANE, Encuesta de Micronegocios (EMICRON) 2024, total nacional; la muestra del DANE no incluye a Casanare.',
     { x: 0.6, y: 6.5, w: 12.1, h: 0.45, fontSize: 10, color: C.accent1 });
   animar.push({ slide: nSlide, grupos: gc });
-  s.addNotes('[ÁNGEL · 1:05 – 1:25] Pero hay otra cara. Entre 2016 y 2025 salieron del registro en Casanare 46.318 negocios: unos 13 cada día. Y casi todos eran de una a cuatro personas. ¿Por qué? En el país, 95 de cada 100 micronegocios no llevan contabilidad formal: la mayoría no anota nada, y el resto, en un cuaderno. Casi uno de cada cuatro que pidió plata prestada terminó en el gota a gota. (Pausa.) No cierran por falta de ganas. Cierran a ciegas: sin saber cuánto ganan, cuánto les deben ni cuánto deben.\n\nSi preguntan: el 46.318 es de la Cámara de Comercio de Casanare e incluye cancelaciones y matrículas no renovadas. Las cifras de contabilidad, gota a gota e internet son del DANE (EMICRON 2024) para el país; el DANE no encuesta a Casanare en esa muestra.');
+  s.addNotes('[DAVID · 1:05 – 1:25]\n(Baje el tono. Serio.)\nPero también cada día salen unos 13. En diez años, 46.318 negocios dejaron el registro en Casanare.\nY no por falta de ganas. En el país, 95 de cada 100 micronegocios no llevan contabilidad formal, y casi uno de cada cuatro que necesitó plata terminó en el gota a gota.\nNo cierran por perezosos. Cierran a ciegas. (Pausa.) Carlos les cuenta quiénes son.');
 
   // ============================================================ 5 QUIENES SON
   s = nueva('CONTENIDO', 'El problema');
@@ -213,7 +213,7 @@ function palotes(s, x, y, color, nombre) {
   texto(s, 'Fuente: DANE, EMICRON 2024 (total nacional) y boletín de panaderías y tiendas de barrio (mayo de 2026).',
     { x: 0.6, y: 6.55, w: 12, h: 0.4, fontSize: 10, color: C.accent1 });
   animar.push({ slide: nSlide, grupos: g5 });
-  s.addNotes('[ÁNGEL · 1:25 – 1:45] ¿Quiénes son? Son la tendera de Trinidad, la peluquera de Yopal, el mecánico de Aguazul, la licorera de Paz de Ariporo, el restaurante de carretera, la contadora que trabaja por su cuenta. Seis de cada diez tiendas de barrio las sostiene una mujer. Y más de un tercio emprendió porque no tenía otra forma de ganarse la vida. (Mirando al jurado.) Para ellos emprender no fue un plan B. Fue la única puerta abierta. Y nosotros queremos que esa puerta no se les cierre.');
+  s.addNotes('[CARLOS · 1:25 – 1:45]\nSon la tendera de Trinidad, la peluquera de Yopal, el mecánico de Aguazul, la licorera de Paz de Ariporo, el restaurante de carretera, la contadora que trabaja por su cuenta.\nSeis de cada diez tiendas de barrio las sostiene una mujer. Y más de un tercio emprendió porque no tenía otra forma de ganarse la vida.\n(Mirando al jurado.) Para ellos emprender no fue un plan B. Fue la única puerta abierta.');
 
   // ============================================================ 6 LA SOLUCION
   pres.addSection({ title: 'Solución' });
@@ -237,7 +237,7 @@ function palotes(s, x, y, color, nombre) {
     g6.push([`sol${i}`, `sol${i}t`, `sol${i}b`]);
   });
   animar.push({ slide: nSlide, grupos: g6 });
-  s.addNotes('[CARLOS · 1:45 – 2:05] Por eso creamos VERTEX AI Pyme. No es una app más: es devolverle el control al que se atrevió. Con VERTEX ningún fiado se pierde: sabe quién le debe, cuánto y desde cuándo. Sabe cuánto ganó hoy. Tiene a sus clientes con cédula o NIT, celular y correo. Y tiene los papeles en orden: le avisa antes de que venza el arriendo o la luz, y le entrega el informe al contador. Todo funciona sin internet.');
+  s.addNotes('[CARLOS · 1:45 – 2:00]\nPor eso creamos VERTEX AI Pyme: para devolverle el control al que se atrevió.\nNingún fiado se pierde. Sabe cuánto ganó hoy. Tiene sus clientes con cédula o NIT. Y le avisa antes de que venza el arriendo o la luz.\nTodo, sin internet.');
 
   // ============================================================ 7 UN DIA
   s = nueva('CONTENIDO', 'Solución');
@@ -268,7 +268,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.9, y: 5.55, w: 11.6, h: 0.95, fontSize: 17, color: C.text2, valign: 'middle', objectName: 'd_rest' });
   g7.push(['d_res', 'd_rest']);
   animar.push({ slide: nSlide, grupos: g7 });
-  s.addNotes('[CARLOS · 2:05 – 2:30] Así es un día de Doña Marta con VERTEX. A las 6:30 abre sin datos y vende. A las 10 llega don Pedro, el productor de la vereda, a fiar purina; si es cliente nuevo, lo registra ahí mismo con su cédula, sin salir de la venta. A las 3, el celular le avisa que mañana vence la luz y que se agotó la sal. A las 6 cobra sin pena, con una cuenta de cobro que dice que le deben desde agosto. Y el lunes le manda el informe al contador. (Pausa.) Por primera vez en 18 años, Doña Marta se acuesta sabiendo cuánto ganó, quién le debe y qué tiene que pagar mañana.');
+  s.addNotes('[CARLOS · 2:00 – 2:20]\nAsí cambia el día de Doña Marta. Abre sin datos y vende. Llega don Pedro a fiar purina: si es nuevo, lo registra ahí mismo con su cédula. En la tarde el celular le avisa que mañana vence la luz. Y en la noche cobra sin pena, con un PDF.\n(Pausa.) Por primera vez en 18 años, Doña Marta se acuesta sabiendo cuánto ganó.');
 
   // ============================================================ 8 CUALQUIER NEGOCIO
   s = nueva('CONTENIDO', 'Solución');
@@ -296,7 +296,7 @@ function palotes(s, x, y, color, nombre) {
   telefono(s, 'registro3', 10.75, 1.5, 5.2, 3, 'ng_tel2');
   g8n.push(['ng_tel1'], ['ng_tel2']);
   animar.push({ slide: nSlide, grupos: g8n });
-  s.addNotes('[CARLOS · 2:30 – 2:45] Y no es solo para tiendas. Sirve para la licorera, la droguería, la peluquería, el que hace carreras en moto, la profesional que cobra por horas y el agro que le fía al productor. Son 22 tipos de negocio. La app pregunta cómo trabaja cada uno y se adapta: hasta los ejemplos de cada casilla hablan el idioma de su negocio.');
+  s.addNotes('[CARLOS · 2:20 – 2:30]\nY no es solo para tiendas: licorera, droguería, peluquería, transporte, el profesional que cobra por horas, el agro. Veintidós tipos de negocio. La app aprende cómo trabaja cada uno y le habla en su idioma.');
 
   // ============================================================ 6b PAGOS
   s = nueva('CONTENIDO', 'Solución');
@@ -316,7 +316,7 @@ function palotes(s, x, y, color, nombre) {
   telefono(s, 'cobro_dividido', 7.55, 1.3, 5.45, -2, 'mp_tel1');
   telefono(s, 'cierre', 10.15, 1.45, 5.3, 3, 'mp_tel2');
   animar.push({ slide: nSlide, grupos: [...gp, ['mp_tel1'], ['mp_tel2'], ['mp_nota']] });
-  s.addNotes('[CARLOS · 2:45 – 2:55] Y el cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber.');
+  s.addNotes('[CARLOS · 2:30 – 2:40]\nY el cliente paga como quiera: efectivo, Nequi, Daviplata o tarjeta, y hasta mitad y mitad. Al final del día, la caja cuadra sola.\n(Pase la palabra.) ¿Y cómo funciona sin señal? David.');
 
   // ============================================================ 8 TECNOLOGIA
   pres.addSection({ title: 'Tecnología' });
@@ -354,7 +354,7 @@ function palotes(s, x, y, color, nombre) {
     g8b.push([`m${i}n`, `m${i}l`]);
   });
   animar.push({ slide: nSlide, grupos: [g8[0], ['fl1'], g8[1], ['fl2'], g8[2], ['fl3', 'fl3t'], g8[3], ...g8b] });
-  s.addNotes('[JOSÉ · 2:55 – 3:15] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío.');
+  s.addNotes('[DAVID · 2:40 – 2:55]\nLo construimos pensando en la vereda, donde no hay señal. Todo se guarda primero en el celular, cifrado, y cuando vuelve internet sube solo a la nube, sin perder ni duplicar nada. En la nube, cada negocio ve solo lo suyo.\nY no se lo pedimos creer: tiene 128 pruebas automáticas, incluida una que le corta el internet a mitad del envío.\n(Pase la palabra.) Ángel les cuenta cómo llegamos a cada negocio.');
 
   // ============================================================ 9 MERCADO
   pres.addSection({ title: 'Mercado' });
@@ -384,7 +384,7 @@ function palotes(s, x, y, color, nombre) {
     g10[g10.length - 1].push(`can${i}x`, `can${i}y`);
   }
   animar.push({ slide: nSlide, grupos: g10 });
-  s.addNotes('[CARLOS · 3:15 – 3:35] ¿Cómo llegamos a cada negocio? Con un mensaje que cualquiera entiende: que ningún fiado se pierda. Empezamos por las tiendas de Trinidad y Yopal con más de 10 clientes debiendo. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda cada semana, con tenderos que recomiendan a otros tenderos, y con instalación en 20 minutos en el propio negocio. ¿Por qué nosotros y no una app gratuita? Porque las apps grandes sirven para todo el país; nosotros somos de aquí: funciona sin datos todo el día, dice desde cuándo le deben, y hay gente de Casanare que la instala y responde por WhatsApp.');
+  s.addNotes('[ÁNGEL · 2:55 – 3:15]\nNuestro mensaje cabe en una frase: que ningún fiado se pierda.\nEmpezamos por las tiendas de Trinidad y Yopal con más de diez clientes debiendo. Llegamos con la Gobernación, con los mayoristas y preventistas que ya visitan cada tienda cada semana, con tenderos que recomiendan a otros tenderos, y la instalamos en 20 minutos en el propio negocio.\nLas apps grandes son para todo el país. Nosotros somos de aquí.');
 
   // ============================================================ 11 NEGOCIO
   pres.addSection({ title: 'Negocio' });
@@ -422,7 +422,7 @@ function palotes(s, x, y, color, nombre) {
     { text: 'La tecnología cuesta unos $135.000 al mes y casi no sube; lo que crece es el soporte. El plan cuesta menos que un fiado recuperado.', options: { fontSize: 13, color: C.background1 } },
   ], { x: 7.85, y: 5.3, w: 4.65, h: 1.3, fontSize: 15, valign: 'middle', objectName: 'cuentat' });
   animar.push({ slide: nSlide, grupos: [...g11, ['graf_ing'], ['cuenta', 'cuentat']] });
-  s.addNotes('[ÁNGEL · 3:35 – 3:55] Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 19.900 pesos al mes o 199.000 al año, menos que un fiado recuperado. Con 78 tiendas cubrimos los costos; con 300 quedan unos 3 millones al mes y con mil, unos 11 millones. La tecnología casi no cuesta: lo que crece es el soporte.');
+  s.addNotes('[ÁNGEL · 3:15 – 3:30]\nPara las MiPymes de Casanare es gratis: la opera la Gobernación. Fuera del programa, 19.900 pesos al mes, menos de lo que vale un solo fiado recuperado. Con 78 tiendas cubrimos los costos.');
 
   // ============================================================ 11b 100 TIENDAS
   s = nueva('CONTENIDO', 'Negocio');
@@ -456,7 +456,7 @@ function palotes(s, x, y, color, nombre) {
     { text: 'Para crecer, una base más grande: cambio de plan, no de código.', options: { bullet: true } },
   ], { x: 7.85, y: 1.75, w: 4.65, h: 4.6, fontSize: 15, color: C.background1, paraSpaceAfter: 8, objectName: 'capt' });
   animar.push({ slide: nSlide, grupos: [['t100'], ['t100n'], ['cap', 'capt']] });
-  s.addNotes('[ÁNGEL · 3:55 – 4:05] Con 100 tiendas entran casi 2 millones al mes; la nube cuesta 135 mil y el soporte 1,4 millones: quedan unos 455 mil. Y no se satura: cada tienda trabaja en su celular, 100 tiendas generan unos 216 megas al mes y la app consulta la nube 10 veces menos cuando no hay cambios.');
+  s.addNotes('[ÁNGEL · 3:30 – 3:40]\nCon 100 tiendas ya quedan unos 455 mil pesos al mes, y el sistema no se satura: cada negocio trabaja en su propio celular.');
 
   // ============================================================ 11c IMPACTO
   pres.addSection({ title: 'Impacto' });
@@ -478,7 +478,7 @@ function palotes(s, x, y, color, nombre) {
   texto(s, 'Escenario a validar en el piloto, no un resultado: 1.000 negocios × $50.000 × 12 meses; 1.000 × 30 minutos × 300 días.',
     { x: 0.6, y: 6.35, w: 12, h: 0.45, fontSize: 11, color: C.accent5 });
   animar.push({ slide: nSlide, grupos: gi });
-  s.addNotes('[ÁNGEL · 4:05 – 4:20] ¿Y qué gana Casanare? Hagamos la cuenta con mil negocios, menos del cinco por ciento de los que hay registrados. Si cada uno recupera apenas 50 mil pesos de fiado al mes, son 600 millones de pesos al año que se quedan en las familias de Casanare. Si cada uno se ahorra media hora diaria de cuentas, son 150 mil horas para vender o para estar con sus hijos. Y son mil negocios con sus números en orden para pedir un crédito de verdad, y no caer en el gota a gota.\n\nSi preguntan: es un escenario que vamos a medir en el piloto, no un resultado.');
+  s.addNotes('[ÁNGEL · 3:40 – 3:55]\nAhora, lo que de verdad importa: ¿qué gana Casanare? Con apenas mil negocios, menos del cinco por ciento: si cada uno recupera 50 mil pesos de fiado al mes, son 600 millones al año que se quedan en las familias de Casanare. Y 150 mil horas para vender… o para estar con los hijos.');
 
   // ============================================================ 12 VALIDACION
   s = nueva('CONTENIDO', 'Negocio');
@@ -516,7 +516,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 8.85, y: 4.15, w: 3.7, h: 2.25, fontSize: 14, color: C.background1, paraSpaceAfter: 4, objectName: 'rutat' });
   g12.push(['ruta', 'rutat']);
   animar.push({ slide: nSlide, grupos: g12 });
-  s.addNotes('[CARLOS · 4:20 – 4:30] Lo vamos a validar con un piloto de 8 semanas en 15 tiendas de Trinidad y Yopal, con metas medibles: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestas a pagar y cerrar un mayorista aliado. Después: Google Play, facturación electrónica con un proveedor autorizado y la versión para iPhone.');
+  s.addNotes('[ÁNGEL · 3:55 – 4:05]\nLo vamos a medir: piloto de ocho semanas con 15 negocios de Trinidad y Yopal, con metas claras de uso y de pago.');
 
   // ============================================================ 13 LEGAL
   s = nueva('CONTENIDO', 'Negocio');
@@ -536,7 +536,7 @@ function palotes(s, x, y, color, nombre) {
     g13.push(await tarjetaIcono(s, { x, y, w: 3.9, h: 2.15, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `lg${i}` }));
   }
   animar.push({ slide: nSlide, grupos: g13 });
-  s.addNotes('[CARLOS · 4:30 – 4:40] En lo legal: cumplimos la Ley 1581 con los formatos oficiales de la convocatoria (casilla sin marcar con enlace visible a la política y Anexo 3 para cada cliente); la MiPyme es responsable y la Gobernación encargada; el equipo conserva la propiedad intelectual y la Gobernación recibe licencia gratuita e indefinida. Todo el software es libre y no prometemos lo que no es: no es factura electrónica.');
+  s.addNotes('[ÁNGEL · 4:05 – 4:15]\nY con las cuentas claras también en lo legal: cumplimos la Ley 1581, cada cliente autoriza sus datos, la MiPyme es responsable y la Gobernación encargada. El código es nuestro y la Gobernación tiene licencia gratuita para siempre.');
 
   // ============================================================ 14 EQUIPO
   pres.addSection({ title: 'Cierre' });
@@ -564,7 +564,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.9, y: 5.3, w: 11.6, h: 1.25, fontSize: 18, valign: 'middle', objectName: 'aerot' });
   g14.push(['aero', 'aerot']);
   animar.push({ slide: nSlide, grupos: g14 });
-  s.addNotes('[ÁNGEL · 4:40 – 4:45] Somos tres hermanos de Casanare. Crecimos viendo estos negocios por dentro. No venimos de afuera a explicarle a nadie su negocio: venimos a darle herramientas.');
+  s.addNotes('[ÁNGEL · 4:15 – 4:25]\nSomos tres hermanos de Casanare. Crecimos viendo estos negocios por dentro. No venimos de afuera a explicarle a nadie su negocio: venimos a darle herramientas.\n(Pase la palabra.) David.');
 
   // ============================================================ 15 CIERRE
   s = nueva('PORTADA', 'Cierre');
@@ -584,7 +584,7 @@ function palotes(s, x, y, color, nombre) {
     { text: 'contacto@vertextechco.online', options: { color: C.background2, bold: false } },
   ], { x: 0.7, y: 6.05, w: 11.9, h: 0.85, fontSize: 17, bold: true, color: C.accent5, objectName: 'c4' });
   animar.push({ slide: nSlide, grupos: [['c1'], ['c2'], ['c3'], ['c4']] });
-  s.addNotes('[ÁNGEL · 4:45 – 5:00] (Despacio. Es el momento más importante.) Doña Marta no necesita que le tengan lástima. Necesita herramientas. Que ningún fiado se pierda. Que ningún negocio cierre a ciegas. Que el que se atrevió a emprender en Casanare tenga la misma claridad que una gran empresa. Hoy les pedimos 15 negocios para el piloto, y que la Gobernación nos acompañe a llegar a todas las MiPymes del departamento. VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias. (Silencio de dos segundos antes de sentarse.)');
+  s.addNotes('[DAVID · 4:25 – 5:00]\n(Al centro. Despacio. Es el momento más importante: mire a los ojos al jurado.)\nDoña Marta no necesita que le tengan lástima. Necesita herramientas.\nQue ningún fiado se pierda. Que ningún negocio de Casanare cierre a ciegas. Que el que madrugó a emprender tenga la misma claridad que una gran empresa.\nHoy les pedimos dos cosas: 15 negocios para empezar el piloto, y que la Gobernación camine con nosotros hasta la última vereda del departamento.\n(Los tres juntos, en voz alta:) ¡Que ningún fiado se pierda!\n(David:) VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias. (Dos segundos de silencio.)');
 
   // ============================================================ 19 VIDEO (bloque de demo)
   pres.addSection({ title: 'Demo en vivo' });
@@ -592,7 +592,7 @@ function palotes(s, x, y, color, nombre) {
   s.addText('VERTEX en 30 segundos', { placeholder: 'title' });
   s.addMedia({ type: 'video', path: path.join(__dirname, '..', 'video', 'VERTEX_AI_Pyme_30s.mp4'), cover: POSTER,
     x: 1.67, y: 1.45, w: 10.0, h: 5.625, objectName: 'video30' });
-  s.addNotes('[JOSÉ · demo 0:00 – 0:32] Clic sobre el video para que empiece (32 segundos, con música). Termina con el código QR en pantalla: dejen que la gente lo escanee. Mientras corre, José pone su celular en modo avión. Si el video no arranca, pasen a la siguiente diapositiva: tiene el mismo QR.');
+  s.addNotes('[DAVID · demo 0:00 – 0:32]\n«Y ahora, véanlo.» Clic sobre el video (32 segundos, con música). Termina con el QR: déjenlo en pantalla. Mientras corre, David pone su celular de la demo en modo avión.');
 
   // ============================================================ 20 PRUEBALA YA (dinámica)
   s = nueva('OSCURA', 'Demo en vivo');
@@ -621,7 +621,7 @@ function palotes(s, x, y, color, nombre) {
   s.addImage({ path: path.join(__dirname, 'qr_limpio.png'), x: 8.7, y: 1.6, w: 3.75, h: 3.75, objectName: 'qr_img' });
   texto(s, 'Apunta la cámara aquí', { x: 8.45, y: 5.42, w: 4.25, h: 0.45, fontSize: 18, bold: true, color: C.text2, align: 'center', objectName: 'qr_t' });
   texto(s, 'ingdavidortegaf-lab.github.io/vertex-ai-pyme', { x: 8.45, y: 5.85, w: 4.25, h: 0.35, fontSize: 11, color: C.text1, align: 'center', objectName: 'qr_url' });
-  s.addNotes('[JOSÉ guía, CARLOS ayuda al público · demo 0:32 – 2:00]\n\nJOSÉ (con energía, mirando al público): «No nos crean a nosotros: saquen su celular. Apunten la cámara al código y toquen el enlace que aparece.» (Esperen 10 segundos: es el momento en que más gente se engancha.)\n\nJOSÉ, paso a paso, haciéndolo él mismo en el celular proyectado: «Toquen Aceptar y continuar. Escriban el nombre de su negocio, o uno inventado, y elijan qué tipo de negocio es… Toquen Siguiente, Siguiente… y Empezar a usar la app.»\n\nJOSÉ: «Ahora hagamos nuestra primera venta: toquen Venta, el botón +5.000 y Guardar venta.» (Pausa.) «¿Ven arriba? Hoy vendiste 5.000 pesos. Acaban de registrar su primera venta en 30 segundos, y sin internet funcionaría igual.»\n\nCARLOS: camina entre la gente y ayuda a quien se quede trabado. No se queden esperando a todos: cuando la mitad levante la mano, sigan con la demo.\n\nSi la red del lugar está lenta: «La primera vez descarga la app; después funciona sin señal.» Que la sigan probando mientras ustedes continúan.');
+  s.addNotes('[DAVID (Carlos ayuda entre la gente) · demo 0:32 – 2:00]\n«No nos crean a nosotros: saquen su celular y apunten la cámara al código.» (Diez segundos con una sonrisa.)\n«Toquen Aceptar y continuar. Escriban el nombre de su negocio, o uno inventado, y elijan su tipo… Siguiente, Siguiente… Empezar a usar la app.»\n«Ahora su primera venta: Venta, más cinco mil, Guardar.» (Pausa.) «¿Ven arriba? Hoy vendiste cinco mil pesos. Eso fue en 30 segundos, y sin internet funcionaría igual.»\nCarlos camina entre la gente y ayuda. Cuando la mitad lo logre, sigan. Si la red está lenta: «La primera vez descarga la app; después funciona sin señal.»');
 
   // ============================================================ 21 DEMO
   s = nueva('OSCURA', 'Demo en vivo');
@@ -643,7 +643,7 @@ function palotes(s, x, y, color, nombre) {
   });
   telefono(s, 'inicio_oscuro', 9.35, 0.85, 5.95, -3, 'demo_tel');
   animar.push({ slide: nSlide, grupos: g21 });
-  s.addNotes('[JOSÉ · demo 2:00 – 3:45] Frase al empezar: «Ahora lo que hace el dueño del negocio todos los días, y en modo avión.» Sigan los 5 pasos. Al final quiten el modo avión y muestren la píldora «Sincronizado». Si algo falla: «esto es software real, por eso falla en vivo», sonrían y sigan con la siguiente diapositiva. Nunca más de 10 segundos peleando con el celular.');
+  s.addNotes('[DAVID · demo 2:00 – 3:45]\n«Ahora lo que hace el dueño del negocio todos los días, en modo avión.» Sigan los 5 pasos. Al final quiten el modo avión y muestren «Sincronizado». Si algo falla: «es software real, por eso falla en vivo», sonrían y sigan. Nunca más de 10 segundos peleando con el celular.');
 
   // ============================================================ 22 ARQUITECTURA
   s = nueva('CONTENIDO', 'Demo en vivo');
@@ -684,7 +684,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.6, y: 6.45, w: 12.1, h: 0.45, fontSize: 14, color: C.text2, objectName: 'ar_pie' });
   gar.push(['ar_pie']);
   animar.push({ slide: nSlide, grupos: gar });
-  s.addNotes('[JOSÉ · demo 3:45 – 4:40] «Así está construido por dentro. Todo pasa primero en el celular, en cuatro capas: las pantallas; las reglas del negocio, como cobrar primero lo más antiguo o calcular el dígito del NIT; una base de datos cifrada; y una cola de envío. Cuando hay señal, la cola sube los cambios por HTTPS a Supabase. Allá cada negocio solo ve sus propios datos, por reglas de la misma base de datos, no solo de la app. Y la inteligencia artificial se llama desde el servidor, así que la clave nunca está en el celular.»\n\nSi preguntan más: los anexos (diapositivas 24 a 31) tienen el viaje de una venta, la base de datos, la seguridad, los costos y la hoja de ruta.');
+  s.addNotes('[DAVID · demo 3:45 – 4:40]\n«Así está construido por dentro. En el celular hay cuatro capas: las pantallas; las reglas del negocio, como cobrar primero lo más antiguo o calcular el dígito del NIT; una base de datos cifrada; y una cola de envío. Cuando hay señal, la cola sube los cambios a Supabase. Allá cada negocio solo ve lo suyo, por reglas de la propia base de datos. Y la inteligencia artificial se llama desde el servidor: la clave nunca está en el celular.»\nSi preguntan más: anexos 24 a 31.');
 
   // ============================================================ 23 PREGUNTAS
   pres.addSection({ title: 'Preguntas' });

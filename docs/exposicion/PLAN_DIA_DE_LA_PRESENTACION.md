@@ -9,11 +9,11 @@
 
 ## 1. Quién hace qué
 
-| Hermano | Papel en el escenario | Habla en | Responde preguntas de |
-|---|---|---|---|
-| **Ángel Elías** · negocio | Abre y cierra. Es la voz del emprendedor: cuenta la historia y las cifras de Casanare | 1 Portada, 2 Historia, 3 Casanare, 4 Cierran a ciegas, 5 Quiénes son, 12 Negocio, 13 Con 100 tiendas, 14 Impacto, 17 Equipo, 18 Cierre | Mercado, precio, competencia, ventas, impacto |
-| **Carlos Andrés** · procesos | Explica cómo cambia el día del negocio | 6 Solución, 7 Un día con VERTEX, 8 Cualquier negocio, 9 Pagos, 11 Marketing, 15 Piloto, 16 Legal; en la demo ayuda al público con el QR | Ley 1581, piloto, soporte, capacitación, operación |
-| **José David** · desarrollo | Maneja el celular y la tecnología | 10 Tecnología, y **todo el bloque de demo** (19 Video, 20 Dinámica con QR, 21 Demo, 22 Arquitectura) | Arquitectura, sin internet, seguridad, IA, base de datos |
+| Hermano | Diapositivas | Responde preguntas de |
+|---|---|---|
+| **José David** | 1 a 4 (intro, Doña Marta y cifras de Casanare), 10 (tecnología), 18 (cierre) y toda la demo, 19 a 22 | Arquitectura, sin internet, seguridad, IA, base de datos |
+| **Carlos Andrés** | 5 a 9 (quiénes son y la solución); en la demo ayuda al público con el QR | Ley 1581, piloto, soporte, capacitación, operación |
+| **Ángel Elías** | 11 a 17 (marketing, negocio, impacto, piloto, legal y equipo) | Mercado, precio, competencia, ventas, impacto |
 
 **Cómo pasar la palabra sin perder tiempo:** cada uno termina con el nombre del siguiente tema, no con "bueno…". Ejemplo: *"…y eso nos lleva a cómo lo construimos. José."*
 
@@ -25,24 +25,24 @@ El pitch arranca con una persona, no con la app. **Hablen despacio en la histori
 
 | Tiempo | Diapositiva | Quién | Lo esencial |
 |---|---|---|---|
-| 0:00–0:10 | 1 Portada | Ángel | "Antes de hablarles de tecnología, quiero hablarles de una persona." |
-| 0:10–0:45 | 2 Son las 5:30 en Trinidad | Ángel | Doña Marta, 18 años en el mostrador, el cuaderno mojado. **"No fue por mala gente."** |
-| 0:45–1:05 | 3 Casanare se atreve | Ángel | 21.613 empresas, 96 de cada 100 micro, casi 11 negocios nuevos al día |
-| 1:05–1:25 | 4 Cierran a ciegas | Ángel | 46.318 salieron en 10 años (13 al día); 95 de cada 100 sin contabilidad; gota a gota |
-| 1:25–1:45 | 5 Quiénes son | Ángel | Tendera, peluquera, mecánico, licorera, restaurante, profesional. **"No fue un plan B."** *"Carlos."* |
+| 0:00–0:10 | 1 Portada | David | "Antes de hablarles de tecnología, quiero hablarles de una persona." |
+| 0:10–0:45 | 2 Son las 5:30 en Trinidad | David | Doña Marta, 18 años en el mostrador, el cuaderno mojado. **"No fue por mala gente."** |
+| 0:45–1:05 | 3 Casanare se atreve | David | 21.613 empresas, 96 de cada 100 micro, casi 11 negocios nuevos al día |
+| 1:05–1:25 | 4 Cierran a ciegas | David | 46.318 salieron en 10 años (13 al día); 95 de cada 100 sin contabilidad; gota a gota |
+| 1:25–1:45 | 5 Quiénes son | Carlos | Tendera, peluquera, mecánico, licorera, restaurante, profesional. **"No fue un plan B."** *"Carlos."* |
 | 1:45–2:05 | 6 Les devolvemos el control | Carlos | Ningún fiado se pierde · cuánto ganó · clientes con cédula/NIT · papeles en orden |
 | 2:05–2:30 | 7 Un día con VERTEX | Carlos | Cliente nuevo desde la venta, aviso de la luz, cobro con PDF. **"Se acuesta sabiendo cuánto ganó."** |
 | 2:30–2:45 | 8 Cualquier negocio | Carlos | 22 tipos, productos o servicios; ejemplos de su propio negocio |
 | 2:45–2:55 | 9 Pagos | Carlos | Nequi, efectivo, pago dividido, cierre de caja. *"José."* |
-| 2:55–3:15 | 10 Tecnología | José | Sin internet, base cifrada, sin duplicados, Supabase con RLS, **128 pruebas**. *"Carlos."* |
-| 3:15–3:35 | 11 Marketing | Carlos | "Que ningún fiado se pierda"; Gobernación, mayoristas, referidos; por qué nosotros. *"Ángel."* |
+| 2:55–3:15 | 10 Tecnología | David | Sin internet, base cifrada, sin duplicados, Supabase con RLS, **128 pruebas**. *"Carlos."* |
+| 3:15–3:35 | 11 Marketing | Ángel | "Que ningún fiado se pierda"; Gobernación, mayoristas, referidos; por qué nosotros. *"Ángel."* |
 | 3:35–3:55 | 12 Modelo de negocio | Ángel | Gratis en el programa; $19.900/mes; equilibrio con 78 tiendas |
 | 3:55–4:05 | 13 Con 100 tiendas | Ángel | Quedan unos $455.000/mes y no se satura |
 | 4:05–4:20 | 14 Impacto en Casanare | Ángel | 1.000 negocios: $600 millones al año, 150.000 horas, crédito formal. *"Carlos."* |
-| 4:20–4:30 | 15 Piloto | Carlos | 8 semanas, 15 negocios, metas medibles |
-| 4:30–4:40 | 16 Legal | Carlos | Ley 1581, Anexo 3, MiPyme responsable, Gobernación encargada. *"Ángel."* |
+| 4:20–4:30 | 15 Piloto | Ángel | 8 semanas, 15 negocios, metas medibles |
+| 4:30–4:40 | 16 Legal | Ángel | Ley 1581, Anexo 3, MiPyme responsable, Gobernación encargada. *"Ángel."* |
 | 4:40–4:45 | 17 Somos de aquí | Ángel | "No venimos de afuera: venimos a darle herramientas." |
-| 4:45–5:00 | 18 Cierre | Ángel, y los tres juntos la última frase | **"Doña Marta no necesita lástima. Necesita herramientas."** |
+| 4:45–5:00 | 18 Cierre | David | **"Doña Marta no necesita lástima. Necesita herramientas."** |
 
 El pitch son las diapositivas **1 a 18**, seguidas. La demo usa de la **19 a la 22**, las preguntas la **23**, y los **anexos 24 a 31** son de apoyo.
 

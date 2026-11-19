@@ -16,11 +16,15 @@ El orden es el de un buen discurso: **una persona → los números de Casanare �
 
 ## Quién habla
 
-| Hermano | Diapositivas | Tiempo |
+| Quién | Diapositivas | Qué le toca |
 |---|---|---|
-| **Ángel** (negocio) | 1 a 5 (historia y cifras), 12 a 14 (negocio e impacto), 17 y 18 (equipo y cierre) | unos 2:50 |
-| **Carlos** (procesos) | 6 a 9 (solución), 11 (marketing), 15 y 16 (piloto y legal) | unos 1:50 |
-| **José** (tecnología) | 10 (tecnología); 19 a 22 (video, dinámica con QR, demo y arquitectura, en los 5 minutos de demo) | unos 0:20 + la demo |
+| **José David** | 1 a 4 | El intro que engancha, la historia de Doña Marta y las cifras de Casanare |
+| **Carlos Andrés** | 5 a 9 | Quiénes son los emprendedores y cómo VERTEX les cambia el día |
+| **José David** | 10 | La tecnología, en palabras sencillas |
+| **Ángel Elías** | 11 a 17 | Cómo llegamos, el negocio, lo que gana Casanare, el piloto, lo legal y el equipo |
+| **José David** | 18 a 22 | El cierre que inspira y toda la demo (video, dinámica con el QR, demo y arquitectura) |
+
+**Para pasar la palabra:** cada uno termina diciendo el nombre del siguiente («…Carlos les cuenta quiénes son.»). En el cierre, la frase «¡Que ningún fiado se pierda!» la dicen **los tres juntos**.
 
 ## Cómo califica el jurado y dónde lo cubrimos
 
@@ -37,117 +41,135 @@ El orden es el de un buen discurso: **una persona → los números de Casanare �
 
 ---
 
-## Minuto a minuto (lo que se dice)
+## El discurso, diapositiva por diapositiva
 
-**1 · Portada · Ángel (0:00–0:10)**
-(Pausa. Miren al jurado antes de hablar.)
-"Buenos días. Antes de hablarles de tecnología, quiero hablarles de una persona."
+Lo que va entre paréntesis y en cursiva es cómo decirlo; lo demás es lo que se dice. Es corto a propósito: hablen despacio y dejen las pausas.
 
-**2 · Son las 5:30 de la mañana en Trinidad · Ángel (0:10–0:45)**
-(Despacio, como contando algo que les pasó a ustedes.)
-"Son las 5:30 de la mañana en Trinidad. Doña Marta sube la persiana de su tienda. Lleva 18 años detrás del mismo mostrador.
-Le fía al vecino, al productor que paga en cosecha, a la familia que llegó sin nada. Todo lo anota en un cuaderno; ya va por la tercera libreta.
-Un día un aguacero le mojó una página, y con esa página se fue más de un millón de pesos que nadie le volvió a pagar.
-(Pausa.) No fue por mala gente. Fue porque nadie se acordaba de cuánto debía."
+**1 · Portada: el intro · David (0:00 – 0:20)**
 
-**3 · Casanare es tierra de gente que se atreve · Ángel (0:45–1:05)**
-"Doña Marta no está sola. En Casanare hay 21.613 empresas registradas, y 96 de cada 100 son microempresas. En casi todas trabajan entre una y cuatro personas: el dueño, la esposa, el hijo. Y cada día se abren casi 11 negocios nuevos.
-Casanare es tierra de gente que se atreve. Detrás de cada número hay una familia que puso sus ahorros y su nombre en un negocio."
+*(Entre al centro. Tres segundos de silencio mirando al público. Nadie habla.)*
+> Levante la mano quien alguna vez le haya fiado algo a un vecino… o quien tenga en la familia una tienda, una peluquería, un taller, un puesto en la plaza. (Levante usted la mano primero. Espere.)
+> Casi todos. Porque en Casanare todos venimos de alguien que se atrevió.
+> Soy José David Ortega. Con mis hermanos Carlos y Ángel no venimos a hablarles de una aplicación. Venimos a hablarles de esa gente.
 
-**4 · Pero muchos cierran a ciegas · Ángel (1:05–1:25)**
-"Pero hay otra cara. Entre 2016 y 2025 salieron del registro en Casanare 46.318 negocios: unos 13 cada día. Y casi todos eran de una a cuatro personas.
-¿Por qué? En el país, 95 de cada 100 micronegocios no llevan contabilidad formal: la mayoría no anota nada, y el resto, en un cuaderno. Casi uno de cada cuatro que pidió plata prestada terminó en el gota a gota.
-(Pausa.) No cierran por falta de ganas. Cierran a ciegas: sin saber cuánto ganan, cuánto les deben ni cuánto deben."
+**2 · Son las 5:30 en Trinidad · David (0:20 – 0:50)**
 
-**5 · Ellos son los que mueven a Casanare · Ángel (1:25–1:45)**
-"¿Quiénes son? Son la tendera de Trinidad, la peluquera de Yopal, el mecánico de Aguazul, la licorera de Paz de Ariporo, el restaurante de carretera, la contadora que trabaja por su cuenta.
-Seis de cada diez tiendas de barrio las sostiene una mujer. Y más de un tercio emprendió porque no tenía otra forma de ganarse la vida.
-(Mirando al jurado.) Para ellos emprender no fue un plan B. Fue la única puerta abierta. Y nosotros queremos que esa puerta no se les cierre."
+*(Más despacio. Como si lo hubiera visto con sus ojos.)*
+> Son las cinco y media de la mañana en Trinidad. Doña Marta sube la persiana de su tienda, como hace 18 años.
+> Le fía al vecino, al productor que paga en cosecha, a la familia que llegó sin nada. Todo va en un cuaderno.
+> Un día, un aguacero le mojó una página. Y con esa página se fue más de un millón de pesos.
+> *(Pausa.)* No fue por mala gente. Fue porque nadie se acordaba de cuánto debía.
 
-**6 · Les devolvemos el control del negocio · Carlos (1:45–2:05)**
-"Por eso creamos VERTEX AI Pyme. No es una app más: es devolverle el control al que se atrevió.
-- Con VERTEX ningún fiado se pierde: sabe quién le debe, cuánto y desde cuándo.
-- Sabe cuánto ganó hoy.
-- Tiene a sus clientes con cédula o NIT, celular y correo.
-- Y tiene los papeles en orden: le avisa antes de que venza el arriendo o la luz, y le entrega el informe al contador.
+**3 · Casanare es tierra de gente que se atreve · David (0:50 – 1:05)**
 
-Todo funciona sin internet."
+*(Con orgullo, subiendo la voz.)*
+> Y Doña Marta no está sola. En Casanare hay 21.613 empresas, y 96 de cada 100 son microempresas: la mamá, el papá y el hijo detrás del mostrador.
+> Cada día se abren casi 11 negocios nuevos. Esta es tierra de gente berraca, que madruga y se le mide.
 
-**7 · Un día de Doña Marta con VERTEX · Carlos (2:05–2:30)**
-"Así es un día de Doña Marta con VERTEX:
-- A las 6:30 abre sin datos y vende.
-- A las 10 llega don Pedro, el productor de la vereda, a fiar purina. Si es cliente nuevo, lo registra ahí mismo con su cédula, sin salir de la venta.
-- A las 3, el celular le avisa que mañana vence la luz y que se agotó la sal.
-- A las 6 cobra sin pena, con una cuenta de cobro que dice que le deben desde agosto.
-- Y el lunes le manda el informe al contador.
+**4 · Pero muchos cierran a ciegas · David (1:05 – 1:25)**
 
-(Pausa.) Por primera vez en 18 años, Doña Marta se acuesta sabiendo cuánto ganó, quién le debe y qué tiene que pagar mañana."
+*(Baje el tono. Serio.)*
+> Pero también cada día salen unos 13. En diez años, 46.318 negocios dejaron el registro en Casanare.
+> Y no por falta de ganas. En el país, 95 de cada 100 micronegocios no llevan contabilidad formal, y casi uno de cada cuatro que necesitó plata terminó en el gota a gota.
+> No cierran por perezosos. Cierran a ciegas. (Pausa.) Carlos les cuenta quiénes son.
 
-**8 · Sirve para cualquier negocio · Carlos (2:30–2:45)**
-"Y no es solo para tiendas. Sirve para la licorera, la droguería, la peluquería, el que hace carreras en moto, la profesional que cobra por horas y el agro que le fía al productor. Son 22 tipos de negocio. La app pregunta cómo trabaja cada uno y se adapta: hasta los ejemplos de cada casilla hablan el idioma de su negocio."
+**5 · Ellos son los que mueven a Casanare · Carlos (1:25 – 1:45)**
 
-**9 · Medios de pago · Carlos (2:45–2:55)**
-"Y el cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber."
+> Son la tendera de Trinidad, la peluquera de Yopal, el mecánico de Aguazul, la licorera de Paz de Ariporo, el restaurante de carretera, la contadora que trabaja por su cuenta.
+> Seis de cada diez tiendas de barrio las sostiene una mujer. Y más de un tercio emprendió porque no tenía otra forma de ganarse la vida.
+> *(Mirando al jurado.)* Para ellos emprender no fue un plan B. Fue la única puerta abierta.
 
-**10 · Tecnología · José (2:55–3:15)**
-"¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android, Windows y la web. Todo se guarda primero en una base cifrada en el celular, y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada negocio solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío."
+**6 · Les devolvemos el control · Carlos (1:45 – 2:00)**
 
-**11 · Cómo llegamos a cada negocio · Carlos (3:15–3:35)**
-"¿Cómo llegamos? Con un mensaje que cualquiera entiende: que ningún fiado se pierda. Empezamos por las tiendas de Trinidad y Yopal con más de 10 clientes debiendo. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda cada semana, con tenderos que recomiendan a otros tenderos, y con instalación en 20 minutos en el propio negocio.
-¿Por qué nosotros y no una app gratuita? Porque las apps grandes sirven para todo el país; nosotros somos de aquí: funciona sin datos todo el día, dice desde cuándo le deben, y hay gente de Casanare que la instala y responde por WhatsApp."
+> Por eso creamos VERTEX AI Pyme: para devolverle el control al que se atrevió.
+> Ningún fiado se pierde. Sabe cuánto ganó hoy. Tiene sus clientes con cédula o NIT. Y le avisa antes de que venza el arriendo o la luz.
+> Todo, sin internet.
 
-**12 · Modelo de negocio · Ángel (3:35–3:55)**
-"Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 19.900 pesos al mes, menos que un fiado recuperado. Con 78 tiendas cubrimos los costos; con 300 quedan unos 3 millones al mes, y con mil, unos 11 millones."
+**7 · Un día de Doña Marta con VERTEX · Carlos (2:00 – 2:20)**
 
-**13 · Con 100 tiendas · Ángel (3:55–4:05)**
-"Con 100 tiendas quedan unos 455 mil pesos al mes, y no se satura: cada negocio trabaja en su celular."
+> Así cambia el día de Doña Marta. Abre sin datos y vende. Llega don Pedro a fiar purina: si es nuevo, lo registra ahí mismo con su cédula. En la tarde el celular le avisa que mañana vence la luz. Y en la noche cobra sin pena, con un PDF.
+> *(Pausa.)* Por primera vez en 18 años, Doña Marta se acuesta sabiendo cuánto ganó.
 
-**14 · Si 1.000 negocios de Casanare usan VERTEX · Ángel (4:05–4:20)**
-"¿Y qué gana Casanare? Hagamos la cuenta con mil negocios, menos del cinco por ciento de los que hay registrados.
-- Si cada uno recupera apenas 50 mil pesos de fiado al mes, son 600 millones de pesos al año que se quedan en las familias de Casanare.
-- Si cada uno se ahorra media hora diaria de cuentas, son 150 mil horas para vender o para estar con sus hijos.
-- Y son mil negocios con sus números en orden para pedir un crédito de verdad, y no caer en el gota a gota."
+**8 · Sirve para cualquier negocio · Carlos (2:20 – 2:30)**
 
-**15 · Piloto · Carlos (4:20–4:30)**
-"Lo vamos a medir con un piloto de 8 semanas en 15 negocios de Trinidad y Yopal: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestos a pagar y cerrar un mayorista aliado."
+> Y no es solo para tiendas: licorera, droguería, peluquería, transporte, el profesional que cobra por horas, el agro. Veintidós tipos de negocio. La app aprende cómo trabaja cada uno y le habla en su idioma.
 
-**16 · Legal · Carlos (4:30–4:40)**
-"Cumplimos la Ley 1581 con los formatos oficiales: la casilla viene sin marcar y cada cliente autoriza con el Anexo 3. La MiPyme es responsable de los datos y la Gobernación es encargada. El equipo conserva el código y la Gobernación recibe una licencia gratuita e indefinida."
+**9 · Pagos · Carlos (2:30 – 2:40)**
 
-**17 · Somos de aquí · Ángel (4:40–4:45)**
-"Somos tres hermanos de Casanare. Crecimos viendo estos negocios por dentro. No venimos de afuera a explicarle a nadie su negocio: venimos a darle herramientas."
+> Y el cliente paga como quiera: efectivo, Nequi, Daviplata o tarjeta, y hasta mitad y mitad. Al final del día, la caja cuadra sola.
+> *(Pase la palabra.)* ¿Y cómo funciona sin señal? David.
 
-**18 · Cierre · Ángel (4:45–5:00)**
-(Despacio. Es el momento más importante.)
-"Doña Marta no necesita que le tengan lástima. Necesita herramientas.
-Que ningún fiado se pierda. Que ningún negocio cierre a ciegas. Que el que se atrevió a emprender en Casanare tenga la misma claridad que una gran empresa.
-Hoy les pedimos 15 negocios para el piloto, y que la Gobernación nos acompañe a llegar a todas las MiPymes del departamento.
-VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias."
-(Silencio de dos segundos antes de sentarse.)
+**10 · Tecnología · David (2:40 – 2:55)**
+
+> Lo construimos pensando en la vereda, donde no hay señal. Todo se guarda primero en el celular, cifrado, y cuando vuelve internet sube solo a la nube, sin perder ni duplicar nada. En la nube, cada negocio ve solo lo suyo.
+> Y no se lo pedimos creer: tiene 128 pruebas automáticas, incluida una que le corta el internet a mitad del envío.
+> *(Pase la palabra.)* Ángel les cuenta cómo llegamos a cada negocio.
+
+**11 · Cómo llegamos a cada negocio · Ángel (2:55 – 3:15)**
+
+> Nuestro mensaje cabe en una frase: que ningún fiado se pierda.
+> Empezamos por las tiendas de Trinidad y Yopal con más de diez clientes debiendo. Llegamos con la Gobernación, con los mayoristas y preventistas que ya visitan cada tienda cada semana, con tenderos que recomiendan a otros tenderos, y la instalamos en 20 minutos en el propio negocio.
+> Las apps grandes son para todo el país. Nosotros somos de aquí.
+
+**12 · Modelo de negocio · Ángel (3:15 – 3:30)**
+
+> Para las MiPymes de Casanare es gratis: la opera la Gobernación. Fuera del programa, 19.900 pesos al mes, menos de lo que vale un solo fiado recuperado. Con 78 tiendas cubrimos los costos.
+
+**13 · Con 100 tiendas · Ángel (3:30 – 3:40)**
+
+> Con 100 tiendas ya quedan unos 455 mil pesos al mes, y el sistema no se satura: cada negocio trabaja en su propio celular.
+
+**14 · Lo que gana Casanare · Ángel (3:40 – 3:55)**
+
+> Ahora, lo que de verdad importa: ¿qué gana Casanare? Con apenas mil negocios, menos del cinco por ciento: si cada uno recupera 50 mil pesos de fiado al mes, son 600 millones al año que se quedan en las familias de Casanare. Y 150 mil horas para vender… o para estar con los hijos.
+
+**15 · Piloto · Ángel (3:55 – 4:05)**
+
+> Lo vamos a medir: piloto de ocho semanas con 15 negocios de Trinidad y Yopal, con metas claras de uso y de pago.
+
+**16 · Legal · Ángel (4:05 – 4:15)**
+
+> Y con las cuentas claras también en lo legal: cumplimos la Ley 1581, cada cliente autoriza sus datos, la MiPyme es responsable y la Gobernación encargada. El código es nuestro y la Gobernación tiene licencia gratuita para siempre.
+
+**17 · Somos de aquí · Ángel (4:15 – 4:25)**
+
+> Somos tres hermanos de Casanare. Crecimos viendo estos negocios por dentro. No venimos de afuera a explicarle a nadie su negocio: venimos a darle herramientas.
+> *(Pase la palabra.)* David.
+
+**18 · Cierre · David (4:25 – 5:00)**
+
+*(Al centro. Despacio. Es el momento más importante: mire a los ojos al jurado.)*
+> Doña Marta no necesita que le tengan lástima. Necesita herramientas.
+> Que ningún fiado se pierda. Que ningún negocio de Casanare cierre a ciegas. Que el que madrugó a emprender tenga la misma claridad que una gran empresa.
+> Hoy les pedimos dos cosas: 15 negocios para empezar el piloto, y que la Gobernación camine con nosotros hasta la última vereda del departamento.
+> *(Los tres juntos, en voz alta:)* ¡Que ningún fiado se pierda!
+> *(David:)* VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias. (Dos segundos de silencio.)
 
 ---
 
-## Los 5 minutos de demo · José
+## Bloque de demo (5 minutos) · David
 
-**19 · Video (32 segundos, con música).** Clic sobre el video. Termina con el **código QR**: déjenlo en pantalla. Mientras corre, José pone su celular de la demo en modo avión.
+**19 · Video con el QR · David (demo 0:00 – 0:32)**
 
-**20 · Pruébala ya, todos juntos (unos 90 segundos).** El público escanea el QR y hace su primera venta. Guion completo, frase por frase, en `docs/exposicion/DINAMICA_EN_VIVO.md`.
+> «Y ahora, véanlo.» Clic sobre el video (32 segundos, con música). Termina con el QR: déjenlo en pantalla. Mientras corre, David pone su celular de la demo en modo avión.
 
-**21 · Demo en vivo, en modo avión.** Frase al empezar: *"Ahora lo que hace el dueño del negocio todos los días, y en modo avión."*
-1. Venta de todo un poco con pago dividido: Nequi y efectivo.
-2. Cliente nuevo desde la venta, con su cédula, y venta fiada.
-3. Cobro por WhatsApp con la cuenta de cobro en PDF.
-4. Pagos fijos: la luz vence pronto, se paga y queda como gasto.
-5. Quita el modo avión: la píldora dice **"Sincronizado"**.
+**20 · Pruébala ya, todos juntos · David (Carlos Ayuda Entre La Gente) (demo 0:32 – 2:00)**
 
-**22 · Cómo está construido el sistema.** Las cuatro capas en el celular (pantallas, reglas, base cifrada, cola de envío) y la nube (usuarios, PostgreSQL con reglas por negocio, IA desde el servidor).
+> «No nos crean a nosotros: saquen su celular y apunten la cámara al código.» (Diez segundos con una sonrisa.)
+> «Toquen Aceptar y continuar. Escriban el nombre de su negocio, o uno inventado, y elijan su tipo… Siguiente, Siguiente… Empezar a usar la app.»
+> «Ahora su primera venta: Venta, más cinco mil, Guardar.» (Pausa.) «¿Ven arriba? Hoy vendiste cinco mil pesos. Eso fue en 30 segundos, y sin internet funcionaría igual.»
+> Carlos camina entre la gente y ayuda. Cuando la mitad lo logre, sigan. Si la red está lenta: «La primera vez descarga la app; después funciona sin señal.»
 
-**23 · ¿Preguntas?** Queda en pantalla con el QR durante las preguntas. Para detalle técnico, los **anexos 24 a 31** (en PowerPoint: escriban el número y Enter).
+**21 · Demo en modo avión · David (demo 2:00 – 3:45)**
 
-**Si sobra un minuto:**
-- **Llegó el pedido → «Una parte» (50 %)**: entra todo al inventario y el saldo aparece en **Lo que debo**. Frase: *"Así trabaja el tendero con el proveedor: paga la mitad y la otra mitad fiada."*
-- **Promociones**: precio de oferta, **Redactar con IA** y la imagen para el estado de WhatsApp.
-- **Proveedores y terceros**: el arrendador con su NIT y el dígito de verificación que se calcula solo.
+> «Ahora lo que hace el dueño del negocio todos los días, en modo avión.» Sigan los 5 pasos. Al final quiten el modo avión y muestren «Sincronizado». Si algo falla: «es software real, por eso falla en vivo», sonrían y sigan. Nunca más de 10 segundos peleando con el celular.
+
+**22 · Cómo está construido el sistema · David (demo 3:45 – 4:40)**
+
+> «Así está construido por dentro. En el celular hay cuatro capas: las pantallas; las reglas del negocio, como cobrar primero lo más antiguo o calcular el dígito del NIT; una base de datos cifrada; y una cola de envío. Cuando hay señal, la cola sube los cambios a Supabase. Allá cada negocio solo ve lo suyo, por reglas de la propia base de datos. Y la inteligencia artificial se llama desde el servidor: la clave nunca está en el celular.»
+> Si preguntan más: anexos 24 a 31.
+
+**23 · ¿Preguntas?** Queda en pantalla con el QR. Respuestas en `docs/exposicion/CHULETA_DE_RESPUESTAS.md`; para detalle técnico, anexos 24 a 31 (en PowerPoint: el número y Enter).
 
 ---
 
