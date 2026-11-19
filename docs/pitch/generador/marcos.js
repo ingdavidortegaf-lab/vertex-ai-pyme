@@ -32,7 +32,8 @@ async function marco(nombre, salida, { top = 0 } = {}) {
     ['phone-asistente', 'asistente'], ['phone-comprobante', 'comprobante'], ['phone-registro-1', 'registro1'],
     ['phone-registro-3', 'registro3'], ['phone-cliente', 'cliente'], ['phone-pedido', 'pedido'],
     ['phone-producto-peso', 'peso'], ['phone-bienvenida', 'bienvenida'], ['phone-movimientos', 'caja'],
-    ['phone-cierre-caja', 'cierre'],
+    ['phone-cierre-caja', 'cierre'], ['phone-registrar', 'registrar'], ['phone-lo-que-debo', 'lo_que_debo'],
+    ['phone-seguimiento', 'seguimiento'], ['phone-promociones', 'promociones'], ['phone-clientes', 'clientes'],
   ];
   for (const [a, b] of lista) await marco(a, b);
   await marco('phone-cobro-dividido', 'cobro_dividido', { top: 990 });

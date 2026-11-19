@@ -3,7 +3,7 @@
 **Hotel El Atajo, Yopal · entregar la presentación antes de las 9:30 a. m.**
 **15 minutos: 5 de pitch + 5 de demo y tecnología + 5 de preguntas.**
 
-> La regla del día: **se califica lo que se demuestra.** Hablamos poco, mostramos mucho y vendemos una idea: *que ningún fiado se pierda.*
+> La regla del día: **se califica lo que se demuestra.** Contamos una historia que se siente, mostramos mucho y vendemos una idea: *que ningún fiado se pierda y que ningún negocio cierre a ciegas.*
 
 ---
 
@@ -11,60 +11,60 @@
 
 | Hermano | Papel en el escenario | Habla en | Responde preguntas de |
 |---|---|---|---|
-| **Ángel Elías** · negocio | Abre y cierra. Es la voz del tendero y del mercado | Portada, Doña Marta, cifras, marketing, modelo de negocio, 100 tiendas, cierre | Mercado, precio, competencia, ventas, crecimiento |
-| **Carlos Andrés** · procesos | Explica cómo cambia el día de la tienda | Solución, un día con VERTEX, documentos, pagos y proveedores, piloto, legal | Ley 1581, piloto, soporte, capacitación, operación |
-| **José David** · desarrollo | Maneja el celular y la tecnología | Tecnología, por qué nosotros, equipo, **toda la demo** | Arquitectura, sin internet, seguridad, IA, base de datos |
-
-> Si en su equipo los papeles de Carlos y Ángel van al revés, cámbienlos aquí y en el guion. Lo importante es que **cada uno ensaye solo sus partes** y sepa a quién le pasa la palabra.
+| **Ángel Elías** · negocio | Abre y cierra. Es la voz del emprendedor: cuenta la historia y las cifras de Casanare | 1 Portada, 2 Historia, 3 Casanare, 4 Cierran a ciegas, 5 Quiénes son, 14 Negocio, 15 Con 100 tiendas, 16 Impacto, 19 Equipo, 20 Cierre | Mercado, precio, competencia, ventas, impacto |
+| **Carlos Andrés** · procesos | Explica cómo cambia el día del negocio | 6 Solución, 7 Un día con VERTEX, 8 Cualquier negocio, 9 Pagos, 13 Marketing, 17 Piloto, 18 Legal | Ley 1581, piloto, soporte, capacitación, operación |
+| **José David** · desarrollo | Maneja el celular y la tecnología | 12 Tecnología, y **todo el bloque de demo** (10 Video y 11 Demo) | Arquitectura, sin internet, seguridad, IA, base de datos |
 
 **Cómo pasar la palabra sin perder tiempo:** cada uno termina con el nombre del siguiente tema, no con "bueno…". Ejemplo: *"…y eso nos lleva a cómo lo construimos. José."*
 
 ---
 
-## 2. Bloque 1 · Pitch (5:00)
+## 2. Bloque 1 · Pitch (5:00): que se sienta, no solo que se entienda
 
-El video abre la presentación. Mientras corre, **nadie habla**: los tres de pie, mirando al jurado.
+El pitch arranca con una persona, no con la app. **Hablen despacio en la historia (2) y en el cierre (20)**, hagan pausas y miren al jurado. El texto completo está en las notas del orador y en `docs/pitch/GUION_DEL_PITCH.md`.
 
-| Tiempo | Diapositiva | Quién | Lo esencial (el texto completo está en las notas del orador) |
+| Tiempo | Diapositiva | Quién | Lo esencial |
 |---|---|---|---|
-| 0:00–0:30 | **Video** (30 s) | Nadie habla | Arranca solo |
-| 0:30–0:40 | 1 Portada | Ángel | "Somos VERTEX TECH, tres hermanos de Casanare. Esto es VERTEX AI Pyme." |
-| 0:40–1:05 | 2 Doña Marta | Ángel | Fía a medio pueblo, va en la tercera libreta, se queda sin datos |
-| 1:05–1:20 | 3 Cifras | Ángel | 450.000 tiendas, la mitad del consumo, casi todas con cuaderno. *"Carlos."* |
-| 1:20–1:30 | 4 Solución | Carlos | "Ya lo vieron en el video: el cuaderno, en el celular, sin internet." |
-| 1:30–1:55 | 5 Un día con VERTEX | Carlos | 6:30 vende sin datos · 10:00 fía · 3:00 aviso de agotado · 6:00 cobra con PDF |
-| 1:55–2:10 | 6 Documentos | Carlos | Número único, logo, archivo. **No es factura DIAN (dígalo usted antes que el jurado)** |
-| 2:10–2:20 | 7 Pagos | Carlos | Nequi, efectivo, pago dividido **y al proveedor: la mitad y el resto fiado**. *"José."* |
-| 2:20–2:25 | 8 Demo | José | "En 5 minutos lo ven en vivo, en modo avión." |
-| 2:25–2:50 | 9 Tecnología | José | Flutter, base cifrada, cola sin duplicados, Supabase con RLS, **128 pruebas** |
-| 2:50–3:05 | 10 Por qué nosotros | José | Hecha para la tienda de aquí. *"Ángel."* |
-| 3:05–3:25 | 11 Marketing | Ángel | Gobernación, mayoristas, referidos, instalación en 20 min **y la IA que hace promociones y le escribe a los clientes** |
-| 3:25–3:45 | 12 Modelo de negocio | Ángel | Gratis en el programa; $19.900/mes; equilibrio con 78 tiendas |
-| 3:45–4:05 | 13 Con 100 tiendas | Ángel | Quedan unos $455.000/mes y no se satura. *"Carlos."* |
-| 4:05–4:25 | 14 Validación | Carlos | Piloto de 8 semanas en 15 tiendas, metas medibles |
-| 4:25–4:40 | 15 Legal | Carlos | Formatos oficiales, Anexo 3, MiPyme responsable, Gobernación encargada. *"José."* |
-| 4:40–4:50 | 16 Equipo | José | Desarrollo, procesos y negocio, con Aerollano. *"Ángel."* |
-| 4:50–5:00 | 17 Cierre | Ángel, y los tres juntos la última frase | **"Que ningún fiado se pierda."** |
+| 0:00–0:10 | 1 Portada | Ángel | "Antes de hablarles de tecnología, quiero hablarles de una persona." |
+| 0:10–0:45 | 2 Son las 5:30 en Trinidad | Ángel | Doña Marta, 18 años en el mostrador, el cuaderno mojado. **"No fue por mala gente."** |
+| 0:45–1:05 | 3 Casanare se atreve | Ángel | 21.613 empresas, 96 de cada 100 micro, casi 11 negocios nuevos al día |
+| 1:05–1:25 | 4 Cierran a ciegas | Ángel | 46.318 salieron en 10 años (13 al día); 95 de cada 100 sin contabilidad; gota a gota |
+| 1:25–1:45 | 5 Quiénes son | Ángel | Tendera, peluquera, mecánico, licorera, restaurante, profesional. **"No fue un plan B."** *"Carlos."* |
+| 1:45–2:05 | 6 Les devolvemos el control | Carlos | Ningún fiado se pierde · cuánto ganó · clientes con cédula/NIT · papeles en orden |
+| 2:05–2:30 | 7 Un día con VERTEX | Carlos | Cliente nuevo desde la venta, aviso de la luz, cobro con PDF. **"Se acuesta sabiendo cuánto ganó."** |
+| 2:30–2:45 | 8 Cualquier negocio | Carlos | 22 tipos, productos o servicios; ejemplos de su propio negocio |
+| 2:45–2:55 | 9 Pagos | Carlos | Nequi, efectivo, pago dividido, cierre de caja. *"José."* |
+| 2:55–3:15 | 12 Tecnología | José | Sin internet, base cifrada, sin duplicados, Supabase con RLS, **128 pruebas**. *"Carlos."* |
+| 3:15–3:35 | 13 Marketing | Carlos | "Que ningún fiado se pierda"; Gobernación, mayoristas, referidos; por qué nosotros. *"Ángel."* |
+| 3:35–3:55 | 14 Modelo de negocio | Ángel | Gratis en el programa; $19.900/mes; equilibrio con 78 tiendas |
+| 3:55–4:05 | 15 Con 100 tiendas | Ángel | Quedan unos $455.000/mes y no se satura |
+| 4:05–4:20 | 16 Impacto en Casanare | Ángel | 1.000 negocios: $600 millones al año, 150.000 horas, crédito formal. *"Carlos."* |
+| 4:20–4:30 | 17 Piloto | Carlos | 8 semanas, 15 negocios, metas medibles |
+| 4:30–4:40 | 18 Legal | Carlos | Ley 1581, Anexo 3, MiPyme responsable, Gobernación encargada. *"Ángel."* |
+| 4:40–4:45 | 19 Somos de aquí | Ángel | "No venimos de afuera: venimos a darle herramientas." |
+| 4:45–5:00 | 20 Cierre | Ángel, y los tres juntos la última frase | **"Doña Marta no necesita lástima. Necesita herramientas."** |
+
+Las diapositivas 10 (video) y 11 (demo) se **saltan** en el pitch y se usan en el bloque 2.
 
 ---
 
 ## 3. Bloque 2 · Demo y tecnología (5:00) · José maneja el celular
 
-**Preparación:** celular con la pantalla proyectada (cable o duplicar pantalla), brillo al máximo, notificaciones silenciadas, **modo avión ya activado** y la app abierta en Inicio con datos de ejemplo (ver la lista del punto 6). Carlos tiene el **segundo celular o el PC** listo por si algo falla.
+**Preparación:** celular con la pantalla proyectada (cable o duplicar pantalla), brillo al máximo, notificaciones silenciadas, la app abierta en Inicio con datos de ejemplo (ver la lista del punto 6) y **un pago fijo «Luz» que venza en 1 o 2 días**. Carlos tiene el **segundo celular o el PC** listo por si algo falla.
 
 | Tiempo | Qué toca José | Qué dice |
 |---|---|---|
-| 0:00–0:20 | Muestra el **avión** en la barra del celular | "Sin señal, como en la vereda. Todo lo que van a ver funciona así." |
-| 0:20–0:55 | **Venta** de $25.000 → **Dividir el pago**: $20.000 Nequi + $5.000 efectivo | "El cliente paga como quiera. Al final, el cierre de caja cuadra solo." |
-| 0:55–1:35 | **Venta fiada** a un cliente → ficha → **Cuenta de cobro en PDF** | "Sabe quién debe y desde cuándo; el cobro sale en PDF, sin pena." |
-| 1:35–2:10 | Pedir mercancía → **Llegó el pedido** → **Una parte (50 %)** → **Lo que debo** | "Así trabaja el tendero: paga la mitad y el resto se lo fían. La app le avisa antes de que venza." |
-| 2:10–2:50 | **Promociones** → arroz con precio de oferta → **Redactar con IA** → **imagen para el estado** | "La IA le escribe la promoción. Sin señal, la redacta el mismo celular." |
-| 2:50–3:15 | **Seguimiento** → "Hace rato no vienen" | "A quién escribirle hoy, **solo si autorizó**: Ley 1581." |
-| 3:15–3:45 | **Quita el modo avión** → la barra dice **Sincronizado** | "Volvió la señal: subió todo, sin perder ni duplicar nada." |
-| 3:45–4:40 | Diapositiva de tecnología (o la guía visual) | Offline-first, base cifrada AES-256, cola transaccional con upsert por id, Supabase PostgreSQL con RLS por tienda, IA desde una Edge Function sin datos personales, **128 pruebas automáticas** |
+| 0:00–0:30 | **Diapositiva 10: video de 30 s** (clic sobre el video). Mientras corre, pone el **modo avión** | Nadie habla |
+| 0:30–0:45 | Muestra el **avión** en la barra del celular | "Sin señal, como en la vereda. Todo lo que van a ver funciona así." |
+| 0:45–1:20 | **Venta** de $25.000 → **Dividir el pago**: $20.000 Nequi + $5.000 efectivo | "El cliente paga como quiera. Al final, el cierre de caja cuadra solo." |
+| 1:20–2:05 | **Venta fiada** → Elegir cliente → **Nuevo cliente** con su cédula → queda elegido → guardar → ficha → **Cuenta de cobro en PDF** | "El cliente nuevo se registra sin salir de la venta. Y el cobro sale en PDF, sin pena." |
+| 2:05–2:40 | Inicio → **Pagos fijos por vencer** → **Pagar** la luz con Nequi → Caja | "Le avisa antes de que venza la luz. Al pagar, queda como gasto." |
+| 2:40–3:15 | **Promociones** → precio de oferta → **Redactar con IA** → imagen para el estado | "La IA le escribe la promoción. Sin señal, la redacta el mismo celular." |
+| 3:15–3:40 | **Quita el modo avión** → la barra dice **Sincronizado** | "Volvió la señal: subió todo, sin perder ni duplicar nada." |
+| 3:40–4:40 | Diapositiva de tecnología (o la guía visual) | Base cifrada AES-256, cola con upsert por id, Supabase PostgreSQL con RLS por negocio, IA desde una Edge Function sin datos personales, **128 pruebas automáticas** |
 | 4:40–5:00 | Muestra el **QR** | "Y no nos crean a nosotros: escaneen el QR y pruébenla ya en su celular." |
 
-**Si algo falla en la demo:** José dice *"esto es software real, por eso falla en vivo"*, sonríe y pasa al **video** o a las **capturas del pitch**. Nunca se pelea con el celular más de 10 segundos.
+**Si algo falla en la demo:** José dice *"esto es software real, por eso falla en vivo"*, sonríe y pasa a las **capturas del pitch**. Nunca se pelea con el celular más de 10 segundos.
 
 ---
 
@@ -108,13 +108,13 @@ Más preguntas con su respuesta: `docs/exposicion/PREGUNTAS_DEL_JURADO.md` (39 p
 - [ ] Ver el video y aprobarlo (está en `docs/pitch/video/VERTEX_AI_Pyme_30s.mp4`).
 - [ ] Ensayar los 15 minutos **completos con cronómetro, dos veces**. Cada uno ensaya solo sus frases.
 - [ ] Instalar el **APK nuevo** en el celular de la demo (`D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\VERTEX_AI_Pyme.apk`).
-- [ ] Cargar datos de ejemplo en ese celular: 4 productos (arroz, aceite, acetaminofén, sal), 3 clientes **con autorización**, un fiado de hace más de 30 días, un proveedor con pedido pagado a la mitad.
+- [ ] Cargar datos de ejemplo en ese celular: 4 productos (arroz, aceite, acetaminofén, sal), 3 clientes **con autorización**, un fiado de hace más de 30 días, un proveedor con pedido pagado a la mitad, y un pago fijo «Luz» que venza en 1 o 2 días.
 - [ ] Probar en un iPhone el enlace o el QR (el día anterior, no en el escenario).
 - [ ] Cargar los dos celulares y el PC al 100 %.
 
 ### Mañana antes de las 9:30
 - [ ] Entregar el PowerPoint (y el PDF de respaldo) en la memoria USB **y** por correo.
-- [ ] Probar en el computador del evento que **el video suena y se ve** en la diapositiva 1.
+- [ ] Probar en el computador del evento que **el video suena y se ve** en la diapositiva 10 (abre la demo).
 - [ ] Probar el cable o la duplicación de pantalla del celular.
 - [ ] Modo avión activado, notificaciones silenciadas, app abierta en Inicio.
 - [ ] Ropa del mismo color los tres (verde o blanco: los colores de la marca).
@@ -122,10 +122,10 @@ Más preguntas con su respuesta: `docs/exposicion/PREGUNTAS_DEL_JURADO.md` (39 p
 ### Plan B
 | Si falla… | Hacemos esto |
 |---|---|
-| El video no reproduce | Ángel arranca directo en la portada; nadie lo menciona |
+| El video no reproduce | José sigue directo con la demo; nadie lo menciona |
 | No se puede proyectar el celular | Demo en el PC (programa de Windows) o con las capturas del pitch |
 | No hay internet en el evento | Mejor: la demo es en modo avión. Solo se omite el paso de "Sincronizado" |
-| Se acaba el tiempo del pitch | Saltar las diapositivas 10 y 13 y pasar a Legal |
+| Se acaba el tiempo del pitch | Saltar la 9 (pagos) y la 15 (100 tiendas). Nunca saltar la historia ni el cierre |
 
 ---
 
@@ -134,7 +134,7 @@ Más preguntas con su respuesta: `docs/exposicion/PREGUNTAS_DEL_JURADO.md` (39 p
 | Criterio (peso) | Dónde lo ganamos |
 |---|---|
 | Tecnología (25) | Demo en modo avión, sincronización sin duplicados, 128 pruebas, seguridad |
-| Emprendimiento (20) | Doña Marta, piloto de 8 semanas, 22 tipos de negocio |
+| Emprendimiento (20) | Doña Marta, cifras de Casanare (21.613 empresas, 46.318 salidas), impacto con 1.000 negocios, piloto de 8 semanas |
 | Marketing (20) | Video, "que ningún fiado se pierda", promociones con IA, seguimiento, QR para probarla ya |
 | Financiera (20) | $19.900/mes, equilibrio con 78 tiendas, $455.000/mes con 100 |
 | Jurídica (15) | Formatos oficiales Ley 1581, Anexo 3, propiedad intelectual y licencia a la Gobernación |

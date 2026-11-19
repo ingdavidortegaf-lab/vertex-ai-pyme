@@ -9,6 +9,7 @@ const SKILL = 'C:/Users/DAVID ORTEGA/AppData/Local/Packages/AnthropicPBC.Claude_
 const { applyTheme } = require(SKILL + '/scripts/apply_theme.js');
 
 const IMG = (n) => path.join(__dirname, 'img', n + '.png');
+const POSTER = 'data:image/png;base64,' + require('fs').readFileSync(path.join(__dirname, 'poster_30s.png')).toString('base64');
 const SALIDA = process.argv[2] || path.join(__dirname, 'VERTEX_AI_Pyme_Pitch.pptx');
 
 const THEME = {
@@ -100,94 +101,156 @@ function palotes(s, x, y, color, nombre) {
   texto(s, [{ text: 'VERTEX', options: { breakLine: true } }, { text: 'AI Pyme', options: { color: C.accent5 } }],
     { x: 0.7, y: 1.35, w: 6.9, h: 2.1, fontSize: 56, bold: true, color: C.background1, fontFace: THEME.headFontFace, lineSpacingMultiple: 0.9 });
   texto(s, [
-    { text: 'El cuaderno de la tienda, ahora en el celular.', options: { breakLine: true } },
-    { text: 'Funciona sin señal.', options: { color: C.accent2, bold: true } },
-  ], { x: 0.7, y: 3.6, w: 6.8, h: 1.2, fontSize: 24, color: C.background1 });
+    { text: 'Para los que abren a las 5 de la mañana', options: { breakLine: true } },
+    { text: 'y cierran cuando se va el último cliente.', options: { color: C.accent2, bold: true } },
+  ], { x: 0.7, y: 3.6, w: 6.9, h: 1.2, fontSize: 24, color: C.background1 });
   palotes(s, 0.8, 4.95, C.accent5, 'pal');
-  texto(s, 'Ventas, fiados, inventario, cobros e informes para el contador, en la tienda de barrio y de pueblo de Casanare.',
+  texto(s, 'El negocio entero en el celular: ventas, fiados, clientes, pagos fijos e informes para el contador. Funciona sin señal.',
     { x: 0.7, y: 5.6, w: 6.6, h: 0.8, fontSize: 16, color: C.background2 });
   texto(s, 'Equipo VERTEX TECH  ·  Respaldo MiPyme TIC: Asociación Aerollano',
     { x: 0.7, y: 6.6, w: 7, h: 0.4, fontSize: 13, color: C.accent5 });
   telefono(s, 'cartera', 9.55, 1.05, 5.7, 7, 'tel_atras');
   telefono(s, 'inicio', 7.75, 0.75, 6.0, -5, 'tel_frente');
-  s.addNotes('[0:00 – 0:15] Buenos días. Somos VERTEX TECH. Les presentamos VERTEX AI Pyme: el cuaderno de la tienda de barrio, ahora en el celular, y que funciona aunque no haya señal.');
+  s.addNotes('[ÁNGEL · 0:00 – 0:10] (Pausa. Miren al jurado antes de hablar.) Buenos días. Antes de hablarles de tecnología, quiero hablarles de una persona.');
 
-  // ============================================================ 2 DOÑA MARTA
-  pres.addSection({ title: 'Problema' });
-  s = nueva('CONTENIDO', 'Problema');
-  s.addText('Doña Marta tiene una tienda en Trinidad', { placeholder: 'title' });
-  texto(s, [
-    { text: '«Vende arroz, acetaminofén, purgante para el ganado y alambre. Le fía a medio pueblo y lo anota en un cuaderno que ya va por la tercera libreta.»', options: { breakLine: true } },
-  ], { x: 0.6, y: 1.65, w: 6.0, h: 2.4, fontSize: 22, italic: true, color: C.text1, fontFace: THEME.headFontFace });
-  texto(s, 'Cuando se le acaban los datos, ninguna app le abre.', { x: 0.6, y: 4.35, w: 6.0, h: 0.9, fontSize: 22, bold: true, color: C.accent3 });
-  texto(s, 'Así es la tienda de todo un poco en Casanare: víveres, droguería, agro y ferretería en el mismo mostrador, y el fiado al vecino y al productor que paga en cosecha.',
-    { x: 0.6, y: 5.4, w: 6.0, h: 1.2, fontSize: 15, color: C.text1 });
-  let n2 = [];
-  n2.push(...await tarjetaIcono(s, { x: 7.1, y: 1.6, w: 5.6, h: 1.55, Comp: fa.FaBookOpen, color: THEME.colors.accent3, titulo: 'El fiado se pierde', cuerpo: 'Páginas mojadas y nombres sin fecha: no sabe cuánto le deben ni desde cuándo.', nombre: 'dolor1' }));
-  n2.push(...await tarjetaIcono(s, { x: 7.1, y: 3.35, w: 5.6, h: 1.55, Comp: fa.FaWifi, color: THEME.colors.accent6, titulo: 'Se acaban los datos', cuerpo: 'Plan prepago y señal que falla en el barrio y en la vereda.', nombre: 'dolor2' }));
-  n2.push(...await tarjetaIcono(s, { x: 7.1, y: 5.1, w: 5.6, h: 1.55, Comp: fa.FaCalculator, color: THEME.colors.accent4, titulo: 'Las cuentas, a ojo', cuerpo: 'No sabe qué pedirle al preventista ni cuánto ganó en el mes.', nombre: 'dolor3' }));
-  animar.push({ slide: nSlide, grupos: [['dolor1', 'dolor1_c', 'dolor1_i', 'dolor1_t', 'dolor1_b'], ['dolor2', 'dolor2_c', 'dolor2_i', 'dolor2_t', 'dolor2_b'], ['dolor3', 'dolor3_c', 'dolor3_i', 'dolor3_t', 'dolor3_b']] });
-  s.addNotes('[0:15 – 0:40] Doña Marta representa a miles de tenderos de Casanare. Vende de todo un poco, fía a sus vecinos y lo anota en un cuaderno. Tiene tres dolores: el fiado se pierde, se le acaban los datos y lleva las cuentas a ojo.');
-
-  // ============================================================ 3 CIFRAS
-  s = nueva('OSCURA', 'Problema');
-  s.addText('La tienda mueve el país… con una libreta', { placeholder: 'title' });
-  const stats = [
-    ['450.000', 'tiendas de barrio en Colombia', C.accent5],
-    ['48 %', 'del consumo masivo pasa por ellas', C.accent2],
-    ['9 de 10', 'hogares compran en la tienda del barrio', C.accent5],
-    ['96 %', 'de los tenderos lleva las cuentas en cuaderno o de memoria', C.accent2],
+  // ============================================================ 2 LA HISTORIA
+  pres.addSection({ title: 'La historia' });
+  s = nueva('OSCURA', 'La historia');
+  s.addText('Son las 5:30 de la mañana en Trinidad', { placeholder: 'title' });
+  const historia = [
+    'Doña Marta sube la persiana de su tienda. Lleva 18 años detrás del mismo mostrador.',
+    'Le fía al vecino, al productor que paga en cosecha y a la familia que llegó sin nada.',
+    'Todo va en un cuaderno. Ya va por la tercera libreta.',
+    'Un aguacero mojó una página. Con ella se fue más de un millón de pesos que nadie volvió a pagar.',
   ];
-  const grupos3 = [];
-  stats.forEach(([num, lab, col], i) => {
-    const x = 0.6 + i * 3.1;
-    texto(s, num, { x, y: 2.25, w: 2.9, h: 1.0, fontSize: 54, bold: true, color: col, fontFace: THEME.bodyFontFace, objectName: `st${i}n` });
-    texto(s, lab, { x, y: 3.3, w: 2.7, h: 1.3, fontSize: 17, color: C.background1, objectName: `st${i}l` });
-    grupos3.push([`st${i}n`, `st${i}l`]);
+  const gh = [];
+  historia.forEach((t, i) => {
+    texto(s, t, { x: 0.6, y: 1.65 + i * 1.05, w: 7.3, h: 0.95, fontSize: 21, color: i === 3 ? C.accent2 : C.background1, bold: i === 3, objectName: `hi${i}` });
+    gh.push([`hi${i}`]);
   });
-  texto(s, 'Y en Casanare la tienda es todavía más: farmacia, agro y ferretería para el barrio y la vereda.',
-    { x: 0.6, y: 5.25, w: 12, h: 0.6, fontSize: 20, bold: true, color: C.background1, objectName: 'st_frase' });
-  grupos3.push(['st_frase']);
-  texto(s, 'Fuentes: Fenalco, Día Nacional del Tendero (2026) y comunicados de 2024; Portafolio (encuesta de hogares); FAO, estudio sobre tenderos (40 % cuaderno, 56 % de memoria).',
-    { x: 0.6, y: 6.35, w: 11.5, h: 0.5, fontSize: 11, color: C.accent5 });
-  animar.push({ slide: nSlide, grupos: grupos3 });
-  s.addNotes('[0:40 – 0:55] No es un problema pequeño: según Fenalco hay unas 450.000 tiendas de barrio y mueven cerca de la mitad del consumo masivo. Nueve de cada diez hogares compran en ellas. Pero casi todas se administran con un cuaderno o de memoria.');
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.4, y: 1.7, w: 4.3, h: 3.7, rectRadius: 0.15, fill: { color: C.background1, transparency: 90 }, line: { color: C.accent5, width: 1.5 }, objectName: 'hq' });
+  texto(s, [
+    { text: '«No fue por mala gente.', options: { breakLine: true } },
+    { text: 'Fue porque nadie se acordaba de cuánto debía.»' },
+  ], { x: 8.7, y: 1.95, w: 3.7, h: 2.6, fontSize: 24, italic: true, color: C.background1, fontFace: THEME.headFontFace, objectName: 'hqt' });
+  texto(s, 'Doña Marta', { x: 8.7, y: 4.65, w: 3.7, h: 0.4, fontSize: 15, bold: true, color: C.accent5, objectName: 'hqa' });
+  gh.push(['hq', 'hqt', 'hqa']);
+  texto(s, 'Doña Marta reúne lo que viven a diario miles de tenderos de Casanare.',
+    { x: 0.6, y: 6.15, w: 11, h: 0.4, fontSize: 13, italic: true, color: C.accent5, objectName: 'hnota' });
+  gh.push(['hnota']);
+  animar.push({ slide: nSlide, grupos: gh });
+  s.addNotes('[ÁNGEL · 0:10 – 0:45] (Despacio, como contando algo que les pasó a ustedes.) Son las 5:30 de la mañana en Trinidad. Doña Marta sube la persiana de su tienda. Lleva 18 años detrás del mismo mostrador. Le fía al vecino, al productor que paga en cosecha, a la familia que llegó sin nada. Todo lo anota en un cuaderno; ya va por la tercera libreta. Un día un aguacero le mojó una página, y con esa página se fue más de un millón de pesos que nadie le volvió a pagar. (Pausa.) No fue por mala gente. Fue porque nadie se acordaba de cuánto debía.\n\nNOTA: Doña Marta es un personaje que reúne lo que viven muchos tenderos. Si ustedes conocen un caso real (un familiar, un vecino), cuéntenlo con su nombre y su pueblo: pega más. No digan que es real si no lo es.');
 
-  // ============================================================ 4 SOLUCION
+  // ============================================================ 3 CASANARE EMPRENDE
+  pres.addSection({ title: 'El problema' });
+  s = nueva('OSCURA', 'El problema');
+  s.addText('Casanare es tierra de gente que se atreve', { placeholder: 'title' });
+  const cas = [
+    ['21.613', 'empresas registradas en Casanare en 2025', C.accent5],
+    ['96 de 100', 'son microempresas (96,2 %)', C.accent2],
+    ['1 a 4', 'personas trabajan en el 94,5 % de las que reportan empleo', C.accent5],
+    ['3.905', 'negocios nuevos en 2025: casi 11 cada día', C.accent2],
+  ];
+  const g3 = [];
+  cas.forEach(([num, lab, col], i) => {
+    const x = 0.6 + i * 3.1;
+    texto(s, num, { x, y: 2.0, w: 3.0, h: 1.0, fontSize: 50, bold: true, color: col, fontFace: THEME.bodyFontFace, objectName: `ca${i}n` });
+    texto(s, lab, { x, y: 3.05, w: 2.8, h: 1.3, fontSize: 17, color: C.background1, objectName: `ca${i}l` });
+    g3.push([`ca${i}n`, `ca${i}l`]);
+  });
+  texto(s, 'Detrás de cada número hay una familia que puso sus ahorros y su nombre en un negocio.',
+    { x: 0.6, y: 4.85, w: 12, h: 0.9, fontSize: 24, bold: true, italic: true, color: C.background1, fontFace: THEME.headFontFace, objectName: 'ca_frase' });
+  g3.push(['ca_frase']);
+  texto(s, 'Fuente: Cámara de Comercio de Casanare, Informe Estudio Económico 2025 (30 de enero de 2026), con datos del Registro Mercantil (RUES).',
+    { x: 0.6, y: 6.35, w: 11.5, h: 0.5, fontSize: 11, color: C.accent5 });
+  animar.push({ slide: nSlide, grupos: g3 });
+  s.addNotes('[ÁNGEL · 0:45 – 1:05] Doña Marta no está sola. En Casanare hay 21.613 empresas registradas, y 96 de cada 100 son microempresas. En casi todas trabajan entre una y cuatro personas: el dueño, la esposa, el hijo. Y cada día se abren casi 11 negocios nuevos. Casanare es tierra de gente que se atreve. Detrás de cada número hay una familia que puso sus ahorros y su nombre en un negocio.');
+
+  // ============================================================ 4 CIERRAN A CIEGAS
+  s = nueva('CONTENIDO', 'El problema');
+  s.addText('Pero muchos cierran a ciegas', { placeholder: 'title' });
+  texto(s, '46.318', { x: 0.6, y: 1.5, w: 5.4, h: 1.3, fontSize: 80, bold: true, color: C.accent3, fontFace: THEME.bodyFontFace, objectName: 'cc_n' });
+  texto(s, 'registros mercantiles salieron en Casanare entre 2016 y 2025. Unos 13 cada día.',
+    { x: 0.6, y: 2.85, w: 5.4, h: 1.0, fontSize: 19, color: C.text2, objectName: 'cc_l' });
+  texto(s, 'De los que tenían empleados, el 98 % eran negocios de 1 a 4 personas.',
+    { x: 0.6, y: 3.9, w: 5.4, h: 0.9, fontSize: 17, bold: true, color: C.accent3, objectName: 'cc_l2' });
+  const gc = [['cc_n', 'cc_l'], ['cc_l2']];
+  gc.push(await tarjetaIcono(s, { x: 6.5, y: 1.55, w: 6.2, h: 1.55, Comp: fa.FaBookOpen, color: THEME.colors.accent6, titulo: '95 de cada 100 sin contabilidad formal', cuerpo: '68,2 % de los micronegocios no lleva ningún registro de cuentas y 27,1 % usa cuaderno o Excel.', nombre: 'cc1' }));
+  gc.push(await tarjetaIcono(s, { x: 6.5, y: 3.3, w: 6.2, h: 1.55, Comp: fa.FaHandHoldingDollar, color: THEME.colors.accent3, titulo: 'Casi 1 de cada 4 cae en el gota a gota', cuerpo: 'El 22,9 % de los micronegocios que pidió crédito acudió a prestamistas gota a gota.', nombre: 'cc2' }));
+  gc.push(await tarjetaIcono(s, { x: 6.5, y: 5.05, w: 6.2, h: 1.3, Comp: fa.FaWifi, color: THEME.colors.accent4, titulo: 'La mitad trabaja sin internet', cuerpo: 'El 50,4 % no usó internet en su negocio en 2024.', nombre: 'cc3' }));
+  texto(s, 'No cierran por falta de ganas. Cierran porque no saben cuánto ganan, cuánto les deben ni cuánto deben.',
+    { x: 0.6, y: 4.95, w: 5.5, h: 1.3, fontSize: 18, italic: true, bold: true, color: C.text2, fontFace: THEME.headFontFace, objectName: 'cc_f' });
+  gc.push(['cc_f']);
+  texto(s, 'Fuentes: Cámara de Comercio de Casanare, Informe 2025 (incluye cancelaciones y matrículas no renovadas). DANE, Encuesta de Micronegocios (EMICRON) 2024, total nacional; la muestra del DANE no incluye a Casanare.',
+    { x: 0.6, y: 6.5, w: 12.1, h: 0.45, fontSize: 10, color: C.accent1 });
+  animar.push({ slide: nSlide, grupos: gc });
+  s.addNotes('[ÁNGEL · 1:05 – 1:25] Pero hay otra cara. Entre 2016 y 2025 salieron del registro en Casanare 46.318 negocios: unos 13 cada día. Y casi todos eran de una a cuatro personas. ¿Por qué? En el país, 95 de cada 100 micronegocios no llevan contabilidad formal: la mayoría no anota nada, y el resto, en un cuaderno. Casi uno de cada cuatro que pidió plata prestada terminó en el gota a gota. (Pausa.) No cierran por falta de ganas. Cierran a ciegas: sin saber cuánto ganan, cuánto les deben ni cuánto deben.\n\nSi preguntan: el 46.318 es de la Cámara de Comercio de Casanare e incluye cancelaciones y matrículas no renovadas. Las cifras de contabilidad, gota a gota e internet son del DANE (EMICRON 2024) para el país; el DANE no encuesta a Casanare en esa muestra.');
+
+  // ============================================================ 5 QUIENES SON
+  s = nueva('CONTENIDO', 'El problema');
+  s.addText('Ellos son los que mueven a Casanare', { placeholder: 'title' });
+  const caras = [
+    [fa.FaStore, THEME.colors.accent1, 'La tendera', 'En Trinidad: fía a medio pueblo y no sabe cuánto le deben.'],
+    [fa.FaScissors, THEME.colors.accent4, 'La peluquera', 'En Yopal: vende servicios, no productos, y cobra por Nequi.'],
+    [fa.FaWrench, THEME.colors.accent6, 'El mecánico', 'En Aguazul: repuestos fiados al proveedor y trabajos por cobrar.'],
+    [fa.FaWineBottle, THEME.colors.accent3, 'La licorera', 'En Paz de Ariporo: arriendo, luz y música que vencen cada mes.'],
+    [fa.FaUtensils, THEME.colors.accent1, 'El restaurante', 'De carretera: almuerzos a empresas que piden cuenta con NIT.'],
+    [fa.FaUserTie, THEME.colors.accent4, 'La profesional', 'Contadora u odontóloga: cobra por horas y necesita orden.'],
+  ];
+  const g5 = [];
+  for (let i = 0; i < caras.length; i++) {
+    const [Comp, col, t1, t2] = caras[i];
+    const x = 0.6 + (i % 3) * 4.07, y = 1.5 + Math.floor(i / 3) * 1.75;
+    g5.push(await tarjetaIcono(s, { x, y, w: 3.9, h: 1.6, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `cara${i}` }));
+  }
+  const datos5 = [['58,8 %', 'de las tiendas de barrio tiene dueña: 6 de cada 10 son mujeres'], ['36,1 %', 'emprendió porque no tenía otra forma de ganarse la vida'], ['11,6 %', 'abrió su negocio para ejercer su oficio o profesión']];
+  datos5.forEach(([n, l], i) => {
+    const x = 0.6 + i * 4.07;
+    texto(s, n, { x, y: 5.15, w: 3.9, h: 0.6, fontSize: 30, bold: true, color: C.accent1, fontFace: THEME.bodyFontFace, objectName: `q${i}n` });
+    texto(s, l, { x, y: 5.75, w: 3.9, h: 0.6, fontSize: 13, color: C.text1, objectName: `q${i}l` });
+    g5.push([`q${i}n`, `q${i}l`]);
+  });
+  texto(s, 'Fuente: DANE, EMICRON 2024 (total nacional) y boletín de panaderías y tiendas de barrio (mayo de 2026).',
+    { x: 0.6, y: 6.55, w: 12, h: 0.4, fontSize: 10, color: C.accent1 });
+  animar.push({ slide: nSlide, grupos: g5 });
+  s.addNotes('[ÁNGEL · 1:25 – 1:45] ¿Quiénes son? Son la tendera de Trinidad, la peluquera de Yopal, el mecánico de Aguazul, la licorera de Paz de Ariporo, el restaurante de carretera, la contadora que trabaja por su cuenta. Seis de cada diez tiendas de barrio las sostiene una mujer. Y más de un tercio emprendió porque no tenía otra forma de ganarse la vida. (Mirando al jurado.) Para ellos emprender no fue un plan B. Fue la única puerta abierta. Y nosotros queremos que esa puerta no se les cierre.');
+
+  // ============================================================ 6 LA SOLUCION
   pres.addSection({ title: 'Solución' });
   s = nueva('CONTENIDO', 'Solución');
-  s.addText('La tienda en el bolsillo', { placeholder: 'title' });
+  s.addText('Les devolvemos el control del negocio', { placeholder: 'title' });
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 9.85, y: 0.6, w: 2.85, h: 0.5, rectRadius: 0.25, fill: { color: C.accent2 }, line: { type: 'none' } });
   texto(s, 'Todo funciona sin internet', { x: 9.85, y: 0.6, w: 2.85, h: 0.5, fontSize: 14, bold: true, color: C.text2, align: 'center', valign: 'middle' });
   const sol = [
-    ['venta', 'Vende en segundos', 'Productos, código de barras y gramera'],
-    ['cartera', 'Sabe quién le debe', 'Cuánto, desde cuándo, y cobra por WhatsApp'],
-    ['informes', 'Le habla al contador', 'Informes de semana, quincena y mes en PDF'],
+    ['cartera', 'Ningún fiado se pierde', 'Quién debe, cuánto y desde cuándo'],
+    ['inicio', 'Sabe cuánto ganó hoy', 'Ventas, gastos y lo que le queda'],
+    ['clientes', 'Clientes con sus datos', 'Cédula o NIT, celular y correo'],
+    ['informes', 'Papeles en orden', 'Pagos fijos con aviso e informe al contador'],
   ];
-  const grupos4 = [];
+  const g6 = [];
   sol.forEach(([img, t1, t2], i) => {
-    const cx = 2.4 + i * 4.27;
-    const h = 4.25, w = h * 572 / 1234;
-    telefono(s, img, cx - w / 2, 1.4, h, 0, `sol${i}`);
-    texto(s, t1, { x: cx - 1.9, y: 5.82, w: 3.8, h: 0.42, fontSize: 19, bold: true, color: C.text2, align: 'center', objectName: `sol${i}t` });
-    texto(s, t2, { x: cx - 1.9, y: 6.24, w: 3.8, h: 0.4, fontSize: 14, color: C.text1, align: 'center', objectName: `sol${i}b` });
-    grupos4.push([`sol${i}`, `sol${i}t`, `sol${i}b`]);
+    const cx = 1.95 + i * 3.15;
+    const h = 3.95, w = h * 572 / 1234;
+    telefono(s, img, cx - w / 2, 1.45, h, 0, `sol${i}`);
+    texto(s, t1, { x: cx - 1.55, y: 5.55, w: 3.1, h: 0.42, fontSize: 18, bold: true, color: C.text2, align: 'center', objectName: `sol${i}t` });
+    texto(s, t2, { x: cx - 1.55, y: 5.97, w: 3.1, h: 0.6, fontSize: 13, color: C.text1, align: 'center', objectName: `sol${i}b` });
+    g6.push([`sol${i}`, `sol${i}t`, `sol${i}b`]);
   });
-  animar.push({ slide: nSlide, grupos: grupos4 });
-  s.addNotes('[0:55 – 1:15] VERTEX AI Pyme pone ese cuaderno en el celular. Vende en segundos, incluso con código de barras o gramera; sabe quién le debe, cuánto y desde cuándo, y cobra por WhatsApp; y le entrega al contador informes en PDF. Todo funciona sin internet.');
+  animar.push({ slide: nSlide, grupos: g6 });
+  s.addNotes('[CARLOS · 1:45 – 2:05] Por eso creamos VERTEX AI Pyme. No es una app más: es devolverle el control al que se atrevió. Con VERTEX ningún fiado se pierde: sabe quién le debe, cuánto y desde cuándo. Sabe cuánto ganó hoy. Tiene a sus clientes con cédula o NIT, celular y correo. Y tiene los papeles en orden: le avisa antes de que venza el arriendo o la luz, y le entrega el informe al contador. Todo funciona sin internet.');
 
-  // ============================================================ 5 UN DIA
+  // ============================================================ 7 UN DIA
   s = nueva('CONTENIDO', 'Solución');
   s.addText('Un día de Doña Marta con VERTEX', { placeholder: 'title' });
   const dia = [
     ['6:30 a. m.', fa.FaPlaneUp, THEME.colors.accent1, 'Abre sin datos', 'Vende de contado y fiado aunque no haya señal.'],
-    ['10:00 a. m.', fa.FaCow, THEME.colors.accent6, 'Don Pedro fía purina', 'Venta fiada con un toque: queda la fecha y el saldo.'],
-    ['3:00 p. m.', fa.FaBell, THEME.colors.accent3, '«Se agotó la sal»', 'Le llega un aviso al celular para pedir a tiempo.'],
+    ['10:00 a. m.', fa.FaCow, THEME.colors.accent6, 'Don Pedro fía purina', 'Si es cliente nuevo, lo registra ahí mismo con su cédula.'],
+    ['3:00 p. m.', fa.FaBell, THEME.colors.accent3, '«Mañana vence la luz»', 'Y «se agotó la sal»: avisos para no quedarse corta.'],
     ['6:00 p. m.', fa.FaWhatsapp, THEME.colors.accent1, 'Cobra sin pena', 'Cuenta de cobro en PDF: debe desde agosto, 95 días.'],
-    ['Lunes', fa.FaChartColumn, THEME.colors.accent4, 'Informe al contador', 'Ventas, gastos, cartera y libro, con número y logo.'],
+    ['Lunes', fa.FaChartColumn, THEME.colors.accent4, 'Informe al contador', 'Ventas, gastos, cartera y a quién le pagó, con su NIT.'],
   ];
   s.addShape(pres.shapes.LINE, { x: 1.4, y: 2.62, w: 10.5, h: 0, line: { color: HEX.grisLinea, width: 3, dashType: 'dash' } });
-  const grupos5 = [];
+  const g7 = [];
   for (let i = 0; i < dia.length; i++) {
     const [hora, Comp, col, t1, t2] = dia[i];
     const cx = 1.4 + i * 2.625;
@@ -196,45 +259,44 @@ function palotes(s, x, y, color, nombre) {
     s.addImage({ data: await icono(Comp, 'FFFFFF'), x: cx - 0.25, y: 2.37, w: 0.5, h: 0.5, objectName: `d${i}i` });
     texto(s, t1, { x: cx - 1.2, y: 3.35, w: 2.4, h: 0.75, fontSize: 17, bold: true, color: C.text2, align: 'center', objectName: `d${i}t` });
     texto(s, t2, { x: cx - 1.15, y: 4.1, w: 2.3, h: 1.1, fontSize: 14, color: C.text1, align: 'center', objectName: `d${i}b` });
-    grupos5.push([`d${i}h`, `d${i}c`, `d${i}i`, `d${i}t`, `d${i}b`]);
+    g7.push([`d${i}h`, `d${i}c`, `d${i}i`, `d${i}t`, `d${i}b`]);
   }
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y: 5.55, w: 12.1, h: 0.95, rectRadius: 0.12, fill: { color: C.accent1, transparency: 88 }, line: { type: 'none' }, objectName: 'd_res' });
   texto(s, [
-    { text: 'Resultado: ', options: { bold: true, color: C.accent1 } },
-    { text: 'menos fiado perdido, menos productos agotados y cuentas claras para el contador, sin depender de la señal.' },
+    { text: 'Al final del día: ', options: { bold: true, color: C.accent1 } },
+    { text: 'Doña Marta se acuesta sabiendo cuánto ganó, quién le debe y qué tiene que pagar mañana.' },
   ], { x: 0.9, y: 5.55, w: 11.6, h: 0.95, fontSize: 17, color: C.text2, valign: 'middle', objectName: 'd_rest' });
-  grupos5.push(['d_res', 'd_rest']);
-  animar.push({ slide: nSlide, grupos: grupos5 });
-  s.addNotes('[1:15 – 1:50] Así es un día con VERTEX. A las 6:30 abre sin datos y vende. A las 10, don Pedro, productor de la vereda, fía purina: un toque y queda registrado. A las 3 de la tarde el celular le avisa que se agotó la sal. A las 6 cobra sin pena: la cuenta de cobro en PDF dice que debe desde agosto. Y el lunes le manda el informe al contador.');
+  g7.push(['d_res', 'd_rest']);
+  animar.push({ slide: nSlide, grupos: g7 });
+  s.addNotes('[CARLOS · 2:05 – 2:30] Así es un día de Doña Marta con VERTEX. A las 6:30 abre sin datos y vende. A las 10 llega don Pedro, el productor de la vereda, a fiar purina; si es cliente nuevo, lo registra ahí mismo con su cédula, sin salir de la venta. A las 3, el celular le avisa que mañana vence la luz y que se agotó la sal. A las 6 cobra sin pena, con una cuenta de cobro que dice que le deben desde agosto. Y el lunes le manda el informe al contador. (Pausa.) Por primera vez en 18 años, Doña Marta se acuesta sabiendo cuánto ganó, quién le debe y qué tiene que pagar mañana.');
 
-  // ============================================================ 6 DOCUMENTOS
+  // ============================================================ 8 CUALQUIER NEGOCIO
   s = nueva('CONTENIDO', 'Solución');
-  s.addText('Cada papel con número, logo y archivo', { placeholder: 'title' });
-  const docs = [
-    ['CV', 'Comprobante de venta', 'tirilla de 80 mm o carta'],
-    ['CT', 'Cotización', 'se convierte en venta con un toque'],
-    ['CC', 'Cuenta de cobro', 'desde cuándo debe y días de mora'],
-    ['PD', 'Pedido al proveedor', 'lo que se está agotando'],
-    ['IN', 'Informes', 'semanal, quincenal y mensual'],
+  s.addText('Sirve para cualquier negocio', { placeholder: 'title' });
+  const neg = [
+    [fa.FaWineBottle, THEME.colors.accent3, 'Licorera', '«Aguardiente Llanero 750 ml» y el pago de la música cada mes.'],
+    [fa.FaPills, THEME.colors.accent4, 'Droguería', '«Acetaminofén 500 mg» y cuentas con NIT para las IPS.'],
+    [fa.FaScissors, THEME.colors.accent1, 'Peluquería', '«Corte y barba»: servicios sin inventario.'],
+    [fa.FaMotorcycle, THEME.colors.accent6, 'Transporte', 'Carreras, gasolina y la cuota de la moto.'],
+    [fa.FaUserTie, THEME.colors.accent4, 'Profesional', 'Asesoría por horas y cuenta de cobro a su nombre.'],
+    [fa.FaSeedling, THEME.colors.accent1, 'Agro y veterinaria', 'Concentrado fiado al productor que paga en cosecha.'],
   ];
-  const grupos6 = [];
-  docs.forEach(([cod, t1, t2], i) => {
-    const y = 1.6 + i * 0.82;
-    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y, w: 0.95, h: 0.58, rectRadius: 0.1, fill: { color: C.text2 }, line: { type: 'none' }, objectName: `doc${i}p` });
-    texto(s, cod, { x: 0.6, y, w: 0.95, h: 0.58, fontSize: 18, bold: true, color: C.accent5, align: 'center', valign: 'middle', objectName: `doc${i}c` });
-    texto(s, [{ text: t1, options: { bold: true, breakLine: true } }, { text: t2, options: { fontSize: 13, color: C.accent1 } }],
-      { x: 1.75, y: y - 0.05, w: 4.6, h: 0.72, fontSize: 17, color: C.text2, valign: 'middle', objectName: `doc${i}t` });
-    grupos6.push([`doc${i}p`, `doc${i}c`, `doc${i}t`]);
-  });
-  texto(s, 'Numeración única por equipo (ej. CC-A3F1-000017) y PDF archivado en el celular o el PC. No es factura electrónica DIAN: los datos quedan listos para conectarse con un proveedor autorizado.',
-    { x: 0.6, y: 5.85, w: 5.9, h: 1.0, fontSize: 13, color: C.text1 });
-  const pw = 3.85, ph = pw * 1430 / 1105;
-  s.addImage({ path: path.join(__dirname, 'informe.png'), x: 8.75, y: 1.3, w: pw, h: ph, rotate: 4, objectName: 'pdf_inf',
-    shadow: { type: 'outer', color: '0B1A14', blur: 10, offset: 5, angle: 90, opacity: 0.3 } });
-  s.addImage({ path: path.join(__dirname, 'cobro.png'), x: 6.75, y: 1.55, w: pw, h: ph, rotate: -3, objectName: 'pdf_cob',
-    shadow: { type: 'outer', color: '0B1A14', blur: 10, offset: 5, angle: 90, opacity: 0.3 } });
-  animar.push({ slide: nSlide, grupos: [...grupos6, ['pdf_inf'], ['pdf_cob']] });
-  s.addNotes('[1:50 – 2:10] Y como un buen contador, cada documento sale con número único, logo y queda archivado: comprobantes, cotizaciones, cuentas de cobro, pedidos e informes semanal, quincenal y mensual. Somos honestos: no es factura electrónica DIAN, pero los datos quedan listos para conectarse con un proveedor autorizado.');
+  const g8n = [];
+  for (let i = 0; i < neg.length; i++) {
+    const [Comp, col, t1, t2] = neg[i];
+    const x = 0.6 + (i % 2) * 3.75, y = 1.5 + Math.floor(i / 2) * 1.6;
+    g8n.push(await tarjetaIcono(s, { x, y, w: 3.6, h: 1.45, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `ng${i}` }));
+  }
+  texto(s, [
+    { text: '22 tipos de negocio. ', options: { bold: true, color: C.accent1 } },
+    { text: 'Al empezar, la app pregunta cómo trabajas y se adapta: los ejemplos de cada casilla son de tu negocio.' },
+  ], { x: 0.6, y: 6.35, w: 7.4, h: 0.6, fontSize: 14, color: C.text2, objectName: 'ng_nota' });
+  g8n.push(['ng_nota']);
+  telefono(s, 'registro1', 8.6, 1.35, 5.35, -3, 'ng_tel1');
+  telefono(s, 'registro3', 10.75, 1.5, 5.2, 3, 'ng_tel2');
+  g8n.push(['ng_tel1'], ['ng_tel2']);
+  animar.push({ slide: nSlide, grupos: g8n });
+  s.addNotes('[CARLOS · 2:30 – 2:45] Y no es solo para tiendas. Sirve para la licorera, la droguería, la peluquería, el que hace carreras en moto, la profesional que cobra por horas y el agro que le fía al productor. Son 22 tipos de negocio. La app pregunta cómo trabaja cada uno y se adapta: hasta los ejemplos de cada casilla hablan el idioma de su negocio.');
 
   // ============================================================ 6b PAGOS
   s = nueva('CONTENIDO', 'Solución');
@@ -254,17 +316,24 @@ function palotes(s, x, y, color, nombre) {
   telefono(s, 'cobro_dividido', 7.55, 1.3, 5.45, -2, 'mp_tel1');
   telefono(s, 'cierre', 10.15, 1.45, 5.3, 3, 'mp_tel2');
   animar.push({ slide: nSlide, grupos: [...gp, ['mp_tel1'], ['mp_tel2'], ['mp_nota']] });
-  s.addNotes('[2:10 – 2:25] El cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber y cuánto llegó a cada cuenta.');
+  s.addNotes('[CARLOS · 2:45 – 2:55] Y el cliente paga como quiera: efectivo, Nequi, Daviplata, Bancolombia o tarjeta, y hasta una parte por Nequi y otra en efectivo. Al final del día, el cierre de caja dice cuánto efectivo debe haber.');
+
+  // ============================================================ 9b VIDEO
+  pres.addSection({ title: 'Demo' });
+  s = nueva('OSCURA', 'Demo');
+  s.addText('VERTEX en 30 segundos', { placeholder: 'title' });
+  s.addMedia({ type: 'video', path: path.join(__dirname, '..', 'video', 'VERTEX_AI_Pyme_30s.mp4'), cover: POSTER,
+    x: 1.67, y: 1.45, w: 10.0, h: 5.625, objectName: 'video30' });
+  s.addNotes('[JOSÉ · abre los 5 minutos de demo] Hagan clic sobre el video para que empiece (30 segundos, con sonido). Mientras corre, José pone el celular en modo avión. Si el video no suena en el equipo del evento, sigan directo con la demo: no pierdan tiempo.');
 
   // ============================================================ 7 DEMO
-  pres.addSection({ title: 'Demo' });
   s = nueva('OSCURA', 'Demo');
   s.addText('Demo en vivo, en modo avión', { placeholder: 'title' });
   const pasos = [
     'Venta de todo un poco: arroz, acetaminofén y sal mineralizada',
-    'Fiado a un vecino y cobro por WhatsApp',
-    'Cuenta de cobro en PDF: desde cuándo debe',
-    'Aviso: «Se agotó la sal»',
+    'Cliente nuevo desde la venta, con su cédula, y fiado',
+    'Cobro por WhatsApp con la cuenta de cobro en PDF',
+    'Pagos fijos: la luz vence pronto, se paga y queda como gasto',
     'Vuelve la señal: todo se sincroniza, sin duplicar nada',
   ];
   const grupos7 = [];
@@ -277,7 +346,7 @@ function palotes(s, x, y, color, nombre) {
   });
   telefono(s, 'inicio_oscuro', 9.35, 0.85, 5.95, -3, 'demo_tel');
   animar.push({ slide: nSlide, grupos: grupos7 });
-  s.addNotes('[Demo, 5 min] Pongan el celular en modo avión frente al jurado. Sigan los 5 pasos de la diapositiva. Al final, quiten el modo avión y muestren la píldora «Sincronizado» con los registros subidos.');
+  s.addNotes('[JOSÉ · demo, 5 min] Celular en modo avión frente al jurado. Sigan los 5 pasos. Frase al empezar: «Todo lo que van a ver funciona sin internet». Al final quiten el modo avión y muestren la píldora «Sincronizado».');
 
   // ============================================================ 8 TECNOLOGIA
   pres.addSection({ title: 'Tecnología' });
@@ -315,37 +384,13 @@ function palotes(s, x, y, color, nombre) {
     g8b.push([`m${i}n`, `m${i}l`]);
   });
   animar.push({ slide: nSlide, grupos: [g8[0], ['fl1'], g8[1], ['fl2'], g8[2], ['fl3', 'fl3t'], g8[3], ...g8b] });
-  s.addNotes('[2:25 – 2:50] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío.');
+  s.addNotes('[JOSÉ · 2:55 – 3:15] ¿Cómo lo hicimos? Una sola app en Flutter y Dart para Android y Windows. Todo se guarda primero en una base cifrada en el celular y una cola lo sube a Supabase cuando hay señal, sin perder ni duplicar nada. En la nube, cada tienda solo ve sus datos. Tenemos 128 pruebas automáticas, incluida una que corta internet a mitad del envío.');
 
-  // ============================================================ 9 DIFERENCIACION
+  // ============================================================ 9 MERCADO
   pres.addSection({ title: 'Mercado' });
-  s = nueva('CONTENIDO', 'Mercado');
-  s.addText('¿Por qué no un cuaderno o una app gratuita?', { placeholder: 'title' });
-  const SI = { text: 'Sí', options: { color: THEME.colors.accent1, bold: true, align: 'center' } };
-  const NO = { text: 'No', options: { color: THEME.colors.accent3, bold: true, align: 'center' } };
-  const AV = (t) => ({ text: t || 'A veces', options: { color: THEME.colors.accent6, align: 'center' } });
-  const head = (t, fill, col) => ({ text: t, options: { bold: true, color: col, fill: { color: fill }, align: 'center', valign: 'middle' } });
-  const filas = [
-    ['Funciona todo el día sin datos', SI, AV(), SI],
-    ['Dice quién debe, cuánto y desde cuándo', NO, AV(), SI],
-    ['Cobra por WhatsApp con cuenta de cobro en PDF', NO, AV(), SI],
-    ['Informes listos para el contador', NO, AV(), SI],
-    ['Productos y servicios, se adapta a cada negocio', NO, AV(), SI],
-    ['Gente de Casanare que instala y acompaña', NO, NO, SI],
-  ];
-  s.addTable([
-    [head('Lo que necesita la tienda', 'EEF3EE', THEME.colors.dk2), head('Cuaderno', 'EEF3EE', THEME.colors.dk2), head('App gratuita genérica', 'EEF3EE', THEME.colors.dk2), head('VERTEX AI Pyme', THEME.colors.dk2, 'FFFFFF')],
-    ...filas.map((f) => [{ text: f[0], options: { color: THEME.colors.dk1 } }, f[1], f[2], { text: 'Sí', options: { color: '1B7F45', bold: true, align: 'center', fill: { color: 'DDF3E5' } } }]),
-  ], { x: 0.6, y: 1.55, w: 12.1, colW: [5.5, 2.0, 2.3, 2.3], rowH: 0.56, fontSize: 16, fontFace: THEME.bodyFontFace,
-    border: { type: 'solid', pt: 0.75, color: HEX.grisLinea }, valign: 'middle', objectName: 'tabla_dif' });
-  texto(s, 'Las apps grandes sirven para todo el país. VERTEX está hecha para la tienda de aquí: la que vende de todo un poco, donde los datos se acaban y el fiado es con el vecino.',
-    { x: 0.6, y: 5.75, w: 12.1, h: 0.9, fontSize: 17, italic: true, color: C.text2, objectName: 'dif_frase' });
-  animar.push({ slide: nSlide, grupos: [['dif_frase']] });
-  s.addNotes('[2:50 – 3:05] La pregunta obvia: ¿por qué no una app gratuita? Porque las apps grandes sirven para todo el país, pero nosotros estamos hechos para la tienda de aquí: funciona sin datos todo el día, dice desde cuándo le deben, cobra con un PDF y tiene gente de Casanare que la instala.');
-
   // ============================================================ 10 MARKETING
   s = nueva('CONTENIDO', 'Mercado');
-  s.addText('Cómo llegamos a cada tienda', { placeholder: 'title' });
+  s.addText('Cómo llegamos a cada negocio', { placeholder: 'title' });
   texto(s, '«Que ningún fiado se pierda»', { x: 0.6, y: 1.6, w: 4.9, h: 1.3, fontSize: 28, italic: true, bold: true, color: C.accent1, fontFace: THEME.headFontFace, objectName: 'mk_lema' });
   texto(s, 'Nuestro mensaje en la tienda, en los grupos de WhatsApp de comerciantes y en la emisora local.', { x: 0.6, y: 3.0, w: 4.9, h: 0.9, fontSize: 15, color: C.text1, objectName: 'mk_lema2' });
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y: 4.15, w: 4.9, h: 1.85, rectRadius: 0.12, fill: { color: C.accent2, transparency: 75 }, line: { type: 'none' }, objectName: 'mk_seg' });
@@ -369,7 +414,7 @@ function palotes(s, x, y, color, nombre) {
     g10[g10.length - 1].push(`can${i}x`, `can${i}y`);
   }
   animar.push({ slide: nSlide, grupos: g10 });
-  s.addNotes('[3:05 – 3:25] Nuestro mensaje es simple: que ningún fiado se pierda. Empezamos por las tiendas con más de 10 clientes debiendo, en Trinidad y Yopal. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda, con referidos entre tenderos, y con instalación en 20 minutos en la propia tienda.');
+  s.addNotes('[CARLOS · 3:15 – 3:35] ¿Cómo llegamos a cada negocio? Con un mensaje que cualquiera entiende: que ningún fiado se pierda. Empezamos por las tiendas de Trinidad y Yopal con más de 10 clientes debiendo. Llegamos con la Gobernación y los gremios, con los mayoristas y preventistas que ya visitan cada tienda cada semana, con tenderos que recomiendan a otros tenderos, y con instalación en 20 minutos en el propio negocio. ¿Por qué nosotros y no una app gratuita? Porque las apps grandes sirven para todo el país; nosotros somos de aquí: funciona sin datos todo el día, dice desde cuándo le deben, y hay gente de Casanare que la instala y responde por WhatsApp.');
 
   // ============================================================ 11 NEGOCIO
   pres.addSection({ title: 'Negocio' });
@@ -407,7 +452,7 @@ function palotes(s, x, y, color, nombre) {
     { text: 'La tecnología cuesta unos $135.000 al mes y casi no sube; lo que crece es el soporte. El plan cuesta menos que un fiado recuperado.', options: { fontSize: 13, color: C.background1 } },
   ], { x: 7.85, y: 5.3, w: 4.65, h: 1.3, fontSize: 15, valign: 'middle', objectName: 'cuentat' });
   animar.push({ slide: nSlide, grupos: [...g11, ['graf_ing'], ['cuenta', 'cuentat']] });
-  s.addNotes('[3:25 – 3:45] Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 19.900 pesos al mes o 199.000 al año, menos que un fiado recuperado. Con 78 tiendas cubrimos los costos; con 300 quedan unos 3 millones al mes y con mil, unos 11 millones. La tecnología casi no cuesta: lo que crece es el soporte.');
+  s.addNotes('[ÁNGEL · 3:35 – 3:55] Para las MiPymes de Casanare la app es gratis: la opera la Gobernación. Fuera del programa, el plan Tienda cuesta 19.900 pesos al mes o 199.000 al año, menos que un fiado recuperado. Con 78 tiendas cubrimos los costos; con 300 quedan unos 3 millones al mes y con mil, unos 11 millones. La tecnología casi no cuesta: lo que crece es el soporte.');
 
   // ============================================================ 11b 100 TIENDAS
   s = nueva('CONTENIDO', 'Negocio');
@@ -441,7 +486,29 @@ function palotes(s, x, y, color, nombre) {
     { text: 'Para crecer, una base más grande: cambio de plan, no de código.', options: { bullet: true } },
   ], { x: 7.85, y: 1.75, w: 4.65, h: 4.6, fontSize: 15, color: C.background1, paraSpaceAfter: 8, objectName: 'capt' });
   animar.push({ slide: nSlide, grupos: [['t100'], ['t100n'], ['cap', 'capt']] });
-  s.addNotes('[3:45 – 4:05] Con 100 tiendas entran casi 2 millones al mes; la nube cuesta 135 mil y el soporte 1,4 millones: quedan unos 455 mil. Y no se satura: cada tienda trabaja en su celular, 100 tiendas generan unos 216 megas al mes y la app consulta la nube 10 veces menos cuando no hay cambios.');
+  s.addNotes('[ÁNGEL · 3:55 – 4:05] Con 100 tiendas entran casi 2 millones al mes; la nube cuesta 135 mil y el soporte 1,4 millones: quedan unos 455 mil. Y no se satura: cada tienda trabaja en su celular, 100 tiendas generan unos 216 megas al mes y la app consulta la nube 10 veces menos cuando no hay cambios.');
+
+  // ============================================================ 11c IMPACTO
+  pres.addSection({ title: 'Impacto' });
+  s = nueva('OSCURA', 'Impacto');
+  s.addText('Si 1.000 negocios de Casanare usan VERTEX…', { placeholder: 'title' });
+  const imp = [
+    ['$600 millones', 'al año vuelven al bolsillo del emprendedor, si cada uno recupera solo $50.000 de fiado al mes', C.accent2],
+    ['150.000 horas', 'al año libres para vender o estar con la familia: media hora diaria menos haciendo cuentas', C.accent5],
+    ['1.000', 'negocios con sus cuentas en orden para pedir un crédito formal, en vez de ir al gota a gota', C.accent2],
+    ['< 5 %', 'de las 21.613 empresas registradas en Casanare: el camino apenas empieza', C.accent5],
+  ];
+  const gi = [];
+  imp.forEach(([n, l, col], i) => {
+    const x = 0.6 + (i % 2) * 6.15, y = 1.55 + Math.floor(i / 2) * 2.1;
+    texto(s, n, { x, y, w: 5.9, h: 0.85, fontSize: 44, bold: true, color: col, fontFace: THEME.bodyFontFace, objectName: `im${i}n` });
+    texto(s, l, { x, y: y + 0.88, w: 5.7, h: 0.9, fontSize: 16, color: C.background1, objectName: `im${i}l` });
+    gi.push([`im${i}n`, `im${i}l`]);
+  });
+  texto(s, 'Escenario a validar en el piloto, no un resultado: 1.000 negocios × $50.000 × 12 meses; 1.000 × 30 minutos × 300 días.',
+    { x: 0.6, y: 6.35, w: 12, h: 0.45, fontSize: 11, color: C.accent5 });
+  animar.push({ slide: nSlide, grupos: gi });
+  s.addNotes('[ÁNGEL · 4:05 – 4:20] ¿Y qué gana Casanare? Hagamos la cuenta con mil negocios, menos del cinco por ciento de los que hay registrados. Si cada uno recupera apenas 50 mil pesos de fiado al mes, son 600 millones de pesos al año que se quedan en las familias de Casanare. Si cada uno se ahorra media hora diaria de cuentas, son 150 mil horas para vender o para estar con sus hijos. Y son mil negocios con sus números en orden para pedir un crédito de verdad, y no caer en el gota a gota.\n\nSi preguntan: es un escenario que vamos a medir en el piloto, no un resultado.');
 
   // ============================================================ 12 VALIDACION
   s = nueva('CONTENIDO', 'Negocio');
@@ -479,7 +546,7 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 8.85, y: 4.15, w: 3.7, h: 2.25, fontSize: 14, color: C.background1, paraSpaceAfter: 4, objectName: 'rutat' });
   g12.push(['ruta', 'rutat']);
   animar.push({ slide: nSlide, grupos: g12 });
-  s.addNotes('[4:05 – 4:25] Lo vamos a validar con un piloto de 8 semanas en 15 tiendas de Trinidad y Yopal, con metas medibles: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestas a pagar y cerrar un mayorista aliado. Después: Google Play, facturación electrónica con un proveedor autorizado y la versión para iPhone.');
+  s.addNotes('[CARLOS · 4:20 – 4:30] Lo vamos a validar con un piloto de 8 semanas en 15 tiendas de Trinidad y Yopal, con metas medibles: que 10 usen la app al menos 4 días por semana, que 6 estén dispuestas a pagar y cerrar un mayorista aliado. Después: Google Play, facturación electrónica con un proveedor autorizado y la versión para iPhone.');
 
   // ============================================================ 13 LEGAL
   s = nueva('CONTENIDO', 'Negocio');
@@ -499,12 +566,12 @@ function palotes(s, x, y, color, nombre) {
     g13.push(await tarjetaIcono(s, { x, y, w: 3.9, h: 2.15, Comp, color: col, titulo: t1, cuerpo: t2, nombre: `lg${i}` }));
   }
   animar.push({ slide: nSlide, grupos: g13 });
-  s.addNotes('[4:25 – 4:40] En lo legal: cumplimos la Ley 1581 con los formatos oficiales de la convocatoria (casilla sin marcar con enlace visible a la política y Anexo 3 para cada cliente); la MiPyme es responsable y la Gobernación encargada; el equipo conserva la propiedad intelectual y la Gobernación recibe licencia gratuita e indefinida. Todo el software es libre y no prometemos lo que no es: no es factura electrónica.');
+  s.addNotes('[CARLOS · 4:30 – 4:40] En lo legal: cumplimos la Ley 1581 con los formatos oficiales de la convocatoria (casilla sin marcar con enlace visible a la política y Anexo 3 para cada cliente); la MiPyme es responsable y la Gobernación encargada; el equipo conserva la propiedad intelectual y la Gobernación recibe licencia gratuita e indefinida. Todo el software es libre y no prometemos lo que no es: no es factura electrónica.');
 
   // ============================================================ 14 EQUIPO
   pres.addSection({ title: 'Cierre' });
   s = nueva('CONTENIDO', 'Cierre');
-  s.addText('Equipo VERTEX TECH', { placeholder: 'title' });
+  s.addText('Somos de aquí: equipo VERTEX TECH', { placeholder: 'title' });
   const eq = [
     ['JD', 'José David Ortega Fuentes', 'App, backend, IA e integraciones', C.accent1],
     ['CA', 'Carlos Andrés Ortega Fuentes', 'Procesos, usabilidad y pruebas con las tiendas piloto', C.accent4],
@@ -527,22 +594,27 @@ function palotes(s, x, y, color, nombre) {
   ], { x: 0.9, y: 5.3, w: 11.6, h: 1.25, fontSize: 18, valign: 'middle', objectName: 'aerot' });
   g14.push(['aero', 'aerot']);
   animar.push({ slide: nSlide, grupos: g14 });
-  s.addNotes('[4:40 – 4:50] Somos tres hermanos de Casanare: desarrollo, procesos y negocio, con el respaldo de la Asociación Aerollano.');
+  s.addNotes('[ÁNGEL · 4:40 – 4:45] Somos tres hermanos de Casanare. Crecimos viendo estos negocios por dentro. No venimos de afuera a explicarle a nadie su negocio: venimos a darle herramientas.');
 
   // ============================================================ 15 CIERRE
   s = nueva('PORTADA', 'Cierre');
-  palotes(s, 0.8, 1.2, C.accent5, 'pc');
-  texto(s, 'Que ningún fiado se pierda.', { x: 0.7, y: 1.95, w: 7.6, h: 1.6, fontSize: 46, bold: true, color: C.background1, fontFace: THEME.headFontFace, objectName: 'c1' });
-  texto(s, 'Hecho en Casanare, para la tienda de Casanare.', { x: 0.7, y: 3.6, w: 7.4, h: 0.6, fontSize: 24, color: C.accent5, objectName: 'c2' });
+  palotes(s, 0.8, 0.85, C.accent5, 'pc');
+  texto(s, 'Doña Marta no necesita lástima. Necesita herramientas.', { x: 0.7, y: 1.55, w: 11.9, h: 1.7, fontSize: 42, bold: true, color: C.background1, fontFace: THEME.headFontFace, objectName: 'c1' });
+  texto(s, [
+    { text: 'Que ningún fiado se pierda.', options: { breakLine: true } },
+    { text: 'Que ningún negocio cierre a ciegas.', options: { breakLine: true } },
+    { text: 'Que el que se atrevió a emprender en Casanare tenga la misma claridad que una gran empresa.' },
+  ], { x: 0.7, y: 3.35, w: 11.9, h: 1.55, fontSize: 22, color: C.accent5, paraSpaceAfter: 4, objectName: 'c2' });
   texto(s, [
     { text: 'Lo que pedimos: ', options: { bold: true, color: C.accent2 } },
-    { text: '15 tiendas para el piloto y el acompañamiento de la Gobernación para llegar a todas las MiPymes del departamento.' },
-  ], { x: 0.7, y: 4.5, w: 7.2, h: 1.2, fontSize: 18, color: C.background1, objectName: 'c3' });
-  texto(s, 'contacto@vertextechco.online', { x: 0.7, y: 6.3, w: 6, h: 0.45, fontSize: 18, bold: true, color: C.accent5 });
-  telefono(s, 'comprobante', 9.45, 0.95, 5.85, 5, 'c_tel2');
-  telefono(s, 'informes', 8.0, 0.7, 6.05, -4, 'c_tel1');
-  animar.push({ slide: nSlide, grupos: [['c1'], ['c2'], ['c3']] });
-  s.addNotes('[4:50 – 5:00] Que ningún fiado se pierda. VERTEX AI Pyme: hecho en Casanare, para la tienda de Casanare. Gracias.');
+    { text: '15 negocios para el piloto y que la Gobernación nos acompañe a llegar a todas las MiPymes del departamento.' },
+  ], { x: 0.7, y: 5.1, w: 11.9, h: 0.8, fontSize: 19, color: C.background1, objectName: 'c3' });
+  texto(s, [
+    { text: 'VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare.', options: { breakLine: true } },
+    { text: 'contacto@vertextechco.online', options: { color: C.background2, bold: false } },
+  ], { x: 0.7, y: 6.05, w: 11.9, h: 0.85, fontSize: 17, bold: true, color: C.accent5, objectName: 'c4' });
+  animar.push({ slide: nSlide, grupos: [['c1'], ['c2'], ['c3'], ['c4']] });
+  s.addNotes('[ÁNGEL · 4:45 – 5:00] (Despacio. Es el momento más importante.) Doña Marta no necesita que le tengan lástima. Necesita herramientas. Que ningún fiado se pierda. Que ningún negocio cierre a ciegas. Que el que se atrevió a emprender en Casanare tenga la misma claridad que una gran empresa. Hoy les pedimos 15 negocios para el piloto, y que la Gobernación nos acompañe a llegar a todas las MiPymes del departamento. VERTEX AI Pyme: hecho en Casanare, para la gente que mueve a Casanare. Gracias. (Silencio de dos segundos antes de sentarse.)');
 
   await pres.writeFile({ fileName: SALIDA });
   await applyTheme(SALIDA, THEME);
