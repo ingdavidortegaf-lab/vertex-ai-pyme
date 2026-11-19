@@ -13,7 +13,7 @@ if (Test-Path $Destino) { Get-ChildItem $Destino -Force | Remove-Item -Recurse -
 else { New-Item -ItemType Directory $Destino | Out-Null }
 
 # Guias generales en la raiz
-foreach ($f in @('00_LEAME_PRIMERO.md','GUIA_VISUAL.html','GUION_PARA_EXPONER.md','PREGUNTAS_DEL_JURADO.md','GLOSARIO.md')) {
+foreach ($f in @('00_LEAME_PRIMERO.md','GUIA_VISUAL.html','GUION_PARA_EXPONER.md','PREGUNTAS_DEL_JURADO.md','GLOSARIO.md','PLAN_DIA_DE_LA_PRESENTACION.md')) {
   Copy-Item "$guias\$f" "$Destino\$f"
 }
 
