@@ -3,6 +3,7 @@ import '../data/local_db.dart';
 import '../domain/contabilidad.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
+import '../domain/identificacion.dart';
 import '../domain/pagos.dart';
 import '../domain/resumen.dart';
 import 'pdf_reportes.dart';
@@ -193,6 +194,17 @@ Future<DatosInforme> cargarInforme(Periodo periodo, DateTime ahora) async {
 
 const _tipos = {'ingreso': 'Venta', 'egreso': 'Gasto', 'abono': 'Abono'};
 
+/// Cliente (en ventas y abonos) o tercero (en gastos), con su documento si
+/// lo tiene: «Inmobiliaria Los Llanos · NIT 900.373.913-4».
+String _quien(Map<String, Object?> m) {
+  final gasto = m['tipo'] == 'egreso';
+  final nombre = (m[gasto ? 'tercero_nombre' : 'cliente_nombre'] as String?) ?? '';
+  final doc = (m[gasto ? 'tercero_documento' : 'cliente_documento'] as String?) ?? '';
+  if (nombre.isEmpty) return '';
+  if (doc.isEmpty) return nombre;
+  return '$nombre · ${mostrarDocumento((m[gasto ? 'tercero_tipo_doc' : 'cliente_tipo_doc'] as String?) ?? 'CC', doc)}';
+}
+
 /// Informe semanal, quincenal o mensual para el dueño y el contador.
 Reporte reporteInforme({
   required PerfilNegocio negocio,
@@ -350,14 +362,14 @@ Reporte reporteInforme({
       ),
       const Seccion('Libro de movimientos del periodo'),
       Tabla(
-        ['Fecha', 'Tipo', 'Concepto', 'Cliente', 'Forma', 'Valor'],
+        ['Fecha', 'Tipo', 'Concepto', 'Cliente o tercero', 'Forma', 'Valor'],
         [
           for (final m in d.movimientos)
             [
               _diaHora.format(DateTime.parse(m['fecha'] as String).toLocal()),
               _tipos[m['tipo']] ?? '${m['tipo']}',
               (m['concepto'] as String?) ?? '',
-              (m['cliente_nombre'] as String?) ?? '',
+              _quien(m),
               m['tipo'] == 'ingreso' && m['credito'] == 1
                   ? 'Crédito'
                   : textoPagos(

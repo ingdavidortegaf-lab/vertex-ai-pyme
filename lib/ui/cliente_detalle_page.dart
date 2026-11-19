@@ -6,6 +6,7 @@ import '../data/local_db.dart';
 import '../data/sync_service.dart';
 import '../domain/asistente_local.dart';
 import '../domain/formato.dart';
+import '../domain/identificacion.dart';
 import '../domain/resumen.dart';
 import 'clientes_page.dart';
 import 'comun.dart';
@@ -162,6 +163,24 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
                     Text(_tel.isEmpty ? 'Sin celular' : mostrarTelefono(_tel),
                         style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
                   ]),
+                  if ((c['documento'] as String? ?? '').isNotEmpty)
+                    Text(mostrarDocumento(c['tipo_doc'] as String? ?? 'CC', c['documento'] as String),
+                        style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
+                  if ((c['correo'] as String? ?? '').isNotEmpty)
+                    Text(c['correo'] as String,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
+                  if (!datosParaFactura(
+                      documento: c['documento'] as String? ?? '', correo: c['correo'] as String? ?? ''))
+                    InkWell(
+                      onTap: () => mostrarFormCliente(context, cliente: c),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text('+ Agregar cédula o NIT y correo',
+                            style: t.labelLarge?.copyWith(color: p.ventasTiza)),
+                      ),
+                    ),
                 ]),
               ),
               iconoSync(c['sync']),

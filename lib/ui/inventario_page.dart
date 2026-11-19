@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../domain/ejemplos.dart';
 import '../data/local_db.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
@@ -509,9 +510,9 @@ class _FormProductoState extends State<_FormProducto> {
               autofocus: nuevo,
               textCapitalization: TextCapitalization.sentences,
               maxLength: 80,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   labelText: 'Nombre',
-                  hintText: 'Ej.: Arroz 500 g',
+                  hintText: 'Ej.: ${ejemplosPara(LocalDb.instance.tipoNegocio.value).producto}',
                   counterText: ''),
               validator: (v) => (v ?? '').trim().length < 2
                   ? 'Escribe el nombre del producto'

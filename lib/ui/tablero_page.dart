@@ -11,6 +11,8 @@ import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'negocio_page.dart';
 import 'oficina_page.dart';
+import 'pagos_fijos_page.dart';
+import '../domain/obligaciones.dart';
 import 'tema.dart';
 import 'ventas_page.dart';
 
@@ -41,16 +43,45 @@ class _TableroPageState extends State<TableroPage> {
   }
 
   double _porPagar = 0;
+  List<PagoFijo> _fijos = [];
 
   Future<void> _load() async {
     final d = await LocalDb.instance.datosAsistente();
     final pp = await LocalDb.instance.totalPorPagar();
+    final fijos = await LocalDb.instance.pagosFijos();
     if (mounted) {
       setState(() {
         _d = d;
         _porPagar = pp;
+        _fijos = fijos;
       });
     }
+  }
+
+  /// Pagos fijos que se pasaron o vencen en los próximos días.
+  List<Widget> _seccionFijos(BuildContext context) {
+    final hoy = DateTime.now();
+    final urgentes = ordenarFijos(_fijos, hoy)
+        .where((f) => const [EstadoFijo.vencido, EstadoFijo.pronto].contains(estadoFijo(f, hoy)))
+        .toList();
+    if (urgentes.isEmpty) return const [];
+    return [
+      TituloSeccion(
+        'Pagos fijos por vencer',
+        accion: TextButton(
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const PagosFijosPage())),
+            child: const Text('Ver todos')),
+      ),
+      Card(
+        child: Column(children: [
+          for (final (i, f) in urgentes.take(3).indexed) ...[
+            if (i > 0) const Divider(indent: 16),
+            FilaFijo(f: f, hoy: hoy),
+          ],
+        ]),
+      ),
+    ];
   }
 
   void _abrirCliente(String id) => Navigator.of(context).push(
@@ -108,6 +139,8 @@ class _TableroPageState extends State<TableroPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            // Lo urgente primero: pagos fijos vencidos o por vencer.
+            ..._seccionFijos(context),
             const TituloSeccion('Herramientas'),
             const HerramientasGrid(),
             if (d.nombreNegocio.isEmpty) ...[

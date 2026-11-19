@@ -4,6 +4,9 @@ import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import 'cliente_detalle_page.dart';
 import 'campo_telefono.dart';
+import 'campos_identificacion.dart';
+import '../domain/ejemplos.dart';
+import '../domain/identificacion.dart';
 import 'comun.dart';
 import 'legal_page.dart';
 import 'ilustraciones.dart';
@@ -63,7 +66,9 @@ class _ClientesPageState extends State<ClientesPage> {
         : _items.where((c) {
             final nombre = _sinTildes(c['nombre'] as String);
             final tel = (c['telefono'] as String?) ?? '';
-            return nombre.contains(f) || (digitos.length >= 3 && tel.contains(digitos));
+            final doc = ((c['documento'] as String?) ?? '').replaceAll(RegExp(r'\D'), '');
+            return nombre.contains(f) ||
+                (digitos.length >= 3 && (tel.contains(digitos) || doc.contains(digitos)));
           }).toList();
     final deudores = _items.where((c) => ((c['saldo'] as num?) ?? 0) > 0).length;
 
@@ -92,7 +97,7 @@ class _ClientesPageState extends State<ClientesPage> {
                     onChanged: (v) => setState(() => _filtro = v),
                     textInputAction: TextInputAction.search,
                     decoration: const InputDecoration(
-                      hintText: 'Buscar por nombre o celular',
+                      hintText: 'Buscar por nombre, celular o cédula',
                       prefixIcon: Icon(Icons.search),
                     ),
                   ),
@@ -139,7 +144,14 @@ class _FilaCliente extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       leading: AvatarCliente(nombre: nombre, clave: nombre),
       title: Text(nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(tel.isEmpty ? 'Sin celular' : mostrarTelefono(tel)),
+      subtitle: Text(
+          [
+            tel.isEmpty ? 'Sin celular' : mostrarTelefono(tel),
+            if ((c['documento'] as String? ?? '').isNotEmpty)
+              mostrarDocumento(c['tipo_doc'] as String? ?? 'CC', c['documento'] as String),
+          ].join(' · '),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         if (saldo > 0)
           Container(
@@ -160,17 +172,19 @@ class _FilaCliente extends StatelessWidget {
 
 /// Crear (cliente == null) o editar un cliente. Devuelve el id guardado.
 Future<String?> mostrarFormCliente(BuildContext context,
-    {Map<String, Object?>? cliente}) async {
-  final r = await showModalBottomSheet<(String, String)>(
+    {Map<String, Object?>? cliente, String nombreInicial = ''}) async {
+  final r = await showModalBottomSheet<_DatosCliente>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    builder: (_) => _FormCliente(cliente: cliente),
+    builder: (_) => _FormCliente(cliente: cliente, nombreInicial: nombreInicial),
   );
   if (r == null) return null;
-  final (nombre, tel) = r;
-  final id = await LocalDb.instance
-      .saveCliente(nombre, tel, id: cliente?['id'] as String?);
+  final id = await LocalDb.instance.saveCliente(r.nombre, r.telefono,
+      id: cliente?['id'] as String?,
+      tipoDoc: r.tipoDoc,
+      documento: r.documento,
+      correo: r.correo);
   if (cliente == null) {
     await LocalDb.instance.registrarAutorizacionCliente(id, 'en la tienda');
   }
@@ -179,18 +193,32 @@ Future<String?> mostrarFormCliente(BuildContext context,
   return id;
 }
 
+class _DatosCliente {
+  final String nombre, telefono, tipoDoc, documento, correo;
+  const _DatosCliente(this.nombre, this.telefono, this.tipoDoc, this.documento, this.correo);
+}
+
 class _FormCliente extends StatefulWidget {
   final Map<String, Object?>? cliente;
-  const _FormCliente({this.cliente});
+  final String nombreInicial;
+  const _FormCliente({this.cliente, this.nombreInicial = ''});
   @override
   State<_FormCliente> createState() => _FormClienteState();
 }
 
 class _FormClienteState extends State<_FormCliente> {
   final _form = GlobalKey<FormState>();
-  late final _nombre =
-      TextEditingController(text: widget.cliente?['nombre'] as String? ?? '');
+  late final _nombre = TextEditingController(
+      text: widget.cliente?['nombre'] as String? ?? widget.nombreInicial);
   late final _tel = TelefonoCtrl(widget.cliente?['telefono'] as String? ?? '');
+  late final _id = IdentificacionCtrl(
+      tipo: widget.cliente?['tipo_doc'] as String? ?? 'CC',
+      documento: widget.cliente?['documento'] as String? ?? '',
+      correo: widget.cliente?['correo'] as String? ?? '');
+
+  /// Los datos de factura se muestran abiertos si ya hay alguno.
+  late bool _verDatos = (widget.cliente?['documento'] as String? ?? '').isNotEmpty ||
+      (widget.cliente?['correo'] as String? ?? '').isNotEmpty;
 
   /// Autorización del cliente (Ley 1581): casilla SIN premarcar,
   /// obligatoria para registrar un cliente nuevo.
@@ -207,6 +235,7 @@ class _FormClienteState extends State<_FormCliente> {
   void dispose() {
     _nombre.dispose();
     _tel.dispose();
+    _id.dispose();
     super.dispose();
   }
 
@@ -215,10 +244,19 @@ class _FormClienteState extends State<_FormCliente> {
     setState(() => _errorAutoriza = nuevo && !_autoriza
         ? 'Para registrar al cliente necesitas su autorización'
         : null);
-    if (!_form.currentState!.validate() || _errorAutoriza != null) return;
+    if (!_form.currentState!.validate()) {
+      // Si el error está en los datos de factura, se abren para verlo.
+      if (problemaDocumento(_id.tipo, _id.documento.text) != null ||
+          problemaCorreo(_id.correo.text) != null) {
+        setState(() => _verDatos = true);
+      }
+      return;
+    }
+    if (_errorAutoriza != null) return;
     final nombre = _nombre.text.trim().replaceAll(RegExp(r'\s+'), ' ');
     final tel = _tel.valor ?? '';
-    Navigator.pop(context, (nombre, tel));
+    Navigator.pop(context,
+        _DatosCliente(nombre, tel, _id.tipo, _id.documentoNormal, _id.correoNormal));
   }
 
   @override
@@ -251,20 +289,39 @@ class _FormClienteState extends State<_FormCliente> {
               autofocus: widget.cliente == null,
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.next,
-              maxLength: 60,
-              decoration: const InputDecoration(
-                  labelText: 'Nombre', prefixIcon: Icon(Icons.person_outline)),
+              maxLength: 80,
+              decoration: InputDecoration(
+                  labelText: _id.esEmpresa ? 'Razón social de la empresa' : 'Nombre completo',
+                  hintText: _id.esEmpresa
+                      ? 'Ej.: ${ejemplosPara(LocalDb.instance.tipoNegocio.value).empresa}'
+                      : 'Ej.: Ana María Pérez Rojas',
+                  prefixIcon: Icon(_id.esEmpresa ? Icons.business_outlined : Icons.person_outline)),
               validator: (v) {
                 final t = (v ?? '').trim();
-                if (t.length < 2) return 'Escribe el nombre del cliente';
-                if (RegExp(r'[0-9@]').hasMatch(t)) {
+                if (t.length < 2) {
+                  return _id.esEmpresa ? 'Escribe el nombre de la empresa' : 'Escribe el nombre del cliente';
+                }
+                if (!_id.esEmpresa && RegExp(r'[0-9@]').hasMatch(t)) {
                   return 'El nombre no debe llevar números ni correos';
                 }
                 return null;
               },
             ),
             const SizedBox(height: 4),
-            CampoTelefono(ctrl: _tel, alEnviar: (_) => _guardar()),
+            CampoTelefono(ctrl: _tel),
+            const SizedBox(height: 4),
+            if (!_verDatos)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  key: const ValueKey('ver_datos_factura'),
+                  onPressed: () => setState(() => _verDatos = true),
+                  icon: const Icon(Icons.badge_outlined),
+                  label: const Text('Agregar cédula o NIT y correo'),
+                ),
+              )
+            else
+              CamposIdentificacion(ctrl: _id, alCambiarTipo: () => setState(() {})),
             const SizedBox(height: 12),
             if (widget.cliente == null) ...[
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

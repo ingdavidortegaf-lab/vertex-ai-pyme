@@ -8,6 +8,9 @@ import 'comun.dart';
 import 'pago_widget.dart';
 import '../domain/pagos.dart';
 import 'escaner.dart';
+import 'clientes_page.dart';
+import 'terceros_page.dart';
+import '../domain/ejemplos.dart';
 import 'herramientas_page.dart';
 import '../domain/codigos.dart';
 import 'ilustraciones.dart';
@@ -212,7 +215,11 @@ Future<void> mostrarFormMovimiento(BuildContext context,
     var concepto = r.concepto.trim();
     if (concepto.isEmpty) concepto = r.tipo == 'abono' ? 'Abono' : 'Venta';
     id = await LocalDb.instance.saveMovimiento(concepto, r.monto,
-        tipo: r.tipo, credito: r.fiado, clienteId: r.clienteId, pagos: r.pagos);
+        tipo: r.tipo,
+        credito: r.fiado,
+        clienteId: r.clienteId,
+        terceroId: r.terceroId,
+        pagos: r.pagos);
   }
   SyncService.instance.sync();
   if (r.tipo == 'ingreso') {
@@ -236,9 +243,12 @@ class _Movimiento {
 
   /// Cómo se pagó (vacío si es fiado).
   final List<Pago> pagos;
+
+  /// A quién se le pagó el gasto (proveedor, arrendador…), si se eligió.
+  final String? terceroId;
   const _Movimiento(
       this.concepto, this.monto, this.tipo, this.fiado, this.clienteId,
-      [this.items = const [], this.pagos = const []]);
+      [this.items = const [], this.pagos = const [], this.terceroId]);
 }
 
 class _FormMovimiento extends StatefulWidget {
@@ -262,7 +272,11 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   late String _tipo = widget.tipoInicial;
   bool _fiado = false;
   late String? _clienteId = widget.clienteId;
+  late List<ClienteSaldo> _clientes = widget.clientes;
   String? _errorCliente;
+  String? _terceroId;
+  String? _terceroNombre;
+  final _ej = ejemplosPara(LocalDb.instance.tipoNegocio.value);
   List<Pago> _pagos = const [];
   String? _errorPago;
 
@@ -378,7 +392,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   }
 
   ClienteSaldo? get _cliente {
-    for (final c in widget.clientes) {
+    for (final c in _clientes) {
       if (c.id == _clienteId) return c;
     }
     return null;
@@ -389,8 +403,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
 
   Future<void> _elegirCliente() async {
     final lista = _tipo == 'abono'
-        ? widget.clientes.where((c) => c.saldo > 0).toList()
-        : widget.clientes;
+        ? _clientes.where((c) => c.saldo > 0).toList()
+        : _clientes;
     final p = Paleta.of(context);
     final elegido = await showModalBottomSheet<String>(
       context: context,
@@ -409,12 +423,22 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                     _tipo == 'abono' ? '¿Quién abona?' : 'Elegir cliente',
                     style: Theme.of(c).textTheme.titleLarge),
               ),
-              if (lista.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(_tipo == 'abono'
-                      ? 'Ningún cliente tiene saldo pendiente.'
-                      : 'Aún no hay clientes. Agrégalos en la pestaña Clientes.'),
+              // Crear el cliente ahí mismo, sin salir de la venta.
+              if (_tipo != 'abono')
+                ListTile(
+                  key: const ValueKey('nuevo_cliente_venta'),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  leading: CircleAvatar(
+                      backgroundColor: p.ventasFondo,
+                      child: Icon(Icons.person_add_alt_1, color: p.ventas)),
+                  title: const Text('Nuevo cliente'),
+                  subtitle: const Text('Regístralo sin salir de la venta'),
+                  onTap: () => Navigator.pop(c, '+'),
+                ),
+              if (lista.isEmpty && _tipo == 'abono')
+                const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('Ningún cliente tiene saldo pendiente.'),
                 ),
               if (!_requiereCliente)
                 ListTile(
@@ -441,11 +465,44 @@ class _FormMovimientoState extends State<_FormMovimiento> {
             ]),
       ),
     );
-    if (elegido == null) return;
+    if (elegido == null || !mounted) return;
+    if (elegido == '+') {
+      final id = await mostrarFormCliente(context);
+      if (id == null || !mounted) return;
+      final l = await LocalDb.instance.clientesConSaldo();
+      if (!mounted) return;
+      setState(() {
+        _clientes = l;
+        _clienteId = id;
+        _errorCliente = null;
+      });
+      return;
+    }
     setState(() {
       _clienteId = elegido.isEmpty ? null : elegido;
       _errorCliente = null;
     });
+  }
+
+  Future<void> _elegirTercero() async {
+    final id = await elegirTercero(context, actual: _terceroId);
+    if (id == null || !mounted) return;
+    final x = id.isEmpty ? null : await LocalDb.instance.proveedor(id);
+    if (!mounted) return;
+    setState(() {
+      _terceroId = x == null ? null : id;
+      _terceroNombre = x?['nombre'] as String?;
+    });
+  }
+
+  /// Montos rápidos para no teclear (se suman al tocar).
+  static const _rapidos = [2000.0, 5000.0, 10000.0, 20000.0, 50000.0];
+
+  void _sumarMonto(double v) {
+    final actual = parseMonto(_monto.text) ?? 0;
+    final n = actual + v;
+    _monto.text = n == n.roundToDouble() ? n.toStringAsFixed(0) : n.toString();
+    setState(() {});
   }
 
   void _guardar() {
@@ -485,7 +542,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
             _tipo == 'ingreso' && _fiado,
             _tipo == 'egreso' ? null : _clienteId,
             conProductos ? _items : const [],
-            pagos));
+            pagos,
+            _tipo == 'egreso' ? _terceroId : null));
   }
 
   @override
@@ -652,6 +710,20 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                     : null,
                 onChanged: (_) => setState(() {}),
               ),
+              const SizedBox(height: 6),
+              Wrap(spacing: 6, runSpacing: 4, children: [
+                for (final v in _rapidos)
+                  ActionChip(
+                    label: Text('+${cop(v)}'),
+                    onPressed: () => _sumarMonto(v),
+                  ),
+                if ((parseMonto(_monto.text) ?? 0) > 0)
+                  ActionChip(
+                    avatar: const Icon(Icons.backspace_outlined, size: 16),
+                    label: const Text('Borrar'),
+                    onPressed: () => setState(() => _monto.clear()),
+                  ),
+              ]),
             ],
             if (_tipo == 'ingreso' &&
                 (LocalDb.instance.modo.value.fia || _fiado)) ...[
@@ -712,6 +784,25 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 ),
               ),
             ],
+            if (_tipo == 'egreso') ...[
+              const SizedBox(height: 8),
+              Material(
+                color: esquema.surfaceContainerLow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: esquema.outlineVariant),
+                ),
+                child: ListTile(
+                  key: const ValueKey('tercero_gasto'),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  leading: const Icon(Icons.storefront_outlined),
+                  title: Text(_terceroNombre ?? '¿A quién le pagaste? (opcional)'),
+                  subtitle: const Text('Proveedor, arrendador, servicios, empleado'),
+                  trailing: const Icon(Icons.expand_more),
+                  onTap: _elegirTercero,
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             TextFormField(
               controller: _concepto,
@@ -723,9 +814,9 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                     : 'Concepto (opcional)',
                 counterText: '',
                 hintText: switch (_tipo) {
-                  'egreso' => 'Ej.: arriendo, mercancía',
+                  'egreso' => 'Ej.: ${_ej.gasto}',
                   'abono' => 'Abono',
-                  _ => 'Ej.: 2 bultos de concentrado',
+                  _ => 'Ej.: ${_ej.venta}',
                 },
               ),
               validator: (v) => _tipo == 'egreso' && (v ?? '').trim().isEmpty

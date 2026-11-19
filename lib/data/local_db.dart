@@ -1330,8 +1330,11 @@ class LocalDb {
   /// Movimientos entre dos fechas locales (para informes).
   Future<List<Map<String, Object?>>> movimientosEntre(DateTime desde, DateTime hasta) =>
       db.rawQuery(
-          'SELECT v.*, c.nombre AS cliente_nombre FROM ventas v '
+          'SELECT v.*, c.nombre AS cliente_nombre, c.tipo_doc AS cliente_tipo_doc, '
+          'c.documento AS cliente_documento, p.nombre AS tercero_nombre, '
+          'p.tipo_doc AS tercero_tipo_doc, p.documento AS tercero_documento FROM ventas v '
           'LEFT JOIN clientes c ON c.id = v.cliente_id '
+          'LEFT JOIN proveedores p ON p.id = v.tercero_id '
           'WHERE v.fecha >= ? AND v.fecha < ? ORDER BY v.fecha',
           [isoUtc(desde), isoUtc(hasta)]);
 

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import '../domain/identificacion.dart' as ident;
+import 'pagos_fijos_page.dart';
+import 'terceros_page.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
 import '../data/sync_service.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
-import 'campo_telefono.dart';
 import 'comun.dart';
 import 'escaner.dart';
 import '../pdf/archivo.dart';
@@ -34,9 +36,15 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
   final negocio = await db.perfilNegocio();
   final clienteId = v['cliente_id'] as String?;
   var saldo = 0.0;
+  // En el PDF, el cliente sale con su cédula o NIT si la tiene.
+  var clientePdf = v['cliente_nombre'] as String?;
   if (clienteId != null) {
     final c = await db.cliente(clienteId);
     saldo = (c?['saldo'] as num?)?.toDouble() ?? 0;
+    final doc = (c?['documento'] as String?) ?? '';
+    if (clientePdf != null && doc.isNotEmpty) {
+      clientePdf = '$clientePdf · ${ident.mostrarDocumento(c?['tipo_doc'] as String? ?? 'CC', doc)}';
+    }
   }
   final texto = textoComprobante(
     negocio: negocio,
@@ -67,7 +75,7 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
     numero: numero,
     fecha: DateTime.parse(v['fecha'] as String).toLocal(),
     negocio: negocio,
-    cliente: v['cliente_nombre'] as String?,
+    cliente: clientePdf,
     lineas: lineas,
     total: (v['monto'] as num).toDouble(),
     notas: [
@@ -204,6 +212,22 @@ class HerramientasGrid extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
     final modo = LocalDb.instance.modo.value;
     final items = [
+      (
+        Icons.event_repeat_outlined,
+        'Pagos fijos',
+        'Arriendo, luz, agua, internet',
+        p.gastosFondo,
+        p.gastos,
+        () => ir(const PagosFijosPage())
+      ),
+      (
+        Icons.storefront_outlined,
+        'Proveedores y terceros',
+        'NIT, celular y correo',
+        p.asistenteFondo,
+        p.asistente,
+        () => ir(const TercerosPage())
+      ),
       (
         Icons.point_of_sale_outlined,
         'Cierre de caja',
@@ -583,44 +607,8 @@ class _PedidoProveedorPageState extends State<PedidoProveedorPage> {
       ];
 
   Future<void> _nuevoProveedor() async {
-    final nombre = TextEditingController();
-    final tel = TelefonoCtrl();
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('Nuevo proveedor'),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(
-              controller: nombre,
-              textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Nombre o empresa')),
-          const SizedBox(height: 12),
-          CampoTelefono(ctrl: tel, etiqueta: 'Celular (WhatsApp)'),
-        ]),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(c, false),
-              child: const Text('Cancelar')),
-          FilledButton(
-              onPressed: () => Navigator.pop(c, true),
-              child: const Text('Guardar')),
-        ],
-      ),
-    );
-    final n = nombre.text.trim();
-    final t = tel.valor;
-    nombre.dispose();
-    tel.dispose();
-    if (ok != true) return;
-    if (n.length < 2) {
-      avisar('Escribe el nombre del proveedor');
-      return;
-    }
-    if (t == null) {
-      avisar('Revisa el celular del proveedor (toca el país si es de otro país)');
-      return;
-    }
-    final id = await LocalDb.instance.saveProveedor(n, t);
+    final id = await mostrarFormTercero(context, claseInicial: 'proveedor');
+    if (id == null) return;
     _proveedorId = id;
     await _load();
   }
