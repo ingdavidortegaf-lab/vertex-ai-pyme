@@ -14,6 +14,24 @@ class Config {
     defaultValue: 'contacto@vertextechco.online',
   );
 
+  // ------------------------------------------------ Encargada del tratamiento
+  // TODO(VERTEX TECH): completar con los datos legales de la empresa. Mientras
+  // estén vacíos, los textos legales muestran «[razón social pendiente]», etc.
+
+  /// Razón social de VERTEX TECH, Encargada del Tratamiento (Ley 1581).
+  static const encargadaRazonSocial = '';
+
+  /// NIT de VERTEX TECH con dígito de verificación (ej.: 900123456-7).
+  static const encargadaNit = '';
+
+  /// Correo de VERTEX TECH para los asuntos de datos personales.
+  static const encargadaCorreo = '';
+
+  /// false mientras un abogado no haya revisado los textos legales: la app
+  /// los muestra marcados como «BORRADOR PARA REVISIÓN DE UN ABOGADO». Se
+  /// cambia a true cuando estén aprobados.
+  static const textosLegalesRevisados = false;
+
   /// Minutos sin usar la app antes de cerrar la sesión de la nube.
   static const minutosInactividad = 30;
 
