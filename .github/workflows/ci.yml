@@ -42,3 +42,28 @@ jobs:
 
       - name: flutter test
         run: flutter test
+
+  aislamiento:
+    name: Aislamiento entre empresas (Supabase local)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Levanta Supabase en Docker y aplica TODAS las migraciones de
+      # supabase/migrations/ sobre una base vacía. No toca el proyecto real.
+      - name: Supabase local con las migraciones
+        run: supabase start
+
+      - name: La empresa A no puede leer ni escribir en la B
+        run: >
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+          -v ON_ERROR_STOP=1 -f supabase/tests/aislamiento_empresas.sql
+
+      - name: Apagar Supabase
+        if: always()
+        run: supabase stop --no-backup
