@@ -2,7 +2,7 @@
 
 **El cuaderno de la tienda, ahora en el celular. Funciona sin señal.**
 
-App para las MiPymes de Casanare: tiendas de barrio y de pueblo y **22 tipos de negocio** (panadería, frutas, carnicería, droguería, ferretería, agro, ropa, celulares, restaurante, peluquería, taller, transporte, hospedaje y más), presentada en **CreaTIC Casanare 2026** por el equipo **VERTEX TECH**.
+App de **VERTEX TECH** para las MiPymes colombianas: tiendas de barrio y **22 tipos de negocio** (panadería, frutas, carnicería, droguería, ferretería, agro, ropa, celulares, restaurante, peluquería, taller, transporte, hospedaje y más).
 
 **Pruébala ya (iPhone, Android o PC, en el navegador):** https://ingdavidortegaf-lab.github.io/vertex-ai-pyme/. Para instalarla en iPhone o Android, ver [docs/INSTALAR_EN_IPHONE_Y_ANDROID.md](docs/INSTALAR_EN_IPHONE_Y_ANDROID.md).
 
@@ -122,7 +122,7 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 - Bloqueo tras 5 intentos fallidos y cierre de sesión a los 30 minutos sin uso.
 - RLS en PostgreSQL: cada empresa ve solo sus datos.
 - Claves fuera del código.
-- **Ley 1581 de 2012:** formatos oficiales de la convocatoria: aviso de privacidad, casilla **sin premarcar** con **enlace visible** a la política (se abre sin internet), enlace a www.casanare.gov.co y **Anexo 3** de autorización para cada cliente, en PDF o por WhatsApp. Ver [`docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md`](docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md). La MiPyme es responsable de los datos; la Gobernación de Casanare es encargada. Ver [`docs/POLITICA_TRATAMIENTO_DATOS.md`](docs/POLITICA_TRATAMIENTO_DATOS.md).
+- **Ley 1581 de 2012:** aviso de privacidad, casilla **sin premarcar** con **enlace visible** a la política (se abre sin internet) y formato de autorización para cada cliente, en PDF o por WhatsApp. Ver [`docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md`](docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md). La MiPyme es responsable de los datos; VERTEX TECH es encargada. Ver [`docs/POLITICA_TRATAMIENTO_DATOS.md`](docs/POLITICA_TRATAMIENTO_DATOS.md).
 
 ## Estado y pendientes
 Probado:
@@ -141,6 +141,6 @@ Pendiente, con el detalle en [`docs/AUDITORIA.md`](docs/AUDITORIA.md):
 ## Propiedad intelectual y licencias
 © 2026 Equipo VERTEX TECH (José David, Carlos Andrés y Ángel Elías Ortega Fuentes). **Todos los derechos reservados.**
 
-Según las bases de CreaTIC Casanare 2026, la Gobernación de Casanare recibe una licencia de uso gratuita e indefinida, y el equipo conserva la propiedad intelectual. Ver la licencia de cada componente de terceros, todos de código abierto, en [`docs/LICENCIAS.md`](docs/LICENCIAS.md).
+Ver la licencia de cada componente de terceros, todos de código abierto, en [`docs/LICENCIAS.md`](docs/LICENCIAS.md).
 
 Contacto: contacto@vertextechco.online

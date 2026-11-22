@@ -1,16 +1,16 @@
 # VERTEX AI Pyme: análisis de mejoras y tendencias (noviembre de 2026)
 
-Este documento resume lo que se mejoró en esta ronda, por qué se hizo y qué sigue. Está escrito para exponerlo ante el jurado de CreaTIC Casanare 2026.
+Este documento resume lo que se mejoró en esta ronda, por qué se hizo y qué sigue.
 
 ---
 
 ## 1. Lo que se mejoró en esta ronda
 
-| Área | Antes | Ahora | Criterio de la rúbrica |
+| Área | Antes | Ahora | Aporta a |
 |---|---|---|---|
-| **Jurídico (Ley 1581)** | Aviso propio y casilla simple | Texto oficial de la convocatoria (Sección A), casilla **sin premarcar** con **enlace visible** a la Política, política completa sin internet, enlace a **www.casanare.gov.co**, formato **Anexo 3** en PDF para cada cliente, registro de «AUTORIZO» por WhatsApp | Jurídica (15) |
+| **Jurídico (Ley 1581)** | Aviso propio y casilla simple | Aviso de privacidad, casilla **sin premarcar** con **enlace visible** a la Política, política completa sin internet, formato de autorización en PDF para cada cliente, registro de «AUTORIZO» por WhatsApp | Jurídica |
 | **Proveedores** | Pedido pagado completo | Se paga **todo, una parte (30/50/70 %) o todo fiado**; el saldo queda en «Lo que debo» con fecha límite, abonos con medio de pago, WhatsApp al proveedor y aviso 3 días antes | Emprendimiento, Financiera |
-| **Promociones** | Lista de precios en texto | **Foto o video** (cámara o galería), **imagen lista para el estado** (1080×1080 con logo y precios), **redactor con IA**: 5 estilos, temporada automática (quincena, fin de semana, viernes negro, Navidad), etiquetas del municipio | Marketing (20), Tecnología |
+| **Promociones** | Lista de precios en texto | **Foto o video** (cámara o galería), **imagen lista para el estado** (1080×1080 con logo y precios), **redactor con IA**: 5 estilos, temporada automática (quincena, fin de semana, viernes negro, Navidad), etiquetas del municipio | Marketing, Tecnología |
 | **Clientes (CRM)** | Lista y cartera | **Seguimiento**: quién hace rato no viene, mejores clientes, nuevos y perdidos; mensaje sugerido por WhatsApp; solo a quien autorizó; no repetir antes de 7 días | Marketing, Jurídica |
 | **Cualquier negocio** | 10 tipos | **22 tipos** con emoji (panadería, frutas, carnicería, ropa, celulares, transporte, hospedaje…) y la app se ajusta sola (inventario, servicios, gramera, códigos, fiado) | Emprendimiento |
 | **Marca** | «V» de tiza | **Logo oficial de VERTEX TECH**: «V» blanca con facetas y el rombo del vértice, en los colores de la app, en el ícono del celular, la web y dentro de la app (el rombo brilla suave) | Marketing |
@@ -44,7 +44,7 @@ En veredas y municipios la señal va y viene. Todo se guarda cifrado en el celul
 Es la misma app en Android (APK), Windows y la web, que se instala en iPhone desde Safari como PWA, con su ícono y su base de datos local en el navegador.
 
 ### 2.7 Privacidad como ventaja
-El cliente confía más en la tienda que le pide permiso. Por eso VERTEX pide la autorización (Anexo 3), la guarda con fecha y medio, y solo sugiere escribirle a quien la dio.
+El cliente confía más en la tienda que le pide permiso. Por eso VERTEX pide la autorización, la guarda con fecha y medio, y solo sugiere escribirle a quien la dio.
 
 ---
 

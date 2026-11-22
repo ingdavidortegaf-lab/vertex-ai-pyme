@@ -15,7 +15,7 @@
 - **En la nube** se usa **PostgreSQL** porque Supabase lo trae con **seguridad por fila (RLS)**, **JSON (`jsonb`)** y **triggers**, que usamos para separar las tiendas y validar los pagos.
 - **El lenguaje (SQL) es casi el mismo en los tres.** Por eso dejamos el archivo `3_practica_MySQL_Workbench.sql`, con las mismas consultas en MySQL, para mostrarlo en el programa que ya tienes.
 
-**Frase para el jurado:** *"Usamos SQLite en el dispositivo porque es una base embebida, sin servidor, ideal para trabajar sin conexión; y PostgreSQL en la nube por la seguridad a nivel de fila y el soporte de JSON. No usamos MySQL, pero el SQL es estándar: aquí tienen las mismas consultas en MySQL."*
+**En una frase:** *"Usamos SQLite en el dispositivo porque es una base embebida, sin servidor, ideal para trabajar sin conexión; y PostgreSQL en la nube por la seguridad a nivel de fila y el soporte de JSON. No usamos MySQL, pero el SQL es estándar: aquí tienen las mismas consultas en MySQL."*
 
 ---
 
@@ -72,7 +72,7 @@ DBeaver Community es gratis y abre **SQLite, PostgreSQL y MySQL** en un solo pro
 3. En **Ruta**, toca **Abrir…** y elige `vertex_demo.db`, en esta carpeta.
 4. Toca **Finalizar**. La primera vez DBeaver ofrece **descargar el controlador** (es gratis): acepta.
 5. A la izquierda despliega la conexión → **Tablas**. Doble clic en **ventas** → pestaña **Datos**: ahí está cada venta.
-6. Pestaña **Diagrama ER**: DBeaver **dibuja las tablas**, muy bueno para el jurado.
+6. Pestaña **Diagrama ER**: DBeaver **dibuja las tablas**, muy útil para explicar la estructura.
 7. Para consultas: menú **Editor SQL → Abrir script SQL** (o **Archivo → Abrir archivo**), elige `1_consultas_base_local_SQLite.sql`, pon el cursor dentro de una consulta y presiona **Ctrl+Enter**.
 
 **¿Y la base real del PC?** Cierra primero la app VERTEX y abre en DBeaver `C:\Users\<tu usuario>\AppData\Roaming\co.vertextech\vertex_ai_pyme\vertex.db`. Para no correr riesgos, solo **consulta** (SELECT): no edites nada a mano.
@@ -88,7 +88,7 @@ DBeaver Community es gratis y abre **SQLite, PostgreSQL y MySQL** en un solo pro
 2. **Table Editor** (icono de tabla): ves cada tabla y sus filas, como una hoja de cálculo.
 3. **SQL Editor** → **New query** → pega una consulta de `2_consultas_nube_PostgreSQL.sql` → **Run**.
 
-Para el jurado, muestra estas tres:
+Para mostrar la base, empieza por estas tres:
 - **Consulta 5:** *"No hay duplicados"*. Sale vacía.
 - **Consulta 7:** *"Las reglas de seguridad por fila"*.
 - **Consulta 8:** *"RLS activado en las 6 tablas"*.

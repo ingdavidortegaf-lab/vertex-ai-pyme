@@ -1,6 +1,6 @@
 ===============================================================================
   VERTEX AI Pyme - COMO ESTA CONSTRUIDA LA APLICACION
-  Equipo VERTEX TECH - CreaTIC Casanare 2026
+  VERTEX TECH
 ===============================================================================
 
 Este documento explica, para exponer y para quien reciba el codigo:
@@ -116,8 +116,8 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
 
   lib/config.dart (24)
       Configuracion que entra al compilar (--dart-define): direccion de
-      Supabase, clave publica, correo de privacidad, politica de la
-      Gobernacion y minutos de inactividad. Aqui NO hay claves escritas.
+      Supabase, clave publica, correo de privacidad y minutos de
+      inactividad. Aqui NO hay claves escritas.
 
   --- lib/domain/  REGLAS DEL NEGOCIO (logica pura, facil de probar) ---
 
@@ -168,9 +168,9 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                           guiado): productos/servicios/ambos, fia, gramera,
                           codigos, pedidos, avisos. 22 tipos de negocio con
                           su emoji y sugerencia.
-  legal.dart              TEXTOS OFICIALES LEY 1581: aviso (Seccion A),
-                          casilla con enlace, politica completa (8 puntos) y
-                          formato Anexo 3 de autorizacion del cliente.
+  legal.dart              TEXTOS LEY 1581: aviso de privacidad, casilla
+                          con enlace, politica completa (7 puntos) y formato
+                          de autorizacion del cliente.
   promocion.dart          REDACTOR DE PROMOCIONES sin internet: 5 estilos,
                           ocasion segun la fecha (quincena, fin de semana,
                           viernes negro, Navidad...), descuento real, combo,
@@ -246,9 +246,9 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
                            precios) y compartir con share_plus.
   seguimiento_page.dart    SEGUIMIENTO: grupos de clientes y mensaje de
                            WhatsApp sugerido; "Pedir autorizacion" si falta.
-  legal_page.dart          Aviso oficial, casilla con enlace visible,
-                           politica sin internet, enlace a casanare.gov.co,
-                           Anexo 3 en PDF (numero AU-) y registro de AUTORIZO.
+  legal_page.dart          Aviso, casilla con enlace visible, politica sin
+                           internet, formato de autorizacion en PDF (numero
+                           AU-) y registro de AUTORIZO.
   --- lib/pdf/  PDF Y DOCUMENTOS ---
 
   pdf_factura.dart (174)   Genera el comprobante/cotizacion/pedido en PDF
@@ -457,11 +457,11 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
     sin sesion no se lee nada.
   - Secretos fuera del codigo: --dart-define y secretos de Supabase.
   - La IA nunca recibe nombres, celulares ni correos.
-  - Ley 1581: formatos oficiales de la convocatoria. Aviso (Seccion A),
-    casilla SIN premarcar con enlace visible a la politica (se abre sin
-    internet), enlace a www.casanare.gov.co, Anexo 3 para cada cliente
-    (PDF o WhatsApp "AUTORIZO", guardado con fecha y medio). Derechos,
-    revocar y borrar. MiPyme = responsable; Gobernacion = encargada.
+  - Ley 1581: aviso de privacidad, casilla SIN premarcar con enlace
+    visible a la politica (se abre sin internet), formato de autorizacion
+    para cada cliente (PDF o WhatsApp "AUTORIZO", guardado con fecha y
+    medio). Derechos, revocar y borrar. MiPyme = responsable;
+    VERTEX TECH = encargada.
   - Mensajes comerciales de seguimiento solo a clientes que autorizaron.
 
 

@@ -56,7 +56,7 @@ La app Android es la más completa: base **cifrada**, **avisos** en el celular y
 ---
 
 ## Después de actualizar (versión del 18 de noviembre)
-- La app pide **aceptar otra vez la autorización de datos** una sola vez, porque el aviso cambió al texto oficial de la convocatoria. Los datos guardados no se pierden.
+- Cuando cambia el aviso de privacidad, la app pide **aceptar otra vez la autorización de datos** una sola vez. Los datos guardados no se pierden.
 - **Ícono nuevo:** en Android aparece al instalar el APK nuevo. En iPhone, el ícono de la pantalla de inicio se queda con el anterior: bórrelo y vuelva a usar **Compartir → Agregar a pantalla de inicio** para ver el logo nuevo.
 - **Subir el logo o fotos** funciona también en la versión web (Safari y Chrome): se guardan dentro de la app.
 - **Compartir foto o video de una promoción:** funciona en Android, en iPhone con Safari y en navegadores que tienen la opción de compartir. En el computador solo se comparte el texto (queda copiado).

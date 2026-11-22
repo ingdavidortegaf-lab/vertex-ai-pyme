@@ -4,7 +4,7 @@ Para correrlas: menú **Terminal → Ejecutar tarea → Correr las 128 pruebas a
 
 - `sync_test.dart`: modo avión y caída de internet a mitad del envío.
 - `contabilidad_test.dart`: cuenta de cobro y numeración de documentos.
-- `legal_test.dart`: textos oficiales y formato Anexo 3.
+- `legal_test.dart`: textos legales y formato de autorización.
 - `proveedores_test.dart`: pedido pagado a medias, abonos y aviso de vencimiento.
 - `promocion_test.dart`: redactor de promociones y lo que viaja a la IA.
 - `seguimiento_test.dart`: grupos de clientes y autorización.

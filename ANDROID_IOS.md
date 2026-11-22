@@ -25,7 +25,7 @@ documenta qué hace, por si hay que revisarlo a mano.
   después de ese primer build.
 - `Info.plist`: `LSApplicationQueriesSchemes` con `https`, `whatsapp` y `mailto`.
 
-## APK para el jurado
+## APK de distribución
 ```
 flutter build apk --release --obfuscate --split-debug-info=build\debug-info --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
 ```

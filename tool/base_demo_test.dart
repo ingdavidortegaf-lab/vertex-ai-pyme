@@ -112,7 +112,7 @@ void main() {
         proveedorNombre: 'Lácteos La Sabana',
         venceSaldo: hoy.add(const Duration(days: 10))));
 
-    // Autorizaciones de datos (Anexo 3) y último contacto de seguimiento.
+    // Autorizaciones de datos y último contacto de seguimiento.
     await en(hace(60), () => db.registrarAutorizacionCliente(ana, 'firmó el formato en la tienda'));
     await en(hace(29), () => db.registrarAutorizacionCliente(luz, 'respondió AUTORIZO por WhatsApp'));
     await en(hace(4), () => db.marcarContactado(ana));

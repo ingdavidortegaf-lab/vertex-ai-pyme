@@ -17,7 +17,7 @@ Cada documento que la app genera recibe un **número único** y su **PDF queda g
 | Cuenta de cobro | CC | `CC-A3F1-000002` |
 | Pedido al proveedor | PD | `PD-A3F1-000007` |
 | Informe (semanal, quincenal, mensual) | IN | `IN-A3F1-000001` |
-| Autorización de datos del cliente (Anexo 3) | AU | `AU-A3F1-000003` |
+| Autorización de datos del cliente | AU | `AU-A3F1-000003` |
 
 El número tiene tres partes: **tipo**, **código del equipo** (4 letras al azar, distinto en cada celular o PC) y **consecutivo** de 6 cifras.
 

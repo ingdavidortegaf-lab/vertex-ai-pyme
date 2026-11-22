@@ -10,7 +10,7 @@ Cada archivo es una pantalla hecha con **Flutter** (lenguaje **Dart**). Las pant
 - `herramientas_page.dart`: comprobantes, cotizaciones y pedido al proveedor (pago todo, en parte o fiado).
 - `promocion_page.dart`: promociones con foto o video, IA e imagen para el estado.
 - `seguimiento_page.dart`: a qué clientes escribirles hoy.
-- `legal_page.dart` y `consent_gate.dart`: aviso, casilla con enlace, política y Anexo 3.
+- `legal_page.dart` y `consent_gate.dart`: aviso, casilla con enlace, política y formato de autorización.
 - `ilustraciones.dart`: el logo y los dibujos hechos en código.
 
 Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

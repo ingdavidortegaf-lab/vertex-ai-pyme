@@ -87,7 +87,6 @@ Preferimos no mostrar algo que no está probado.
 ### Precio recomendado
 | Plan | Precio | Qué incluye |
 |---|---|---|
-| **MiPymes de Casanare** (programa de la Gobernación) | **$0 para la tienda** | Todo. La Gobernación recibe licencia gratuita e indefinida; el ingreso viene de implementación, capacitación y soporte |
 | **Plan Tienda** | **$19.900/mes** o **$199.000/año** (2 meses gratis) | Nube y respaldo, 2 celulares, PDF, informes, cierre de caja, avisos |
 | **Plan Red** (mayoristas) | Por tienda, con descuento por volumen | El mayorista lo paga para las tiendas que surte |
 
@@ -135,7 +134,7 @@ Si la mensualidad se cobra con link de pago de Wompi, cada cobro de $19.900 paga
 | 1.000 | $19.900.000 | $8.595.000 (3 personas + nube más grande) | $11.305.000 | $135.660.000 |
 
 **Más ingresos posibles:**
-- el contrato con la Gobernación (implementación y capacitación por municipio);
+- implementación y capacitación para gremios o grupos de negocios;
 - el plan Red con mayoristas;
 - la comisión por referir tiendas a la pasarela de pago, cuando exista.
 

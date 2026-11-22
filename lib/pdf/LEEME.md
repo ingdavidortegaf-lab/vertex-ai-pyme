@@ -7,6 +7,6 @@ Los PDF se dibujan en el celular, sin internet, con el paquete `pdf`, y se impri
 - `reportes_contables.dart`: arma el contenido de los informes y del cobro.
 - `archivo.dart`: guarda el PDF con su número único y lo vuelve a abrir.
 
-El formato de autorización de datos (Anexo 3, número `AU-`) se dibuja en `lib/ui/legal_page.dart` → `pdfAutorizacion` y se archiva con este mismo `archivo.dart`.
+El formato de autorización de datos (número `AU-`) se dibuja en `lib/ui/legal_page.dart` → `pdfAutorizacion` y se archiva con este mismo `archivo.dart`.
 
 Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

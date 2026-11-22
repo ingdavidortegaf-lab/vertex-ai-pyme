@@ -29,8 +29,8 @@ privacidad conforme a la Ley 1581 de 2012 (la IA nunca recibe nombres ni
 celulares).
 
 ## Operating Context
-- Prototipo para CreaTIC Casanare 2026; demostración en vivo el 18 nov. 2026
-  ante jurado, en un Xiaomi 14T (Android 15, HyperOS), incluso en modo avión.
+- Producto comercial de VERTEX TECH. Probado en un Xiaomi 14T (Android 15,
+  HyperOS), incluso en modo avión.
 - Uso a una mano, en el mostrador o en la calle, con luz fuerte.
 - Montos en pesos colombianos sin decimales; celulares colombianos de 10 dígitos.
 
