@@ -25,6 +25,38 @@ Future<void> abrirEnlace(String url) async {
   }
 }
 
+/// Datos de VERTEX TECH como Encargada, desde config.dart.
+const encargadaConfig = DatosEncargada(
+  razonSocial: Config.encargadaRazonSocial,
+  nit: Config.encargadaNit,
+  correo: Config.encargadaCorreo,
+);
+
+/// Cinta «BORRADOR PARA REVISIÓN DE UN ABOGADO» mientras los textos no estén
+/// aprobados (Config.textosLegalesRevisados).
+class MarcaBorrador extends StatelessWidget {
+  const MarcaBorrador({super.key});
+  @override
+  Widget build(BuildContext context) {
+    if (Config.textosLegalesRevisados) return const SizedBox.shrink();
+    final esquema = Theme.of(context).colorScheme;
+    return Container(
+      key: const ValueKey('marca_borrador'),
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+          color: esquema.errorContainer, borderRadius: BorderRadius.circular(8)),
+      child: Text(marcaBorrador,
+          textAlign: TextAlign.center,
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium
+              ?.copyWith(color: esquema.onErrorContainer, fontWeight: FontWeight.w800)),
+    );
+  }
+}
+
 /// Enlace visible y subrayado, como en una página web.
 TextSpan enlace(BuildContext context, String texto, VoidCallback alTocar) => TextSpan(
       text: texto,
@@ -54,13 +86,14 @@ class AvisoOficial extends StatelessWidget {
         border: Border.all(color: esquema.outlineVariant),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const MarcaBorrador(),
         Row(children: [
           Icon(Icons.verified_user_outlined, size: 18, color: Paleta.of(context).ventas),
           const SizedBox(width: 6),
           Text('Aviso de privacidad', style: t.titleSmall),
         ]),
         const SizedBox(height: 6),
-        Text(avisoPrivacidadOficial, style: t.bodyMedium),
+        Text(avisoPrivacidad(encargadaConfig), style: t.bodyMedium),
         const SizedBox(height: 8),
         Text.rich(TextSpan(style: t.bodyMedium, children: [
           const TextSpan(text: 'Política completa: '),
@@ -104,10 +137,12 @@ class PoliticaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final secciones = politicaTratamiento(contacto: Config.contactoPrivacidad);
+    final secciones =
+        politicaTratamiento(contacto: Config.contactoPrivacidad, encargada: encargadaConfig);
     return Scaffold(
       appBar: AppBar(title: const Text('Política de Tratamiento de Datos')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
+        const MarcaBorrador(),
         Text('Política de Tratamiento de Datos Personales', style: t.headlineSmall),
         const SizedBox(height: 4),
         Text('VERTEX AI Pyme · Ley 1581 de 2012 y Decreto 1074 de 2015 · $versionAviso',
@@ -151,6 +186,7 @@ Future<void> generarAutorizacionCliente(BuildContext context, String clienteId) 
     telefono: mostrarTelefono((c['telefono'] as String?) ?? ''),
     municipio: negocio.direccion,
     fecha: DateTime.now(),
+    encargada: encargadaConfig,
   );
   final documento = await db.emitirDocumento('autorizacion',
       refId: clienteId, clienteId: clienteId, clienteNombre: a.cliente,
@@ -189,6 +225,10 @@ Future<Uint8List> pdfAutorizacion(AutorizacionCliente a, String numero) async {
     build: (_) => pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: [
       pw.Text('VERTEX AI Pyme · Protección de datos personales (Ley 1581 de 2012)',
           style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
+      if (!Config.textosLegalesRevisados)
+        pw.Text(marcaBorrador,
+            textAlign: pw.TextAlign.center,
+            style: const pw.TextStyle(fontSize: 10, color: PdfColors.red800, fontWeight: pw.FontWeight.bold)),
       pw.SizedBox(height: 6),
       pw.Container(
         color: azul,
@@ -227,7 +267,7 @@ Future<Uint8List> pdfAutorizacion(AutorizacionCliente a, String numero) async {
         ]),
       ]),
       pw.Spacer(),
-      pw.Text('Responsable: ${a.comercio}. Encargada: VERTEX TECH. '
+      pw.Text('Responsable: ${a.comercio}. Encargada: ${a.encargada.nombre}, ${a.encargada.correoTexto}. '
           'Política de Tratamiento de Datos Personales: disponible en la aplicación VERTEX AI Pyme. '
           'Canal de derechos: ${Config.contactoPrivacidad}.',
           style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),

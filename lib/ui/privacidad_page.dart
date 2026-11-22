@@ -22,10 +22,13 @@ class TextoAvisoPrivacidad extends StatelessWidget {
           'VERTEX AI Pyme te ayuda a llevar los clientes, las ventas, los '
           'gastos y los cobros de tu negocio, aunque no haya señal.'),
       h('Qué datos guardamos'),
-      const Text('• De tus clientes: solo nombre y celular (opcional).\n'
+      const Text('• De tus clientes: nombre y, si te los dan, celular, cédula '
+          'o NIT y correo.\n'
+          '• De tus proveedores: nombre y, si los registras, celular, documento '
+          'y correo.\n'
           '• De tu negocio: ventas, gastos, abonos y cobros pendientes.\n'
           '• De tu cuenta: el correo con el que inicias sesión.\n'
-          'No pedimos cédulas, direcciones ni datos sensibles.'),
+          'No pedimos datos sensibles.'),
       h('Para qué los usamos'),
       const Text('Para registrar y consultar la información de tu negocio, '
           'mostrarte el tablero del mes, sugerirte mensajes para tus clientes '
@@ -36,12 +39,12 @@ class TextoAvisoPrivacidad extends StatelessWidget {
           '• Cada empresa ve únicamente sus propios datos.\n'
           '• La sesión se cierra sola tras 30 minutos sin uso.\n'
           '• El asistente de IA recibe solo totales y la pregunta sin '
-          'nombres, celulares ni correos.'),
+          'nombres, celulares, documentos ni correos.'),
       h('Quién es responsable'),
-      const Text('Tu negocio es el responsable de los datos de sus clientes y '
-          'debe contar con su autorización para registrarlos. VERTEX TECH, '
-          'como operadora de la app, actúa como encargada del tratamiento y '
-          'solo los usa para prestarte el servicio.'),
+      Text('Tu negocio es el responsable de los datos de sus clientes y '
+          'debe contar con su autorización para registrarlos. '
+          '${encargadaConfig.nombre}, como operadora de la app, actúa como '
+          'encargada del tratamiento y solo los usa para prestarte el servicio.'),
       h('Política de tratamiento de datos'),
       const Text('Puedes consultar la Política de Tratamiento de Datos '
           'Personales completa en esta app, en el menú ⋮ → «Privacidad y datos».'),

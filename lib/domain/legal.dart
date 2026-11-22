@@ -1,20 +1,52 @@
 /// Textos jurídicos de VERTEX AI Pyme (Ley 1581 de 2012, Decreto 1074 de
 /// 2015): aviso de privacidad, casilla de autorización, política de
 /// tratamiento y formato de autorización del cliente final.
+///
+/// Roles: la MiPyme usuaria es Responsable del Tratamiento y VERTEX TECH es
+/// Encargada. Los datos de VERTEX TECH (razón social, NIT y correo) salen de
+/// las constantes de `config.dart` (ver [DatosEncargada]).
+///
+/// BORRADOR PARA REVISIÓN DE UN ABOGADO: mientras
+/// `Config.textosLegalesRevisados` sea false, la app los muestra con
+/// [marcaBorrador].
 library;
+
+/// Marca visible mientras un abogado no apruebe los textos.
+const marcaBorrador = 'BORRADOR PARA REVISIÓN DE UN ABOGADO';
+
+/// Datos de VERTEX TECH como Encargada del Tratamiento. Lo que falte se
+/// muestra como «[… pendiente]» para que no pase desapercibido.
+class DatosEncargada {
+  final String razonSocial;
+  final String nit;
+  final String correo;
+  const DatosEncargada({this.razonSocial = '', this.nit = '', this.correo = ''});
+
+  String get razonSocialTexto => _o(razonSocial, '[razón social pendiente]');
+  String get nitTexto => _o(nit, '[NIT pendiente]');
+  String get correoTexto => _o(correo, '[correo pendiente]');
+
+  /// Para los textos corridos: «VERTEX TECH (Razón S.A.S., NIT 900…)».
+  String get nombre => 'VERTEX TECH ($razonSocialTexto, NIT $nitTexto)';
+
+  /// ¿Faltan datos por completar en config.dart?
+  bool get incompleta => razonSocial.trim().isEmpty || nit.trim().isEmpty || correo.trim().isEmpty;
+
+  static String _o(String v, String falta) => v.trim().isEmpty ? falta : v.trim();
+}
 
 /// Versión del aviso aceptado (si cambia, la app vuelve a pedir la
 /// autorización).
 const versionAviso = 'Aviso v2 · noviembre de 2026';
 
 /// Texto corto para la pantalla de registro.
-const avisoPrivacidadOficial =
+String avisoPrivacidad(DatosEncargada e) =>
     'AVISO DE PRIVACIDAD: En cumplimiento de la Ley 1581 de 2012 y el Decreto '
     '1074 de 2015, le informamos que los datos personales suministrados serán '
     'tratados para gestionar su registro, operación comercial, inventario, '
     'ventas, pedidos y contacto dentro de esta aplicación. Frente a los datos de '
     'clientes finales registrados por los comercios, la MiPyme usuaria actúa '
-    'como Responsable del Tratamiento y VERTEX TECH, como operadora de la '
+    'como Responsable del Tratamiento y ${e.nombre}, como operadora de la '
     'plataforma, actúa como Encargada del Tratamiento. Usted '
     'puede ejercer sus derechos a conocer, actualizar, rectificar y suprimir sus '
     'datos, así como consultar nuestra Política de Tratamiento de Datos '
@@ -31,21 +63,27 @@ const casillaDespuesDelEnlace = '.';
 /// Política de Tratamiento de Datos Personales (consulta offline en la app).
 /// Estructura del art. 13 del Decreto 1377 de 2013 (compilado en el Decreto
 /// 1074 de 2015).
-List<(String, String)> politicaTratamiento({required String contacto}) =>
+List<(String, String)> politicaTratamiento({
+  required String contacto,
+  DatosEncargada encargada = const DatosEncargada(),
+}) =>
     [
       (
         '1. Responsable y Encargado',
         'Responsable del Tratamiento: cada MiPyme o comercio que usa VERTEX AI '
             'Pyme, respecto de los datos de sus clientes, proveedores y contactos. '
             'Encargada del Tratamiento: VERTEX TECH, desarrolladora y operadora de '
-            'la plataforma, que trata los datos solo por instrucción del '
-            'Responsable y no los usa para fines propios.'
+            'la plataforma (razón social: ${encargada.razonSocialTexto}; NIT: '
+            '${encargada.nitTexto}; correo: ${encargada.correoTexto}), que trata '
+            'los datos solo por instrucción del Responsable y no los usa para '
+            'fines propios.'
       ),
       (
         '2. Datos que se tratan',
-        'De los clientes del comercio: nombre, celular y, si el cliente lo da, '
-            'correo y municipio; sus compras, abonos y saldos. De proveedores: '
-            'nombre, celular, pedidos y saldos. Del comercio: ventas, gastos, '
+        'De los clientes del comercio: nombre, celular y, si el cliente los da, '
+            'tipo y número de documento (cédula o NIT), correo y municipio; sus '
+            'compras, abonos y saldos. De proveedores y terceros: nombre, celular, '
+            'documento y correo si se registran, pedidos y saldos. Del comercio: ventas, gastos, '
             'medios de pago, inventario, cotizaciones y documentos. Del usuario: '
             'correo para iniciar sesión (la contraseña se guarda con hash). No se '
             'tratan datos sensibles ni datos de niños, niñas o adolescentes; '
@@ -68,7 +106,7 @@ List<(String, String)> politicaTratamiento({required String contacto}) =>
             'solo por HTTPS y cada comercio ve únicamente los suyos (seguridad por '
             'fila). La inteligencia artificial recibe solo totales del negocio o '
             'nombres de productos y precios, nunca nombres de personas, '
-            'celulares ni correos. La sesión se bloquea tras 5 intentos fallidos y '
+            'celulares, documentos ni correos. La sesión se bloquea tras 5 intentos fallidos y '
             'se cierra tras 30 minutos sin uso. No se venden ni se ceden datos.'
       ),
       (
@@ -104,12 +142,14 @@ class AutorizacionCliente {
   final String telefono;
   final String municipio;
   final DateTime fecha;
+  final DatosEncargada encargada;
   const AutorizacionCliente({
     required this.cliente,
     required this.comercio,
     this.telefono = '',
     this.municipio = '',
     required this.fecha,
+    this.encargada = const DatosEncargada(),
   });
 
   String get cuerpo =>
@@ -117,8 +157,8 @@ class AutorizacionCliente {
       'actuando en nombre propio (o en representación del establecimiento '
       '______________________), manifiesto de manera libre, previa, expresa e '
       'informada que AUTORIZO a $comercio en calidad de Responsable del '
-      'Tratamiento, y a VERTEX TECH en calidad de Encargada y operadora de la '
-      'aplicación VERTEX AI Pyme, '
+      'Tratamiento, y a ${encargada.nombre} en calidad de Encargada y operadora '
+      'de la aplicación VERTEX AI Pyme, '
       'para recolectar, almacenar, usar, circular y actualizar mis datos '
       'personales de contacto, ubicación y transacciones comerciales.';
 
