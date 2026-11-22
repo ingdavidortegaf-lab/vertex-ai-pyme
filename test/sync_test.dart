@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vertex_ai_pyme/data/local_db.dart';
 import 'package:vertex_ai_pyme/data/sync_service.dart';
 import 'soporte.dart';
 

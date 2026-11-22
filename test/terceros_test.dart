@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:vertex_ai_pyme/data/local_db.dart';
 import 'package:vertex_ai_pyme/domain/conflictos.dart';
 import 'package:vertex_ai_pyme/domain/ejemplos.dart';
 import 'package:vertex_ai_pyme/domain/identificacion.dart';

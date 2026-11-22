@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:vertex_ai_pyme/data/local_db.dart';
 import 'package:vertex_ai_pyme/domain/documentos.dart';
 import 'package:vertex_ai_pyme/domain/formato.dart';
 import 'package:vertex_ai_pyme/domain/resumen.dart';

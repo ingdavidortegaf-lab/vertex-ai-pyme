@@ -1,5 +1,8 @@
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:vertex_ai_pyme/data/local_db.dart';
+// Las pruebas usan los métodos de LocalDb, que viven en extensiones por
+// módulo (local_db_*.dart): se reexportan para que estén disponibles.
+export 'package:vertex_ai_pyme/data/local_db.dart';
 import 'package:vertex_ai_pyme/data/remote_api.dart';
 import 'package:vertex_ai_pyme/domain/conflictos.dart';
 

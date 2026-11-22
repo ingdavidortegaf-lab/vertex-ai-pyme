@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:vertex_ai_pyme/data/local_db.dart';
 import 'soporte.dart';
 
 void main() {
