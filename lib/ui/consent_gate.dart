@@ -13,8 +13,7 @@ class ConsentGate extends StatefulWidget {
   final Widget child;
   const ConsentGate({super.key, required this.child});
 
-  /// v2: texto modelo oficial de la convocatoria (sección A). Al cambiar la
-  /// versión, la app vuelve a pedir la autorización.
+  /// Al cambiar la versión, la app vuelve a pedir la autorización.
   static const claveConsentimiento = 'consentimiento_v2';
 
   /// Al revocar, la pantalla vuelve a pedir la autorización.

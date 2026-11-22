@@ -1,26 +1,21 @@
 /// Textos jurídicos de VERTEX AI Pyme (Ley 1581 de 2012, Decreto 1074 de
-/// 2015). El aviso y la casilla son el TEXTO MODELO de la convocatoria
-/// CreaTIC Casanare 2026 («Formatos Modelo de Protección de Datos», sección A)
-/// y el formato de autorización es el Anexo 3 (sección B). Se mantienen
-/// literales para cumplir lo que pide la convocatoria.
+/// 2015): aviso de privacidad, casilla de autorización, política de
+/// tratamiento y formato de autorización del cliente final.
 library;
 
 /// Versión del aviso aceptado (si cambia, la app vuelve a pedir la
 /// autorización).
 const versionAviso = 'Aviso v2 · noviembre de 2026';
 
-const sitioGobernacion = 'https://www.casanare.gov.co';
-const sitioGobernacionVisible = 'www.casanare.gov.co';
-
-/// Sección A: texto corto para la pantalla de registro.
+/// Texto corto para la pantalla de registro.
 const avisoPrivacidadOficial =
     'AVISO DE PRIVACIDAD: En cumplimiento de la Ley 1581 de 2012 y el Decreto '
     '1074 de 2015, le informamos que los datos personales suministrados serán '
     'tratados para gestionar su registro, operación comercial, inventario, '
     'ventas, pedidos y contacto dentro de esta aplicación. Frente a los datos de '
     'clientes finales registrados por los comercios, la MiPyme usuaria actúa '
-    'como Responsable del Tratamiento y la Gobernación de Casanare, como '
-    'operadora de la plataforma, actúa como Encargada del Tratamiento. Usted '
+    'como Responsable del Tratamiento y VERTEX TECH, como operadora de la '
+    'plataforma, actúa como Encargada del Tratamiento. Usted '
     'puede ejercer sus derechos a conocer, actualizar, rectificar y suprimir sus '
     'datos, así como consultar nuestra Política de Tratamiento de Datos '
     'Personales directamente en esta aplicación.';
@@ -36,19 +31,15 @@ const casillaDespuesDelEnlace = '.';
 /// Política de Tratamiento de Datos Personales (consulta offline en la app).
 /// Estructura del art. 13 del Decreto 1377 de 2013 (compilado en el Decreto
 /// 1074 de 2015).
-List<(String, String)> politicaTratamiento({
-  required String contacto,
-  String politicaGobernacion = '',
-}) =>
+List<(String, String)> politicaTratamiento({required String contacto}) =>
     [
       (
         '1. Responsable y Encargado',
         'Responsable del Tratamiento: cada MiPyme o comercio que usa VERTEX AI '
             'Pyme, respecto de los datos de sus clientes, proveedores y contactos. '
-            'Encargada del Tratamiento: Gobernación de Casanare – Dirección de las '
-            'TIC, como operadora de la plataforma. Desarrollador: VERTEX TECH, que '
-            'presta soporte técnico bajo instrucción de la Encargada y no usa los '
-            'datos para fines propios.'
+            'Encargada del Tratamiento: VERTEX TECH, desarrolladora y operadora de '
+            'la plataforma, que trata los datos solo por instrucción del '
+            'Responsable y no los usa para fines propios.'
       ),
       (
         '2. Datos que se tratan',
@@ -98,23 +89,15 @@ List<(String, String)> politicaTratamiento({
             '15, Ley 1581 de 2012).'
       ),
       (
-        '7. Política de la Gobernación de Casanare',
-        politicaGobernacion.isNotEmpty
-            ? 'La política de la Encargada está publicada en $politicaGobernacion '
-                'y en $sitioGobernacionVisible.'
-            : 'La política de la Encargada está disponible en '
-                '$sitioGobernacionVisible y en la Dirección de las TIC de la '
-                'Gobernación de Casanare.'
-      ),
-      (
-        '8. Vigencia',
+        '7. Vigencia',
         'Rige desde su aceptación en la app ($versionAviso). Los cambios '
             'sustanciales se avisarán en la app y se pedirá de nuevo la '
             'autorización.'
       ),
     ];
 
-/// Anexo 3: formato de autorización y consentimiento informado (prellenado).
+/// Formato de autorización y consentimiento informado del cliente final
+/// (prellenado).
 class AutorizacionCliente {
   final String cliente;
   final String comercio;
@@ -134,8 +117,8 @@ class AutorizacionCliente {
       'actuando en nombre propio (o en representación del establecimiento '
       '______________________), manifiesto de manera libre, previa, expresa e '
       'informada que AUTORIZO a $comercio en calidad de Responsable del '
-      'Tratamiento, y a la GOBERNACIÓN DE CASANARE – DIRECCIÓN DE LAS TIC en '
-      'calidad de Encargada y operadora de la aplicación móvil VERTEX AI Pyme, '
+      'Tratamiento, y a VERTEX TECH en calidad de Encargada y operadora de la '
+      'aplicación VERTEX AI Pyme, '
       'para recolectar, almacenar, usar, circular y actualizar mis datos '
       'personales de contacto, ubicación y transacciones comerciales.';
 
@@ -146,7 +129,7 @@ class AutorizacionCliente {
       'responder preguntas sobre datos sensibles; y que puedo ejercer '
       'gratuitamente mis derechos a conocer, actualizar, rectificar y suprimir '
       'mis datos conforme a la Política de Tratamiento de Datos Personales '
-      'disponible en la aplicación y en $sitioGobernacionVisible.';
+      'disponible en la aplicación.';
 
   /// Versión corta para pedir la autorización por WhatsApp.
   String textoWhatsApp() =>

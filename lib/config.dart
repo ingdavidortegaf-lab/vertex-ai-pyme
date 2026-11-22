@@ -14,11 +14,6 @@ class Config {
     defaultValue: 'contacto@vertextechco.online',
   );
 
-  /// Dirección de la Política de Tratamiento de Datos de la Gobernación
-  /// (encargada). Se configura al publicar, cuando la Gobernación la entregue.
-  static const politicaGobernacion =
-      String.fromEnvironment('POLITICA_GOBERNACION');
-
   /// Minutos sin usar la app antes de cerrar la sesión de la nube.
   static const minutosInactividad = 30;
 

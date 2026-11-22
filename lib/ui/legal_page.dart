@@ -39,7 +39,7 @@ TextSpan enlace(BuildContext context, String texto, VoidCallback alTocar) => Tex
 void verPolitica(BuildContext context) => Navigator.of(context)
     .push(MaterialPageRoute(builder: (_) => const PoliticaPage()));
 
-/// El aviso de privacidad oficial (texto modelo de la convocatoria).
+/// El aviso de privacidad.
 class AvisoOficial extends StatelessWidget {
   const AvisoOficial({super.key});
   @override
@@ -65,8 +65,6 @@ class AvisoOficial extends StatelessWidget {
         Text.rich(TextSpan(style: t.bodyMedium, children: [
           const TextSpan(text: 'Política completa: '),
           enlace(context, casillaEnlace, () => verPolitica(context)),
-          const TextSpan(text: ' · '),
-          enlace(context, sitioGobernacionVisible, () => abrirEnlace(sitioGobernacion)),
         ])),
       ]),
     );
@@ -100,14 +98,13 @@ class CasillaAutorizacion extends StatelessWidget {
 }
 
 /// Política de Tratamiento de Datos Personales: se consulta en la app, sin
-/// internet («enlace offline» que pide la convocatoria).
+/// internet.
 class PoliticaPage extends StatelessWidget {
   const PoliticaPage({super.key});
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final secciones = politicaTratamiento(
-        contacto: Config.contactoPrivacidad, politicaGobernacion: Config.politicaGobernacion);
+    final secciones = politicaTratamiento(contacto: Config.contactoPrivacidad);
     return Scaffold(
       appBar: AppBar(title: const Text('Política de Tratamiento de Datos')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
@@ -126,11 +123,6 @@ class PoliticaPage extends StatelessWidget {
         const SizedBox(height: 18),
         Wrap(spacing: 8, runSpacing: 8, children: [
           OutlinedButton.icon(
-            onPressed: () => abrirEnlace(sitioGobernacion),
-            icon: const Icon(Icons.public),
-            label: const Text(sitioGobernacionVisible),
-          ),
-          OutlinedButton.icon(
             onPressed: () => abrirEnlace('mailto:${Config.contactoPrivacidad}'
                 '?subject=${Uri.encodeComponent('Derechos sobre mis datos personales')}'),
             icon: const Icon(Icons.mail_outline),
@@ -145,7 +137,7 @@ class PoliticaPage extends StatelessWidget {
 // --------------------------------------------- autorización de clientes
 final _fecha = DateFormat('dd/MM/yyyy', 'es_CO');
 
-/// Formato de autorización del Anexo 3, prellenado con los datos del
+/// Formato de autorización del cliente, prellenado con los datos del
 /// cliente y del comercio; se archiva con número (AU-…) y se puede imprimir
 /// para firmar o enviar por WhatsApp para que el cliente responda AUTORIZO.
 Future<void> generarAutorizacionCliente(BuildContext context, String clienteId) async {
@@ -195,7 +187,7 @@ Future<Uint8List> pdfAutorizacion(AutorizacionCliente a, String numero) async {
         left: 18 * PdfPageFormat.mm, right: 18 * PdfPageFormat.mm,
         top: 16 * PdfPageFormat.mm, bottom: 16 * PdfPageFormat.mm),
     build: (_) => pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: [
-      pw.Text('Convocatoria CreaTIC Casanare 2026 · Formatos Modelo de Protección de Datos (Ley 1581 de 2012)',
+      pw.Text('VERTEX AI Pyme · Protección de datos personales (Ley 1581 de 2012)',
           style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
       pw.SizedBox(height: 6),
       pw.Container(
@@ -235,9 +227,9 @@ Future<Uint8List> pdfAutorizacion(AutorizacionCliente a, String numero) async {
         ]),
       ]),
       pw.Spacer(),
-      pw.Text('Responsable: ${a.comercio}. Encargada: Gobernación de Casanare – Dirección de las TIC. '
-          'Política de Tratamiento de Datos Personales: disponible en la aplicación VERTEX AI Pyme y en '
-          '$sitioGobernacionVisible. Canal de derechos: ${Config.contactoPrivacidad}.',
+      pw.Text('Responsable: ${a.comercio}. Encargada: VERTEX TECH. '
+          'Política de Tratamiento de Datos Personales: disponible en la aplicación VERTEX AI Pyme. '
+          'Canal de derechos: ${Config.contactoPrivacidad}.',
           style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
     ]),
   ));
