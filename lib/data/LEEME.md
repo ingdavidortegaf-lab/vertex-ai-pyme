@@ -6,4 +6,4 @@
 - `asistente_service.dart`: qué se le pregunta a la IA (consejos, mensajes y promociones) y qué se hace sin señal.
 - `remote_api.dart`: la conexión con Supabase (upsert por id, sin duplicar).
 
-Explicación completa: `docs/exposicion/3_datos_sin_senal.md`
+Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

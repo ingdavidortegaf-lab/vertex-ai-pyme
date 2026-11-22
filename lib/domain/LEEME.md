@@ -12,4 +12,4 @@ La lógica pura, sin pantallas ni internet, y por eso fácil de probar.
 - `seguimiento.dart`: grupos de clientes para escribirles por WhatsApp.
 - `modo_negocio.dart`: los 22 tipos de negocio y cómo se adapta la app.
 
-Explicación completa: `docs/exposicion/2_reglas_del_negocio.md`
+Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

@@ -9,4 +9,4 @@ Para correrlas: menú **Terminal → Ejecutar tarea → Correr las 128 pruebas a
 - `promocion_test.dart`: redactor de promociones y lo que viaja a la IA.
 - `seguimiento_test.dart`: grupos de clientes y autorización.
 
-Explicación completa: `docs/exposicion/6_pruebas.md`
+Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

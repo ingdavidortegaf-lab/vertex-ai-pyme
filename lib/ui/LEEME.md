@@ -13,4 +13,4 @@ Cada archivo es una pantalla hecha con **Flutter** (lenguaje **Dart**). Las pant
 - `legal_page.dart` y `consent_gate.dart`: aviso, casilla con enlace, política y Anexo 3.
 - `ilustraciones.dart`: el logo y los dibujos hechos en código.
 
-Explicación completa: `docs/exposicion/1_pantallas.md`
+Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

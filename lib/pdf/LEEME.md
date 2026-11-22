@@ -9,4 +9,4 @@ Los PDF se dibujan en el celular, sin internet, con el paquete `pdf`, y se impri
 
 El formato de autorización de datos (Anexo 3, número `AU-`) se dibuja en `lib/ui/legal_page.dart` → `pdfAutorizacion` y se archiva con este mismo `archivo.dart`.
 
-Explicación completa: `docs/exposicion/5_pdf_y_documentos.md`
+Explicación completa: `docs/COMO_ESTA_CONSTRUIDO.txt`

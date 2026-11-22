@@ -26,7 +26,7 @@ Paint _tiza(Color c, double ancho) => Paint()
 // ------------------------------------------------------------------ logo
 /// Marca de VERTEX: la «V» blanca de dos brazos con sus facetas y el rombo
 /// del vértice, sobre verde con un halo de luz. Es el mismo dibujo del ícono
-/// de la app (docs/pitch/generador/iconos.js). Con [animar], el rombo y el
+/// de la app (tool/iconos/iconos.js). Con [animar], el rombo y el
 /// halo brillan suave.
 class LogoVertex extends StatefulWidget {
   final double tam;
@@ -72,7 +72,7 @@ class _LogoPainter extends CustomPainter {
   final double brillo; // 0..1: intensidad del halo del rombo
   _LogoPainter(this.brillo);
 
-  // Mismo dibujo que el ícono (docs/pitch/generador/iconos.js), sobre 1080.
+  // Mismo dibujo que el ícono (tool/iconos/iconos.js), sobre 1080.
   static const _k = 1.38, _cx = 540.0, _cy = 542.0;
 
   @override

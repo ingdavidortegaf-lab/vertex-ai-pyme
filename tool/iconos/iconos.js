@@ -4,9 +4,11 @@
 // (lib/ui/ilustraciones.dart). Coordenadas sobre un lienzo de 1080.
 // Uso: node iconos.js            -> íconos de la app (paleta verde de la app)
 //      node iconos.js muestra    -> además, comparación verde / azul original
+// Requiere: npm install sharp (en esta carpeta).
 const sharp = require('sharp');
 const path = require('path');
-const P = 'C:/dev/vertex_ai_pyme/';
+// Raíz del repositorio (este archivo vive en tool/iconos/).
+const P = path.join(__dirname, '..', '..') + path.sep;
 
 const PALETAS = {
   verde: { f1: '#245C49', f2: '#17362C', f3: '#0B1F18', v: '#FFFFFF', faceta: '#5FCB8C', rombo: '#8FE0AE', tallo: '#2E7A5C', halo: '#8FE0AE' },
