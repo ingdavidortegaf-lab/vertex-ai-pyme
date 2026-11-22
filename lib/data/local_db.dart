@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
 import '../domain/documentos.dart';
 import '../domain/identificacion.dart';
+import '../domain/legal.dart';
 import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
@@ -1250,7 +1251,7 @@ class LocalDb {
   /// medio (en la tienda, por WhatsApp, firmada) y versión del texto.
   Future<void> registrarAutorizacionCliente(String clienteId, String medio) =>
       setAjuste('aut_cli_$clienteId',
-          jsonEncode({'fecha': _ahora(), 'medio': medio, 'version': 'Autorización cliente v1'}));
+          jsonEncode({'fecha': _ahora(), 'medio': medio, 'version': versionAutorizacion}));
 
   Future<Map<String, dynamic>?> autorizacionCliente(String clienteId) async {
     final v = await ajuste('aut_cli_$clienteId');

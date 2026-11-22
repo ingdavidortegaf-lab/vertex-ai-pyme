@@ -37,7 +37,10 @@ class DatosEncargada {
 
 /// Versión del aviso aceptado (si cambia, la app vuelve a pedir la
 /// autorización).
-const versionAviso = 'Aviso v2 · noviembre de 2026';
+const versionAviso = 'Aviso v3 · noviembre de 2026';
+
+/// Versión del formato de autorización del cliente que queda registrada.
+const versionAutorizacion = 'Autorización cliente v2';
 
 /// Texto corto para la pantalla de registro.
 String avisoPrivacidad(DatosEncargada e) =>
