@@ -1,10 +1,14 @@
 # Aviso de privacidad, casilla y formato de autorización (Ley 1581 de 2012)
 
-> Textos tal como los muestra la app. Código: `lib/domain/legal.dart` y `lib/ui/legal_page.dart`. Cuando cambia la versión del aviso, la app vuelve a pedir la autorización una vez.
+> **BORRADOR PARA REVISIÓN DE UN ABOGADO.** La app muestra esta misma marca en el aviso, la política y el PDF de autorización mientras `Config.textosLegalesRevisados` sea `false`.
+
+> Textos tal como los muestra la app. Código: `lib/domain/legal.dart` y `lib/ui/legal_page.dart`. Versión: **Aviso v3 · noviembre de 2026**; autorización del cliente **v2**. Cuando cambia la versión del aviso, la app vuelve a pedir la autorización una vez.
+>
+> Los corchetes `[razón social]`, `[NIT]` y `[correo]` de VERTEX TECH salen de `Config.encargadaRazonSocial`, `Config.encargadaNit` y `Config.encargadaCorreo`. Mientras estén vacíos, la app muestra «[… pendiente]».
 
 ## Aviso en la pantalla de registro (primer uso)
 
-> AVISO DE PRIVACIDAD: En cumplimiento de la Ley 1581 de 2012 y el Decreto 1074 de 2015, le informamos que los datos personales suministrados serán tratados para gestionar su registro, operación comercial, inventario, ventas, pedidos y contacto dentro de esta aplicación. Frente a los datos de clientes finales registrados por los comercios, la MiPyme usuaria actúa como Responsable del Tratamiento y VERTEX TECH, como operadora de la plataforma, actúa como Encargada del Tratamiento. Usted puede ejercer sus derechos a conocer, actualizar, rectificar y suprimir sus datos, así como consultar nuestra Política de Tratamiento de Datos Personales directamente en esta aplicación.
+> AVISO DE PRIVACIDAD: En cumplimiento de la Ley 1581 de 2012 y el Decreto 1074 de 2015, le informamos que los datos personales suministrados serán tratados para gestionar su registro, operación comercial, inventario, ventas, pedidos y contacto dentro de esta aplicación. Frente a los datos de clientes finales registrados por los comercios, la MiPyme usuaria actúa como Responsable del Tratamiento y VERTEX TECH ([razón social], NIT [NIT]), como operadora de la plataforma, actúa como Encargada del Tratamiento. Usted puede ejercer sus derechos a conocer, actualizar, rectificar y suprimir sus datos, así como consultar nuestra Política de Tratamiento de Datos Personales directamente en esta aplicación.
 
 **Casilla (sin premarcar; el botón «Aceptar y continuar» no se activa hasta marcarla):**
 
@@ -28,7 +32,7 @@ Texto del formato:
 
 > **FORMATO DE AUTORIZACIÓN Y CONSENTIMIENTO INFORMADO PARA EL TRATAMIENTO DE DATOS PERSONALES**
 >
-> Yo, [cliente], identificado(a) con C.C. / NIT No. ________, actuando en nombre propio (o en representación del establecimiento ________), manifiesto de manera libre, previa, expresa e informada que AUTORIZO a [comercio] en calidad de Responsable del Tratamiento, y a VERTEX TECH en calidad de Encargada y operadora de la aplicación VERTEX AI Pyme, para recolectar, almacenar, usar, circular y actualizar mis datos personales de contacto, ubicación y transacciones comerciales.
+> Yo, [cliente], identificado(a) con C.C. / NIT No. ________, actuando en nombre propio (o en representación del establecimiento ________), manifiesto de manera libre, previa, expresa e informada que AUTORIZO a [comercio] en calidad de Responsable del Tratamiento, y a VERTEX TECH ([razón social], NIT [NIT]) en calidad de Encargada y operadora de la aplicación VERTEX AI Pyme, para recolectar, almacenar, usar, circular y actualizar mis datos personales de contacto, ubicación y transacciones comerciales.
 >
 > Finalidades y Derechos: Declaro haber sido informado(a) de que mis datos serán utilizados exclusivamente para gestionar pedidos, ventas, entregas, control de cartera/fiados y comunicación comercial; que es facultativo responder preguntas sobre datos sensibles; y que puedo ejercer gratuitamente mis derechos a conocer, actualizar, rectificar y suprimir mis datos conforme a la Política de Tratamiento de Datos Personales disponible en la aplicación.
 >
