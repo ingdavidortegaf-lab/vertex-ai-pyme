@@ -1,6 +1,12 @@
--- VERTEX AI Pyme · esquema para Supabase (plan gratuito).
--- Ejecutar COMPLETO en Supabase > SQL Editor > New query > Run.
--- Es idempotente: se puede volver a ejecutar sin perder datos.
+-- VERTEX AI Pyme · esquema CONSOLIDADO de Supabase (solo de referencia).
+--
+-- LA FUENTE DE VERDAD SON LAS MIGRACIONES de supabase/migrations/, que
+-- coinciden con el historial del proyecto real. Todo cambio nuevo va en una
+-- migración nueva (supabase migration new <nombre>) y después se refleja
+-- aquí para que se pueda leer el esquema completo en un solo archivo.
+--
+-- Para un proyecto vacío también se puede ejecutar completo en
+-- Supabase > SQL Editor > Run: es idempotente.
 --
 -- Si ejecutaste una versión ANTERIOR de este archivo (tablas sin empresa_id),
 -- borra primero esas tablas de prueba:

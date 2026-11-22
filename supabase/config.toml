@@ -1,0 +1,37 @@
+# Configuración de la CLI de Supabase para el entorno LOCAL (pruebas y CI).
+# No tiene claves: el proyecto real se enlaza aparte con `supabase link`.
+# Las migraciones de supabase/migrations/ se aplican en orden con
+# `supabase db reset` (local) o `supabase db push` (proyecto enlazado).
+project_id = "vertex-ai-pyme"
+
+[db]
+port = 54322
+major_version = 17
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+
+# Lo que no se usa en las pruebas va apagado para que arranque más rápido.
+[studio]
+enabled = false
+
+[realtime]
+enabled = false
+
+[storage]
+enabled = false
+
+[inbucket]
+enabled = false
+
+[analytics]
+enabled = false
+
+[edge_runtime]
+enabled = false
