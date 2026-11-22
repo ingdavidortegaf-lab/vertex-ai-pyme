@@ -1,0 +1,44 @@
+# Integración continua: en cada push y pull request a main revisa el código
+# (flutter analyze) y corre las pruebas (flutter test).
+# No usa ninguna clave: las pruebas corren contra SQLite en memoria y un
+# servidor falso.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Análisis y pruebas (Flutter)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.50.0
+          channel: stable
+          cache: true
+
+      # Las pruebas de la base local usan SQLite por FFI.
+      - name: SQLite para las pruebas
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Dependencias
+        run: flutter pub get
+
+      # Falla con errores o advertencias. Los avisos «info» (APIs marcadas
+      # como obsoletas por el SDK) no detienen el flujo.
+      - name: flutter analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: flutter test
+        run: flutter test
