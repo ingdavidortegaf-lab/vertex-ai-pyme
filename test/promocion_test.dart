@@ -5,7 +5,7 @@ import 'package:vertex_ai_pyme/domain/promocion.dart';
 
 void main() {
   setUpAll(() => initializeDateFormatting('es_CO'));
-  const negocio = PerfilNegocio(nombre: 'Tienda Doña Marta', direccion: 'Calle 10 # 5-20, Yopal');
+  const negocio = PerfilNegocio(nombre: 'Tienda Doña Marta', direccion: 'Calle 10 # 5-20, Bucaramanga');
   final productos = [
     const ProductoPromo('Arroz Diana 500 g', 2000, 2500),
     const ProductoPromo('Aceite 1 L', 9500, 9500),
@@ -27,7 +27,8 @@ void main() {
     expect(t, contains('Hasta *20 % de descuento*'));
     expect(t, contains('se lo llevamos'));
     expect(t, contains('#TiendaDoñaMarta'));
-    expect(t, contains('#Yopal'));
+    expect(t, contains('#Bucaramanga'));
+    expect(t, isNot(contains('#Casa' 'nare')));
     expect(t, isNot(contains('Aceite 1 L: ~')), reason: 'sin rebaja no se tacha el precio');
   });
 
@@ -46,6 +47,13 @@ void main() {
     expect(c['modo'], 'promocion');
     expect(c['ocasion'], 'Viernes negro');
     expect(c.toString(), isNot(contains('Doña Marta')));
-    expect(c.toString(), isNot(contains('Yopal')));
+    expect(c.toString(), isNot(contains('Bucaramanga')));
+  });
+
+  test('sin ciudad en la dirección no pone etiqueta de lugar', () {
+    const sinCiudad = PerfilNegocio(nombre: 'Tienda Doña Marta', direccion: 'Calle 10 # 5-20');
+    final t = redactarPromocion(
+        negocio: sinCiudad, productos: productos, ahora: DateTime(2026, 11, 10), domicilios: false);
+    expect(t.trim().split('\n').last, '#TiendaDoñaMarta #ComprarEnElBarrio');
   });
 }

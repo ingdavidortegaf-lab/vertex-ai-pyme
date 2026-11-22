@@ -1,6 +1,6 @@
 /// Indicativos de país para los celulares (WhatsApp usa el número completo
 /// con el indicativo y sin «+»). Colombia va primero; luego los más comunes
-/// para el comercio de Casanare (vecinos, Venezuela, EE. UU., España…).
+/// para el comercio colombiano (vecinos, Venezuela, EE. UU., España…).
 library;
 
 class Pais {

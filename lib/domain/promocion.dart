@@ -156,8 +156,8 @@ String redactarPromocion({
     '📲 Escríbanos y se lo apartamos${domicilios ? ' o se lo llevamos' : ''}',
   ]));
   b.writeln(dir.isEmpty ? '.' : ' o visítenos en $dir.');
-  final municipio = _municipio(dir);
-  b.write('#${_etiqueta(nombre)} #ComprarEnElBarrio${municipio.isEmpty ? ' #Casanare' : ' #$municipio #Casanare'}');
+  final ciudad = _ciudad(dir);
+  b.write('#${_etiqueta(nombre)} #ComprarEnElBarrio${ciudad.isEmpty ? '' : ' #$ciudad'}');
   return b.toString();
 }
 
@@ -171,18 +171,16 @@ String _etiqueta(String s) {
   return limpio.isEmpty ? 'MiTienda' : limpio;
 }
 
-const _municipios = [
-  'Yopal', 'Aguazul', 'Villanueva', 'Tauramena', 'Monterrey', 'Paz de Ariporo',
-  'Maní', 'Trinidad', 'Orocué', 'Hato Corozal', 'Pore', 'Nunchía', 'Támara',
-  'San Luis de Palenque', 'Sabanalarga', 'Recetor', 'Chámeza', 'Sácama', 'La Salina',
-];
-
-String _municipio(String direccion) {
-  final d = direccion.toLowerCase();
-  for (final m in _municipios) {
-    if (d.contains(m.toLowerCase())) return _etiqueta(m);
-  }
-  return '';
+/// Ciudad de la dirección: lo que va después de la última coma, si no lleva
+/// números («Cra 20 # 10-15, Bucaramanga» → «Bucaramanga»). Sirve en
+/// cualquier parte del país, sin una lista fija de municipios.
+String _ciudad(String direccion) {
+  final partes = direccion.split(',');
+  if (partes.length < 2) return '';
+  final c = partes.last.trim();
+  if (c.isEmpty || c.length > 40 || RegExp(r'[0-9#]').hasMatch(c)) return '';
+  final e = _etiqueta(c);
+  return e == 'MiTienda' ? '' : e;
 }
 
 /// Lo único que viaja a la IA en la nube para una promoción: nombres de

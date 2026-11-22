@@ -420,7 +420,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                   labelText: 'Dirección',
-                  hintText: 'Ej.: Cra 20 # 10-15, Yopal')),
+                  hintText: 'Ej.: Cra 20 # 10-15, Bucaramanga')),
           const SizedBox(height: 12),
           CampoTelefono(ctrl: _tel, etiqueta: 'WhatsApp del negocio'),
           const SizedBox(height: 12),

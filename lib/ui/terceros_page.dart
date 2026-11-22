@@ -243,7 +243,7 @@ class _FormTerceroState extends State<_FormTercero> {
   }
 
   String get _ejemplo => switch (_clase) {
-        'servicios' => 'Ej.: Enerca (la luz), acueducto, internet',
+        'servicios' => 'Ej.: empresa de energía, acueducto, internet',
         'arriendo' => 'Ej.: Don Pedro Rincón (dueño del local)',
         'empleado' => 'Ej.: Luis Fernando Pérez',
         'otro' => 'Ej.: Contador, mensajero',

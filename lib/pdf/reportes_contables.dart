@@ -195,7 +195,7 @@ Future<DatosInforme> cargarInforme(Periodo periodo, DateTime ahora) async {
 const _tipos = {'ingreso': 'Venta', 'egreso': 'Gasto', 'abono': 'Abono'};
 
 /// Cliente (en ventas y abonos) o tercero (en gastos), con su documento si
-/// lo tiene: «Inmobiliaria Los Llanos · NIT 900.373.913-4».
+/// lo tiene: «Inmobiliaria Horizonte · NIT 900.373.913-4».
 String _quien(Map<String, Object?> m) {
   final gasto = m['tipo'] == 'egreso';
   final nombre = (m[gasto ? 'tercero_nombre' : 'cliente_nombre'] as String?) ?? '';
