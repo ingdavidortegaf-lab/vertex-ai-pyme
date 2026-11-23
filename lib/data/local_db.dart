@@ -93,6 +93,25 @@ class LocalDb {
     }
   }
 
+  /// ¿Hay en este celular algo del negocio (ventas, clientes, productos,
+  /// movimientos de inventario o envíos pendientes)? Se mira antes de unirse
+  /// a otro negocio, para no mezclar ni perder datos.
+  Future<bool> tieneDatosDelNegocio() async {
+    for (final t in ['ventas', 'clientes', 'productos', 'inventario', 'cola_sync']) {
+      if (LocalDb._int(await db.rawQuery('SELECT COUNT(*) FROM $t')) > 0) return true;
+    }
+    return false;
+  }
+
+  /// Esta cuenta pasó a otro negocio (se unió con un código o el dueño la
+  /// quitó del equipo): lo que hay en el celular es del negocio anterior y
+  /// no debe quedarse ni subirse al nuevo. Se borra y se baja lo del nuevo.
+  Future<void> cambiarDeNegocio(ContextoEquipo nuevo) async {
+    await borrarDatosLocales();
+    perfilActivo.value = null;
+    await guardarContexto(nuevo);
+  }
+
   Future<void> _cargarContexto() async {
     equipo.value = ContextoEquipo(
       rol: rolDesdeTexto(await ajuste('equipo_rol')),

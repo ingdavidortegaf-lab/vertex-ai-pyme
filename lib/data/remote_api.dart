@@ -1,10 +1,16 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../domain/invitaciones.dart';
+import '../domain/roles.dart';
 
 /// El servidor rechazó el registro (dato inválido, permiso, etc.).
 /// Se reintenta con espera creciente y luego se aparta, sin borrarlo.
 class RechazoServidor implements Exception {
   final String codigo;
-  const RechazoServidor(this.codigo);
+
+  /// Explicación del servidor, cuando la da (las funciones del equipo
+  /// responden en español: «El código no es válido…»).
+  final String mensaje;
+  const RechazoServidor(this.codigo, [this.mensaje = '']);
   @override
   String toString() => 'RechazoServidor($codigo)';
 }
@@ -35,6 +41,18 @@ abstract class RemoteApi {
   /// Rol y empresa de este usuario (función mi_contexto del servidor).
   /// Null si el servidor todavía no la tiene.
   Future<Map<String, dynamic>?> contexto();
+
+  // ------------------------------------------------ equipo (necesitan red)
+  /// Crea un código de un solo uso para entrar al negocio con [rol].
+  Future<String> crearInvitacion(Rol rol, {int dias = diasInvitacion});
+
+  /// Une esta cuenta al negocio del código. Devuelve empresa_id y rol.
+  Future<Map<String, dynamic>> unirseConCodigo(String codigo);
+
+  Future<List<MiembroEquipo>> equipo();
+  Future<void> cambiarRol(String usuario, Rol rol);
+  Future<void> quitarMiembro(String usuario);
+  Future<void> definirDespachadorFia(bool valor);
 }
 
 class SupabaseRemote implements RemoteApi {
@@ -54,7 +72,7 @@ class SupabaseRemote implements RemoteApi {
   Never _traducir(Object e) {
     if (e is PostgrestException) {
       if (_esSesion(e)) throw const SesionVencida();
-      throw RechazoServidor(e.code ?? 'servidor');
+      throw RechazoServidor(e.code ?? 'servidor', e.message);
     }
     if (e is AuthException) throw const SesionVencida();
     throw e; // red / timeout
@@ -104,6 +122,40 @@ class SupabaseRemote implements RemoteApi {
       _traducir(e);
     }
   }
+
+  Future<dynamic> _rpc(String fn, [Map<String, dynamic>? params]) async {
+    try {
+      return await _sb.rpc(fn, params: params).timeout(_timeout);
+    } catch (e) {
+      _traducir(e);
+    }
+  }
+
+  @override
+  Future<String> crearInvitacion(Rol rol, {int dias = diasInvitacion}) async =>
+      (await _rpc('crear_invitacion', {'p_rol': rolATexto(rol), 'p_dias': dias})) as String;
+
+  @override
+  Future<Map<String, dynamic>> unirseConCodigo(String codigo) async =>
+      Map<String, dynamic>.from(
+          (await _rpc('unirse_con_codigo', {'p_codigo': normalizarCodigo(codigo)})) as Map);
+
+  @override
+  Future<List<MiembroEquipo>> equipo() async => [
+        for (final f in (await _rpc('equipo')) as List)
+          MiembroEquipo.desdeServidor(Map<String, dynamic>.from(f as Map))
+      ];
+
+  @override
+  Future<void> cambiarRol(String usuario, Rol rol) =>
+      _rpc('cambiar_rol', {'p_usuario': usuario, 'p_rol': rolATexto(rol)});
+
+  @override
+  Future<void> quitarMiembro(String usuario) => _rpc('quitar_miembro', {'p_usuario': usuario});
+
+  @override
+  Future<void> definirDespachadorFia(bool valor) =>
+      _rpc('definir_despachador_fia', {'p_valor': valor});
 
   @override
   Future<String?> asistente(Map<String, dynamic> cuerpo) async {

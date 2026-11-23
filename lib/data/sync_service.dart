@@ -160,6 +160,9 @@ class SyncService {
         estado.value = EstadoSync.sinSesion;
         return;
       }
+      // Primero el rol y el negocio: si esta cuenta ya no es de este negocio,
+      // lo pendiente no debe subirse al nuevo.
+      await _actualizarContexto(api);
       final cola = await db.colaLista();
       if (cola.isNotEmpty) estado.value = EstadoSync.sincronizando;
       for (final item in cola) {
@@ -176,7 +179,6 @@ class SyncService {
         }
         await _contar();
       }
-      await _actualizarContexto(api);
       if (!_porTiempo || !reloj().isBefore(_proximoPull)) {
         final llegaron = await _descargar(api);
         pullCada = llegaron > 0
@@ -209,10 +211,19 @@ class SyncService {
 
   /// Pregunta al servidor el rol de este usuario. Si el servidor todavía no
   /// tiene la función (o la rechaza), se sigue con el rol que ya se sabía.
+  /// Si la cuenta ya es de otro negocio (el dueño la quitó del equipo), lo
+  /// del negocio anterior se borra de este celular.
   Future<void> _actualizarContexto(RemoteApi api) async {
     try {
       final c = await api.contexto();
-      if (c != null) await db.guardarContexto(ContextoEquipo.desdeServidor(c));
+      if (c == null) return;
+      final nuevo = ContextoEquipo.desdeServidor(c);
+      final antes = db.equipo.value.empresaId;
+      if (antes.isNotEmpty && nuevo.empresaId.isNotEmpty && antes != nuevo.empresaId) {
+        await db.cambiarDeNegocio(nuevo);
+      } else {
+        await db.guardarContexto(nuevo);
+      }
     } on RechazoServidor {
       // Servidor sin la función mi_contexto: no cambia nada.
     }
