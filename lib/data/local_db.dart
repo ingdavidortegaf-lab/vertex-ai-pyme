@@ -11,6 +11,7 @@ import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
 import '../domain/caja.dart';
+import '../domain/facturacion.dart';
 import '../domain/perfiles.dart';
 import '../domain/resumen.dart';
 import '../domain/roles.dart';
@@ -21,6 +22,7 @@ part 'local_db_caja.dart';
 part 'local_db_clientes.dart';
 part 'local_db_cotizaciones.dart';
 part 'local_db_documentos.dart';
+part 'local_db_facturacion.dart';
 part 'local_db_inventario.dart';
 part 'local_db_movimientos.dart';
 part 'local_db_negocio.dart';
@@ -195,10 +197,11 @@ class LocalDb {
     await agregarTerceros(d);
     await agregarPerfiles(d);
     await agregarCaja(d);
+    await agregarFacturacion(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 10;
+  static const versionEsquema = 11;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
@@ -211,6 +214,32 @@ class LocalDb {
     if (viejo < 8 && nuevo >= 8) await agregarTerceros(d); // v8: documentos, correo, terceros y pagos fijos
     if (viejo < 9 && nuevo >= 9) await agregarPerfiles(d); // v9: perfiles con PIN y quién hizo cada venta
     if (viejo < 10 && nuevo >= 10) await agregarCaja(d); // v10: anulaciones, descuentos y turnos
+    if (viejo < 11 && nuevo >= 11) await agregarFacturacion(d); // v11: IVA por producto y factura electrónica
+  }
+
+  /// v11: IVA por producto (−1 = sin definir; se une por campo como los
+  /// demás) y la cola de facturas electrónicas (solo en este celular).
+  static Future<void> agregarFacturacion(Database d) async {
+    const inicio = '1970-01-01T00:00:00.000Z';
+    await d.execute('ALTER TABLE productos ADD COLUMN iva REAL NOT NULL DEFAULT -1');
+    await d.execute("ALTER TABLE productos ADD COLUMN iva_ts TEXT NOT NULL DEFAULT '$inicio'");
+    await d.execute('''CREATE TABLE facturas_e(
+      id TEXT PRIMARY KEY,
+      venta_id TEXT NOT NULL UNIQUE,
+      numero TEXT NOT NULL UNIQUE,
+      consecutivo INTEGER NOT NULL,
+      estado TEXT NOT NULL CHECK (estado IN ('pendiente','enviado','aceptado','rechazado')),
+      id_externo TEXT,
+      cufe TEXT,
+      qr TEXT,
+      mensaje TEXT NOT NULL DEFAULT '',
+      payload TEXT NOT NULL,
+      total REAL NOT NULL,
+      comprador TEXT NOT NULL DEFAULT '',
+      intentos INTEGER NOT NULL DEFAULT 0,
+      creado TEXT NOT NULL,
+      actualizado TEXT NOT NULL)''');
+    await d.execute('CREATE INDEX facturas_e_estado_idx ON facturas_e(estado)');
   }
 
   /// v10: anulaciones (un movimiento nuevo que apunta al original),
@@ -620,7 +649,8 @@ class LocalDb {
         'pagos_fijos_hechos',
         'pagos_fijos',
         'perfiles',
-        'turnos'
+        'turnos',
+        'facturas_e'
       ]) {
         await t.delete(tabla);
       }

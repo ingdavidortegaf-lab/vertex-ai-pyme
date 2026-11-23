@@ -151,7 +151,8 @@ class ProductoCampos {
     'minimo',
     'deleted',
     'codigo',
-    'unidad'
+    'unidad',
+    'iva'
   ];
 
   /// Unidades de venta: por unidad o por peso (gramera).
@@ -173,6 +174,9 @@ class ProductoCampos {
   bool get deleted => valores['deleted'] == true;
   String get codigo => valores['codigo'] as String;
   String get unidad => valores['unidad'] as String;
+
+  /// Porcentaje de IVA (−1 = sin definir).
+  double get iva => (valores['iva'] as num).toDouble();
 
   DateTime get updatedAt =>
       ts.values.reduce((a, b) => b.isAfter(a) ? b : a);
@@ -198,12 +202,18 @@ class ProductoCampos {
       'deleted': local ? (r['deleted'] as int? ?? 0) == 1 : r['deleted'] == true,
       'codigo': (r['codigo'] as String?) ?? '',
       'unidad': unidades.contains(r['unidad']) ? r['unidad'] as String : 'und',
+      'iva': _iva(r['iva']),
     };
     final t = {
       for (final c in campos)
         c: r['${c}_ts'] is String ? DateTime.parse(r['${c}_ts'] as String) : _inicio
     };
     return ProductoCampos(r['id'] as String, v, t);
+  }
+
+  static double _iva(Object? v) {
+    final x = (v as num?)?.toDouble() ?? -1;
+    return x == -1 || (x.isFinite && x >= 0 && x <= 100) ? x : -1;
   }
 
   factory ProductoCampos.fromLocal(Map<String, Object?> r) => _leer(r, true);

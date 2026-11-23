@@ -20,6 +20,7 @@ extension LocalDbInventario on LocalDb {
           sync: x['sync'] as String? ?? 'pendiente',
           codigo: (x['codigo'] as String?) ?? '',
           unidad: (x['unidad'] as String?) ?? 'und',
+          iva: LocalDb._dbl(x['iva'] ?? -1),
         )
     ];
   }
@@ -53,8 +54,10 @@ extension LocalDbInventario on LocalDb {
       double stockInicial = 0,
       String codigo = '',
       String unidad = 'und',
+      double? iva,
       String? id}) async {
     if (nombre.trim().isEmpty) throw ArgumentError('nombre');
+    if (iva != null && !ivaValido(iva)) throw ArgumentError('iva');
     if (!ProductoCampos.unidades.contains(unidad)) throw ArgumentError('unidad');
     if (!precio.isFinite || precio < 0 || !costo.isFinite || costo < 0) {
       throw ArgumentError('precio');
@@ -71,6 +74,8 @@ extension LocalDbInventario on LocalDb {
         'minimo': minimo < 0 ? 0 : minimo,
         'codigo': codigo.replaceAll(RegExp(r'\s'), ''),
         'unidad': unidad,
+        // Si no se dice, el IVA se deja como estaba (al crear: sin definir).
+        if (iva != null) 'iva': iva,
       };
       final Map<String, Object?> row;
       if (prev.isEmpty) {

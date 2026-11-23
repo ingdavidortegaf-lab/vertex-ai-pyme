@@ -66,6 +66,9 @@ class ProductoStock {
 
   /// Unidad de venta: 'und', 'kg' o 'lb' (por peso, con gramera).
   final String unidad;
+
+  /// Porcentaje de IVA que escribió el dueño (−1 = sin definir).
+  final double iva;
   const ProductoStock({
     required this.id,
     required this.nombre,
@@ -76,6 +79,7 @@ class ProductoStock {
     this.sync = 'pendiente',
     this.codigo = '',
     this.unidad = 'und',
+    this.iva = -1,
   });
 
   /// Los servicios no llevan inventario: nunca se agotan.

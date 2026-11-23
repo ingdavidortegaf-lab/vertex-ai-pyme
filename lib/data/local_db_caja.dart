@@ -27,6 +27,10 @@ extension LocalDbCaja on LocalDb {
       if (LocalDb._int(await t.rawQuery('SELECT COUNT(*) FROM ventas WHERE anula = ?', [id])) > 0) {
         throw StateError('ya anulado');
       }
+      // Con factura electrónica no se anula así (iría con nota crédito).
+      if (LocalDb._int(await t.rawQuery("SELECT COUNT(*) FROM facturas_e WHERE venta_id = ? AND estado <> 'rechazado'", [id])) > 0) {
+        throw StateError('facturada');
+      }
       var concepto = 'Anulación: ${o['concepto']}';
       final m = motivo.trim().replaceAll(RegExp(r'\s+'), ' ');
       if (m.isNotEmpty) concepto = '$concepto · $m';
