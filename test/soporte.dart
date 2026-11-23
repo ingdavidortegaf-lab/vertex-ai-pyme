@@ -21,6 +21,7 @@ Future<LocalDb> baseDePrueba() async {
     ..reloj = DateTime.now;
   // La instancia es única: el rol de una prueba no debe pasar a la siguiente.
   db.equipo.value = const ContextoEquipo();
+  db.perfilActivo.value = null;
   return db;
 }
 

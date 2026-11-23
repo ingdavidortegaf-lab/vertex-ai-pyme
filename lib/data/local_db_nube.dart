@@ -49,6 +49,7 @@ extension LocalDbNube on LocalDb {
             'monto': monto,
             'tipo': tipo,
             'credito': f['credito'] == true ? 1 : 0,
+            'perfil': (f['perfil'] as String?) ?? '',
             'fecha': isoUtc(fecha),
             'pagos': f['pagos'] == null
                 ? null

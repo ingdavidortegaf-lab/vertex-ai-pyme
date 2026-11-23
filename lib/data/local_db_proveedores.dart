@@ -124,6 +124,7 @@ extension LocalDbProveedores on LocalDb {
         'tipo': 'egreso',
         'credito': 0,
         'fecha': _ahora(),
+        ..._quien,
       };
       await t.insert('ventas', {
         ...row,
@@ -191,6 +192,7 @@ extension LocalDbProveedores on LocalDb {
           'tipo': 'egreso',
           'credito': 0,
           'fecha': _ahora(),
+          ..._quien,
         };
         final medios = LocalDb._pagosDe('egreso', false, pagado, pagosGasto)!;
         await t.insert('ventas',
@@ -236,6 +238,7 @@ extension LocalDbProveedores on LocalDb {
         'tipo': 'egreso',
         'credito': 0,
         'fecha': _ahora(),
+        ..._quien,
       };
       await t.insert('ventas', {...row, 'pagos': codificarPagos(medios), 'sync': 'pendiente'});
       await _enqueue(t, 'ventas', id,

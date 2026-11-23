@@ -221,6 +221,19 @@ begin
   end if;
 end $$;
 
+-- ------------------------------------------- quién atendió (perfil del celular)
+do $$
+begin
+  insert into public.ventas (id, concepto, monto, tipo, credito, fecha, perfil)
+  values (gen_random_uuid(), 'Venta de Luis', 2000, 'ingreso', false, now(), 'Luis');
+  begin
+    insert into public.ventas (id, concepto, monto, tipo, credito, fecha, perfil)
+    values (gen_random_uuid(), 'Nombre larguísimo', 2000, 'ingreso', false, now(), repeat('x', 41));
+    raise exception 'FALLO: se aceptó un nombre de perfil de más de 40 caracteres';
+  exception when check_violation then null;
+  end;
+end $$;
+
 -- ------------------------------------- el costo lo puso el servidor (lo ve D)
 select set_config('request.jwt.claim.sub', 'd0000000-0000-4000-8000-00000000000d', true),
        set_config('request.jwt.claims', '{"sub":"d0000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);

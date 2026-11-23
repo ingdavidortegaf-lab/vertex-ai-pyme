@@ -683,3 +683,12 @@ revoke all on function public.crear_invitacion(text, int), public.unirse_con_cod
 grant execute on function public.crear_invitacion(text, int), public.unirse_con_codigo(text),
   public.cambiar_rol(uuid, text), public.quitar_miembro(uuid), public.definir_despachador_fia(boolean),
   public.mi_contexto(), public.equipo() to authenticated;
+
+-- ============================================================================
+-- Migración 20261122160000_perfil_en_ventas (copia de referencia)
+-- ============================================================================
+-- Nombre de quien registró el movimiento cuando varias personas atienden en
+-- el mismo celular (perfil con PIN). Es informativo: quién lo envió de verdad
+-- lo dice creado_por, que la política no deja falsear.
+alter table public.ventas add column if not exists perfil text not null default ''
+  check (char_length(perfil) <= 40);

@@ -28,6 +28,7 @@ extension LocalDbMovimientos on LocalDb {
       'tipo': tipo,
       'credito': fiado ? 1 : 0,
       'fecha': _ahora(),
+      ..._quien,
     };
     await db.transaction((t) async {
       await t.insert('ventas', {

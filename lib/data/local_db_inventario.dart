@@ -165,6 +165,7 @@ extension LocalDbInventario on LocalDb {
       'tipo': 'ingreso',
       'credito': fiado ? 1 : 0,
       'fecha': _ahora(),
+      ..._quien,
     };
     await db.transaction((t) async {
       await t.insert('ventas', {

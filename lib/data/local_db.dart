@@ -10,6 +10,7 @@ import '../domain/legal.dart';
 import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
+import '../domain/perfiles.dart';
 import '../domain/resumen.dart';
 import '../domain/roles.dart';
 import '../domain/seguimiento.dart';
@@ -22,6 +23,7 @@ part 'local_db_inventario.dart';
 part 'local_db_movimientos.dart';
 part 'local_db_negocio.dart';
 part 'local_db_nube.dart';
+part 'local_db_perfiles.dart';
 part 'local_db_proveedores.dart';
 
 /// Base local CIFRADA (SQLCipher). La clave (256 bits aleatorios) se genera
@@ -64,8 +66,21 @@ class LocalDb {
   /// el dueño). Las pantallas lo escuchan para mostrar solo lo permitido.
   final equipo = ValueNotifier<ContextoEquipo>(const ContextoEquipo());
 
-  /// ¿El rol actual permite [p]? (la app oculta; el servidor impide).
-  bool puede(Permiso p) => equipo.value.puede(p);
+  /// Quién está atendiendo en este celular (perfil con PIN), si se usan.
+  final perfilActivo = ValueNotifier<Perfil?>(null);
+
+  /// ¿El rol actual permite [p]? Es el de la cuenta y, si hay alguien
+  /// atendiendo con su perfil, también el de ese perfil (la app oculta; el
+  /// servidor impide).
+  bool puede(Permiso p) => puedeEfectivo(equipo.value, perfilActivo.value?.rol, p);
+
+  /// Nombre de quien atiende, para guardarlo en cada movimiento.
+  String get _perfilNombre => perfilActivo.value?.nombre ?? '';
+
+  /// Lo que se agrega a cada movimiento sobre quién lo hizo. A la nube solo
+  /// va si hay perfil (así sigue funcionando con un servidor sin la columna).
+  Map<String, Object?> get _quien =>
+      _perfilNombre.isEmpty ? const {} : {'perfil': _perfilNombre};
 
   /// Guarda el rol que informó el servidor.
   Future<void> guardarContexto(ContextoEquipo c) async {
@@ -148,10 +163,11 @@ class LocalDb {
     await agregarPagos(d);
     await crearCuentasPagar(d);
     await agregarTerceros(d);
+    await agregarPerfiles(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 8;
+  static const versionEsquema = 9;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
@@ -162,6 +178,21 @@ class LocalDb {
     if (viejo < 6) await agregarPagos(d); // v6: medios de pago
     if (viejo < 7) await crearCuentasPagar(d); // v7: lo que se le debe a proveedores
     if (viejo < 8) await agregarTerceros(d); // v8: documentos, correo, terceros y pagos fijos
+    if (viejo < 9) await agregarPerfiles(d); // v9: perfiles con PIN y quién hizo cada venta
+  }
+
+  /// v9: perfiles del celular compartido (PIN con hash y sal; solo en este
+  /// equipo) y el nombre de quien registró cada movimiento.
+  static Future<void> agregarPerfiles(Database d) async {
+    await d.execute('''CREATE TABLE perfiles(
+      id TEXT PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      rol TEXT NOT NULL,
+      pin_hash TEXT NOT NULL,
+      sal TEXT NOT NULL,
+      activo INTEGER NOT NULL DEFAULT 1,
+      creado TEXT NOT NULL)''');
+    await d.execute("ALTER TABLE ventas ADD COLUMN perfil TEXT NOT NULL DEFAULT ''");
   }
 
   /// v8: identificación y correo de clientes y terceros (proveedores,
@@ -478,7 +509,8 @@ class LocalDb {
         'pagos_proveedor',
         'cuentas_pagar',
         'pagos_fijos_hechos',
-        'pagos_fijos'
+        'pagos_fijos',
+        'perfiles'
       ]) {
         await t.delete(tabla);
       }
