@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
+import '../domain/caja.dart';
 import '../domain/roles.dart';
+import 'caja_widgets.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
@@ -71,8 +73,10 @@ class _VentasPageState extends State<VentasPage> {
       if (out.isEmpty || out.last.$1 != dia) out.add((dia, 0, []));
       final (d, vendido, lista) = out.removeLast();
       lista.add(v);
-      final suma =
-          v['tipo'] == 'ingreso' ? (v['monto'] as num).toDouble() : 0.0;
+      final m = (v['monto'] as num).toDouble();
+      final suma = v['tipo'] == 'ingreso'
+          ? m
+          : (v['tipo'] == 'anulacion' && v['anula_tipo'] == 'ingreso' ? -m : 0.0);
       out.add((d, vendido + suma, lista));
     }
     return out;
@@ -89,6 +93,7 @@ class _VentasPageState extends State<VentasPage> {
     final db = LocalDb.instance;
     final registra =
         db.puede(Permiso.venderContado) || db.puede(Permiso.registrarGasto);
+    final turnos = db.puede(Permiso.venderContado);
     return Scaffold(
       floatingActionButton: registra
           ? FloatingActionButton.extended(
@@ -100,17 +105,26 @@ class _VentasPageState extends State<VentasPage> {
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
-              ? const EstadoVacio(
-                  ilustracion: IlustracionPizarra(),
-                  titulo: 'Aún no hay movimientos',
-                  texto: 'Toca «Registrar» para anotar una venta, un gasto o '
-                      'un abono. Funciona aunque no haya señal.',
-                )
+              ? Column(children: [
+                  if (turnos)
+                    const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: TarjetaTurno()),
+                  const Expanded(
+                    child: EstadoVacio(
+                      ilustracion: IlustracionPizarra(),
+                      titulo: 'Aún no hay movimientos',
+                      texto: 'Toca «Registrar» para anotar una venta, un gasto o '
+                          'un abono. Funciona aunque no haya señal.',
+                    ),
+                  ),
+                ])
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(12, 4, 12, 96),
-                  itemCount: dias.length,
+                  itemCount: dias.length + (turnos ? 1 : 0),
                   itemBuilder: (_, i) {
-                    final (dia, vendido, lista) = dias[i];
+                    if (turnos && i == 0) return const TarjetaTurno();
+                    final (dia, vendido, lista) = dias[i - (turnos ? 1 : 0)];
                     return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -160,9 +174,11 @@ class FilaMovimiento extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final tipo = v['tipo'] as String? ?? 'ingreso';
     final fiado = v['credito'] == 1;
+    final anulada = (v['anulada'] as num? ?? 0) > 0;
     final (Color color, String etiqueta, String signo) = switch (tipo) {
       'egreso' => (p.gastos, 'Gasto', '−'),
       'abono' => (p.fiado, 'Abono', '+'),
+      'anulacion' => (p.tizaSuave, 'Anulación', v['anula_tipo'] == 'egreso' ? '+' : '−'),
       _ => fiado ? (p.fiado, 'Venta fiada', '+') : (p.ventas, 'Venta', '+'),
     };
     final cliente = v['cliente_nombre'] as String?;
@@ -170,7 +186,10 @@ class FilaMovimiento extends StatelessWidget {
     final pagos = leerPagos(v['pagos'],
         monto: (v['monto'] as num).toDouble(), tipo: tipo, credito: fiado);
     final partes = [
-      if (etiqueta != v['concepto']) etiqueta,
+      if (anulada) 'Anulada',
+      if ((v['descuento'] as num? ?? 0) > 0) 'descuento ${cop((v['descuento'] as num).toDouble())}',
+      if ((v['autoriza'] as String? ?? '').isNotEmpty) 'autorizó ${v['autoriza']}',
+      if (etiqueta != v['concepto'] && tipo != 'anulacion') etiqueta,
       if (mostrarCliente && cliente != null) cliente,
       if (pagos.isNotEmpty) textoPagos(pagos, conValor: false),
       if ((v['perfil'] as String? ?? '').isNotEmpty) 'por ${v['perfil']}',
@@ -180,7 +199,9 @@ class FilaMovimiento extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       leading: IconoTipo(tipo: tipo, fiado: fiado),
       title: Text(v['concepto'] as String,
-          maxLines: 1, overflow: TextOverflow.ellipsis),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: anulada ? const TextStyle(decoration: TextDecoration.lineThrough) : null),
       subtitle: Text(partes.join(' · '),
           maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -190,9 +211,11 @@ class FilaMovimiento extends StatelessWidget {
         iconoSync(v['sync']),
       ]),
       // Tocar una venta abre su comprobante para enviarlo por WhatsApp.
-      onTap: tipo == 'ingreso'
+      onTap: tipo == 'ingreso' && !anulada
           ? () => enviarComprobante(context, v['id'] as String)
           : null,
+      // Mantener presionado: anular (dueño o administrador).
+      onLongPress: sePuedeAnular(v) ? () => anularDesdeCaja(context, v) : null,
     );
   }
 }
@@ -220,7 +243,8 @@ Future<void> mostrarFormMovimiento(BuildContext context,
         fiado: r.fiado,
         clienteId: r.clienteId,
         concepto: r.concepto,
-        pagos: r.pagos);
+        pagos: r.pagos,
+        descuento: r.descuento);
   } else {
     var concepto = r.concepto.trim();
     if (concepto.isEmpty) concepto = r.tipo == 'abono' ? 'Abono' : 'Venta';
@@ -229,7 +253,8 @@ Future<void> mostrarFormMovimiento(BuildContext context,
         credito: r.fiado,
         clienteId: r.clienteId,
         terceroId: r.terceroId,
-        pagos: r.pagos);
+        pagos: r.pagos,
+        descuento: r.descuento);
   }
   SyncService.instance.sync();
   if (r.tipo == 'ingreso') {
@@ -256,9 +281,12 @@ class _Movimiento {
 
   /// A quién se le pagó el gasto (proveedor, arrendador…), si se eligió.
   final String? terceroId;
+
+  /// Descuento en pesos ([monto] es el valor antes del descuento).
+  final double descuento;
   const _Movimiento(
       this.concepto, this.monto, this.tipo, this.fiado, this.clienteId,
-      [this.items = const [], this.pagos = const [], this.terceroId]);
+      [this.items = const [], this.pagos = const [], this.terceroId, this.descuento = 0]);
 }
 
 class _FormMovimiento extends StatefulWidget {
@@ -302,6 +330,24 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   final _ej = ejemplosPara(LocalDb.instance.tipoNegocio.value);
   List<Pago> _pagos = const [];
   String? _errorPago;
+  final _descuento = TextEditingController();
+  String? _errorDescuento;
+
+  /// ¿Puede dar descuento quien atiende? (el dueño sin tope; los demás
+  /// solo si el dueño fijó un tope).
+  bool get _puedeDescontar {
+    final db = LocalDb.instance;
+    return _tipo == 'ingreso' &&
+        db.puede(Permiso.aplicarDescuento) &&
+        (_libre || db.equipo.value.descuentoMaxPct > 0);
+  }
+
+  bool get _libre => libreDeTope(LocalDb.instance.equipo.value, LocalDb.instance.perfilActivo.value?.rol);
+
+  double get _valorDescuento => _puedeDescontar ? (parseMonto(_descuento.text) ?? 0) : 0;
+
+  /// Valor antes del descuento.
+  double get _bruto => (_tipo == 'ingreso' && _carrito.isNotEmpty) ? _totalCarrito : (parseMonto(_monto.text) ?? 0);
 
   /// ¿Este movimiento lleva medio de pago? (todo menos la venta fiada)
   bool get _llevaPago => !(_tipo == 'ingreso' && _fiado);
@@ -410,6 +456,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   @override
   void dispose() {
     _concepto.dispose();
+    _descuento.dispose();
     _monto.dispose();
     super.dispose();
   }
@@ -540,6 +587,12 @@ class _FormMovimientoState extends State<_FormMovimiento> {
     }
     final conProductos = _tipo == 'ingreso' && _carrito.isNotEmpty;
     final monto = conProductos ? _totalCarrito : parseMonto(_monto.text);
+    final descuento = _valorDescuento;
+    final errDescuento = monto == null || descuento == 0
+        ? null
+        : problemaDescuento(descuento, monto,
+            topePct: LocalDb.instance.equipo.value.descuentoMaxPct, libre: _libre);
+    final neto = monto == null ? null : monto - descuento;
     if (_tipo == 'abono' &&
         cliente != null &&
         monto != null &&
@@ -547,16 +600,18 @@ class _FormMovimientoState extends State<_FormMovimiento> {
       errCliente = 'El abono supera lo que debe (${cop(cliente.saldo)})';
     }
     final pagos = _llevaPago ? normalizarPagos(_pagos) : const <Pago>[];
-    final errPago = _llevaPago && monto != null && monto > 0
-        ? problemaPagos(pagos, monto)
+    final errPago = _llevaPago && neto != null && neto > 0 && errDescuento == null
+        ? problemaPagos(pagos, neto)
         : null;
     setState(() {
       _errorCliente = errCliente;
       _errorPago = errPago;
+      _errorDescuento = errDescuento;
     });
     if (!okForm ||
         errCliente != null ||
         errPago != null ||
+        errDescuento != null ||
         monto == null ||
         monto <= 0) {
       return;
@@ -571,7 +626,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
             _tipo == 'egreso' ? null : _clienteId,
             conProductos ? _items : const [],
             pagos,
-            _tipo == 'egreso' ? _terceroId : null));
+            _tipo == 'egreso' ? _terceroId : null,
+            descuento));
   }
 
   @override
@@ -757,6 +813,30 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                   ),
               ]),
             ],
+            if (_puedeDescontar) ...[
+              const SizedBox(height: 8),
+              TextFormField(
+                key: const ValueKey('campo_descuento'),
+                controller: _descuento,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: 'Descuento (opcional)',
+                  prefixText: r'$ ',
+                  errorText: _errorDescuento,
+                  helperText: _libre
+                      ? null
+                      : 'Máximo ${cop(descuentoMaximo(_bruto, LocalDb.instance.equipo.value.descuentoMaxPct))}',
+                ),
+                onChanged: (_) => setState(() => _errorDescuento = null),
+              ),
+              if (_valorDescuento > 0 && _valorDescuento < _bruto)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6, left: 4),
+                  child: Text('Total con descuento: ${cop(_bruto - _valorDescuento)}',
+                      key: const ValueKey('total_con_descuento'),
+                      style: cifras(t.titleMedium?.copyWith(color: tinta))),
+                ),
+            ],
             if (_tipo == 'ingreso' &&
                 LocalDb.instance.puede(Permiso.venderFiado) &&
                 (LocalDb.instance.modo.value.fia || _fiado)) ...[
@@ -777,9 +857,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 titulo: _tipo == 'egreso'
                     ? '¿Con qué pagó el gasto?'
                     : '¿Cómo pagó?',
-                total: (_tipo == 'ingreso' && _carrito.isNotEmpty)
-                    ? _totalCarrito
-                    : (parseMonto(_monto.text) ?? 0),
+                total: (_bruto - _valorDescuento).clamp(0, double.infinity).toDouble(),
                 error: _errorPago,
                 onChanged: (l) => _pagos = l,
               ),

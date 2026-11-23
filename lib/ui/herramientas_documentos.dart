@@ -194,7 +194,7 @@ class _ComprobantesPageState extends State<ComprobantesPage> {
   Future<void> _load() async {
     final m = await LocalDb.instance.movimientos(limite: 100);
     if (mounted) {
-      setState(() => _ventas = m.where((x) => x['tipo'] == 'ingreso').toList());
+      setState(() => _ventas = m.where((x) => x['tipo'] == 'ingreso' && (x['anulada'] as num? ?? 0) == 0).toList());
     }
   }
 

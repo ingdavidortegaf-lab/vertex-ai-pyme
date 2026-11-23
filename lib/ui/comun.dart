@@ -71,3 +71,32 @@ Future<bool> confirmar(BuildContext context, String titulo, String texto,
   );
   return r == true;
 }
+
+/// Diálogo con un campo de texto cuyo controlador vive lo mismo que el
+/// diálogo: se libera cuando el diálogo termina de cerrarse, no antes (si se
+/// libera al volver de showDialog, la animación de salida lo usa ya liberado).
+Future<T?> dialogoConTexto<T>(BuildContext context,
+        {String texto = '',
+        required Widget Function(BuildContext context, TextEditingController ctrl) builder}) =>
+    showDialog<T>(context: context, builder: (_) => _DialogoConTexto(texto: texto, builder: builder));
+
+class _DialogoConTexto extends StatefulWidget {
+  final String texto;
+  final Widget Function(BuildContext context, TextEditingController ctrl) builder;
+  const _DialogoConTexto({required this.texto, required this.builder});
+  @override
+  State<_DialogoConTexto> createState() => _DialogoConTextoState();
+}
+
+class _DialogoConTextoState extends State<_DialogoConTexto> {
+  late final _ctrl = TextEditingController(text: widget.texto);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _ctrl);
+}

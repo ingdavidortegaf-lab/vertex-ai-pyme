@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../domain/identificacion.dart' as ident;
 import 'pagos_fijos_page.dart';
 import 'terceros_page.dart';
+import 'turnos_page.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
 import '../domain/roles.dart';
@@ -37,6 +38,7 @@ const _permisoHerramienta = {
   'Pagos fijos': Permiso.pagosFijos,
   'Proveedores y terceros': Permiso.verProveedores,
   'Cierre de caja': Permiso.verGastos,
+  'Turnos de caja': Permiso.verInformes,
   'Comprobantes': Permiso.verVentas,
   'Cotizaciones': Permiso.cotizaciones,
   'Pedir mercancía': Permiso.gestionarProveedores,
@@ -81,6 +83,14 @@ class HerramientasGrid extends StatelessWidget {
         p.ventasFondo,
         p.ventas,
         () => ir(const CierreCajaPage())
+      ),
+      (
+        Icons.timer_outlined,
+        'Turnos de caja',
+        'Quién cerró y cuánto cuadró',
+        p.ventasFondo,
+        p.ventas,
+        () => ir(const TurnosPage())
       ),
       (
         Icons.receipt_outlined,

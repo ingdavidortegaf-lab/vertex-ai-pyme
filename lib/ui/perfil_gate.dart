@@ -105,10 +105,9 @@ class QuienAtiendePage extends StatelessWidget {
 /// El dueño entra con la clave de su cuenta (necesita internet) y luego
 /// cambia su PIN en Equipo.
 Future<void> _recuperarConCuenta(BuildContext context) async {
-  final ctrl = TextEditingController();
-  final clave = await showDialog<String>(
-    context: context,
-    builder: (c) => AlertDialog(
+  final clave = await dialogoConTexto<String>(
+    context,
+    builder: (c, ctrl) => AlertDialog(
       title: const Text('Entrar con la cuenta'),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
         Text('Escribe la clave de la cuenta ${correoSesion() ?? ''}. Se necesita internet.'),
@@ -127,7 +126,6 @@ Future<void> _recuperarConCuenta(BuildContext context) async {
       ],
     ),
   );
-  ctrl.dispose();
   if (clave == null || clave.isEmpty) return;
   if (await confirmarClaveCuenta(clave)) {
     LocalDb.instance.entrarComoCuenta();
@@ -147,9 +145,53 @@ Future<bool> pedirPin(BuildContext context, Perfil p) async =>
     ) ??
     false;
 
+/// Un dueño o administrador del celular autoriza algo con su PIN (por
+/// ejemplo, anular cuando atiende un despachador). Devuelve su nombre, o
+/// null si no autorizó.
+Future<String?> autorizarSupervisor(BuildContext context, {required String que}) async {
+  final supervisores = [
+    for (final p in await LocalDb.instance.perfiles())
+      if (p.rol == Rol.dueno || p.rol == Rol.administrador) p
+  ];
+  if (!context.mounted) return null;
+  if (supervisores.isEmpty) {
+    avisar('No hay un perfil de dueño o administrador en este celular para autorizar.');
+    return null;
+  }
+  final elegido = supervisores.length == 1
+      ? supervisores.first
+      : await showDialog<Perfil>(
+          context: context,
+          builder: (c) => SimpleDialog(
+            title: Text('¿Quién autoriza $que?'),
+            children: [
+              for (final p in supervisores)
+                SimpleDialogOption(
+                  key: ValueKey('autoriza_${p.nombre}'),
+                  onPressed: () => Navigator.pop(c, p),
+                  child: Text('${p.nombre} (${nombreRol(p.rol).toLowerCase()})'),
+                ),
+            ],
+          ),
+        );
+  if (elegido == null || !context.mounted) return null;
+  final ok = await showModalBottomSheet<bool>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (_) => _TecladoPin(perfil: elegido, soloAutorizar: true, que: que),
+      ) ??
+      false;
+  return ok ? elegido.nombre : null;
+}
+
 class _TecladoPin extends StatefulWidget {
   final Perfil perfil;
-  const _TecladoPin({required this.perfil});
+
+  /// Solo revisa el PIN (quien atiende no cambia).
+  final bool soloAutorizar;
+  final String que;
+  const _TecladoPin({required this.perfil, this.soloAutorizar = false, this.que = ''});
   @override
   State<_TecladoPin> createState() => _TecladoPinState();
 }
@@ -206,7 +248,9 @@ class _TecladoPinState extends State<_TecladoPin> {
   Future<void> _entrar() async {
     if (_pin.length < 4 || _revisando) return;
     setState(() => _revisando = true);
-    final ok = await db.entrarComo(widget.perfil.id, _pin);
+    final ok = widget.soloAutorizar
+        ? await db.verificarPin(widget.perfil.id, _pin) != null
+        : await db.entrarComo(widget.perfil.id, _pin);
     if (!mounted) return;
     if (ok) {
       Navigator.of(context).pop(true);
@@ -242,7 +286,8 @@ class _TecladoPinState extends State<_TecladoPin> {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(widget.perfil.nombre, style: t.titleLarge),
         const SizedBox(height: 4),
-        Text('Escribe tu PIN', style: t.bodyMedium),
+        Text(widget.soloAutorizar ? 'Escribe tu PIN para autorizar ${widget.que}' : 'Escribe tu PIN',
+            textAlign: TextAlign.center, style: t.bodyMedium),
         const SizedBox(height: 16),
         Semantics(
           label: '${_pin.length} números escritos',
@@ -302,7 +347,7 @@ class _TecladoPinState extends State<_TecladoPin> {
                   onPressed: _pin.length >= 4 && _espera == 0 && !_revisando ? _entrar : null,
                   child: _revisando
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Entrar'),
+                      : Text(widget.soloAutorizar ? 'Autorizar' : 'Entrar'),
                 ),
               ),
             ),

@@ -128,10 +128,9 @@ class _EquipoPageState extends State<EquipoPage> {
       await mostrarLogin(context);
       if (!mounted || !_haySesion) return;
     }
-    final ctrl = TextEditingController();
-    final codigo = await showDialog<String>(
-      context: context,
-      builder: (c) => AlertDialog(
+    final codigo = await dialogoConTexto<String>(
+      context,
+      builder: (c, ctrl) => AlertDialog(
         title: const Text('Unirme a un negocio'),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('Escribe el código que te envió el dueño del negocio. '
@@ -152,7 +151,6 @@ class _EquipoPageState extends State<EquipoPage> {
         ],
       ),
     );
-    ctrl.dispose();
     if (codigo == null || codigo.trim().isEmpty) return;
     try {
       final rol = await s.unirse(codigo);
@@ -179,6 +177,51 @@ class _EquipoPageState extends State<EquipoPage> {
               'Si tenía algo sin subir en su celular, no se subirá.');
       if (!ok) return;
       await _hacer(() => s.quitar(m), listo: 'Se quitó del equipo');
+    }
+  }
+
+  // ------------------------------------------------------------ descuentos
+  static String _pct(double p) => p == p.roundToDouble() ? p.toInt().toString() : p.toStringAsFixed(1);
+
+  Future<void> _cambiarTope() async {
+    final pct = await dialogoConTexto<double>(
+      context,
+      texto: _pct(db.equipo.value.descuentoMaxPct),
+      builder: (c, ctrl) => AlertDialog(
+        title: const Text('Tope de descuento'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('¿Hasta qué porcentaje del total pueden descontar tus empleados? 0 = ninguno.'),
+          const SizedBox(height: 12),
+          TextField(
+            key: const ValueKey('campo_tope'),
+            controller: ctrl,
+            autofocus: true,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(labelText: 'Porcentaje', suffixText: '%'),
+          ),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
+          FilledButton(
+            key: const ValueKey('guardar_tope'),
+            onPressed: () {
+              final v = double.tryParse(ctrl.text.trim().replaceAll(',', '.'));
+              if (v != null && v >= 0 && v <= 100) Navigator.pop(c, v);
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+    if (pct == null) return;
+    final s = _servicio;
+    if (s == null) {
+      // Sin nube: solo aplica a los perfiles de este celular.
+      await db.guardarContexto(db.equipo.value.copiar(descuentoMaxPct: pct));
+      if (mounted) setState(() {});
+      avisar('Tope guardado');
+    } else {
+      await _hacer(() => s.definirDescuentoMaximo(pct), listo: 'Tope guardado');
     }
   }
 
@@ -334,6 +377,23 @@ class _EquipoPageState extends State<EquipoPage> {
                 icon: const Icon(Icons.vpn_key_outlined),
                 label: const Text('Me invitaron a otro negocio: tengo un código'),
               ),
+          ],
+          if (manejaEquipo && (!nube || _haySesion)) ...[
+            const SizedBox(height: 24),
+            Text('Descuentos', style: t.titleMedium),
+            const SizedBox(height: 4),
+            Card(
+              child: ListTile(
+                key: const ValueKey('tope_descuento'),
+                leading: const Icon(Icons.percent),
+                title: Text(ctx.descuentoMaxPct <= 0
+                    ? 'Nadie más que tú puede dar descuentos'
+                    : 'Tope de descuento: ${_pct(ctx.descuentoMaxPct)} % del total'),
+                subtitle: const Text('Para todos menos el dueño. Lo hace cumplir el servidor.'),
+                trailing: const Icon(Icons.edit_outlined),
+                onTap: _cambiarTope,
+              ),
+            ),
           ],
           if (manejaPerfiles) ...[
             const SizedBox(height: 24),

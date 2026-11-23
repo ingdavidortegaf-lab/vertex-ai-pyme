@@ -60,16 +60,24 @@ extension LocalDbPerfiles on LocalDb {
   /// Entra con el PIN. Tras [intentosAntesDeEsperar] fallos seguidos hay que
   /// esperar [esperaTrasFallos]. Devuelve true si el PIN es correcto.
   Future<bool> entrarComo(String id, String pin) async {
-    if (await esperaPin() > 0) return false;
+    final p = await verificarPin(id, pin);
+    if (p == null) return false;
+    perfilActivo.value = p;
+    _avisar();
+    return true;
+  }
+
+  /// Revisa el PIN de un perfil sin cambiar quién atiende (para que un
+  /// supervisor autorice algo). Cuenta los fallos igual que al entrar.
+  Future<Perfil?> verificarPin(String id, String pin) async {
+    if (await esperaPin() > 0) return null;
     final f = await db.query('perfiles', where: 'id = ? AND activo = 1', whereArgs: [id]);
-    if (f.isEmpty) return false;
+    if (f.isEmpty) return null;
     final p = Perfil.desdeFila(f.first);
     if (pinCorrecto(pin, p)) {
       await borrarAjuste('pin_fallos');
       await borrarAjuste('pin_bloqueo_hasta');
-      perfilActivo.value = p;
-      _avisar();
-      return true;
+      return p;
     }
     final fallos = int.parse(await ajuste('pin_fallos') ?? '0') + 1;
     if (fallos >= intentosAntesDeEsperar) {
@@ -78,7 +86,7 @@ extension LocalDbPerfiles on LocalDb {
     } else {
       await setAjuste('pin_fallos', '$fallos');
     }
-    return false;
+    return null;
   }
 
   /// Quien maneja la cuenta entra sin perfil (por ejemplo, el dueño que
