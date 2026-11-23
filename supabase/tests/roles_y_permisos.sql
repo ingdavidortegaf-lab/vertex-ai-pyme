@@ -171,12 +171,9 @@ begin
 
   insert into public.inventario (id, producto_id, cantidad, motivo, fecha)
   values (gen_random_uuid(), '11111111-0000-4000-8000-000000000001', 10, 'entrada', now());
-  begin
-    insert into public.inventario (id, producto_id, cantidad, motivo, costo_unit, fecha)
-    values (gen_random_uuid(), '11111111-0000-4000-8000-000000000001', 10, 'entrada', 1800, now());
-    raise exception 'FALLO: el despachador registró un costo';
-  exception when insufficient_privilege then null;
-  end;
+  -- Aunque mande un costo, el servidor pone el del producto (2000).
+  insert into public.inventario (id, producto_id, cantidad, motivo, costo_unit, fecha)
+  values ('33333333-0000-4000-8000-000000000003', '11111111-0000-4000-8000-000000000001', 10, 'entrada', 1, now());
   begin
     insert into public.inventario (id, producto_id, cantidad, motivo, fecha)
     values (gen_random_uuid(), '11111111-0000-4000-8000-000000000001', -3, 'ajuste', now());
@@ -221,6 +218,16 @@ begin
   values (gen_random_uuid(), '22222222-0000-4000-8000-000000000002', 'Abono', 500, 'abono', false, now());
   if (select count(*) from public.ventas where tipo = 'egreso') <> 0 then
     raise exception 'FALLO: con fiado, el despachador ve gastos';
+  end if;
+end $$;
+
+-- ------------------------------------- el costo lo puso el servidor (lo ve D)
+select set_config('request.jwt.claim.sub', 'd0000000-0000-4000-8000-00000000000d', true),
+       set_config('request.jwt.claims', '{"sub":"d0000000-0000-4000-8000-00000000000d","role":"authenticated"}', true);
+do $$
+begin
+  if (select costo_unit from public.inventario where id = '33333333-0000-4000-8000-000000000003') is distinct from 2000 then
+    raise exception 'FALLO: el costo del inventario del despachador no es el del producto';
   end if;
 end $$;
 

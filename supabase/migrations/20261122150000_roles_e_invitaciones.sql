@@ -110,7 +110,23 @@ create policy "productos editar" on public.productos for update to authenticated
               and (select privado.mi_rol()) in ('dueno','administrador'));
 
 -- ------------------------------------------------------------- inventario
--- Solo se agrega. Despachador y bodeguero registran sin costo.
+-- Solo se agrega. Cuando registran despachador o bodeguero, el costo lo pone
+-- el servidor con el costo actual del producto: ellos no lo ven ni lo
+-- mandan, nadie puede inventar un costo y el dueño no pierde la utilidad.
+create or replace function privado.costo_inventario_por_rol() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if privado.mi_rol() in ('despachador','bodeguero') then
+    new.costo_unit := (select p.costo from public.productos p
+                       where p.id = new.producto_id and p.empresa_id = new.empresa_id);
+  end if;
+  return new;
+end $$;
+revoke all on function privado.costo_inventario_por_rol() from public, anon, authenticated;
+drop trigger if exists inventario_costo_por_rol on public.inventario;
+create trigger inventario_costo_por_rol before insert on public.inventario
+  for each row execute function privado.costo_inventario_por_rol();
+
 drop policy if exists "inventario ver"   on public.inventario;
 drop policy if exists "inventario crear" on public.inventario;
 create policy "inventario ver" on public.inventario for select to authenticated
@@ -120,10 +136,8 @@ create policy "inventario crear" on public.inventario for insert to authenticate
   with check (empresa_id = (select privado.mi_empresa())
               and creado_por = (select auth.uid())
               and ((select privado.mi_rol()) in ('dueno','administrador')
-                   or ((select privado.mi_rol()) = 'despachador'
-                       and motivo in ('venta','entrada') and costo_unit is null)
-                   or ((select privado.mi_rol()) = 'bodeguero'
-                       and motivo in ('entrada','ajuste') and costo_unit is null)));
+                   or ((select privado.mi_rol()) = 'despachador' and motivo in ('venta','entrada'))
+                   or ((select privado.mi_rol()) = 'bodeguero' and motivo in ('entrada','ajuste'))));
 
 -- -------------------------------------------- vistas sin costos (operativas)
 -- Corren con los permisos del dueño de la vista y filtran por la empresa de
