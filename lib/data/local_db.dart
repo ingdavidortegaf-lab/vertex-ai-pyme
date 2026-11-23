@@ -11,6 +11,7 @@ import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
 import '../domain/resumen.dart';
+import '../domain/roles.dart';
 import '../domain/seguimiento.dart';
 
 part 'local_db_asistente.dart';
@@ -58,6 +59,32 @@ class LocalDb {
   /// Tipo de negocio (licorera, droguería…): de ahí salen los ejemplos de
   /// las casillas.
   final tipoNegocio = ValueNotifier<String>('');
+
+  /// Rol de este usuario en su negocio (lo informa el servidor; sin nube es
+  /// el dueño). Las pantallas lo escuchan para mostrar solo lo permitido.
+  final equipo = ValueNotifier<ContextoEquipo>(const ContextoEquipo());
+
+  /// ¿El rol actual permite [p]? (la app oculta; el servidor impide).
+  bool puede(Permiso p) => equipo.value.puede(p);
+
+  /// Guarda el rol que informó el servidor.
+  Future<void> guardarContexto(ContextoEquipo c) async {
+    await setAjuste('equipo_rol', rolATexto(c.rol));
+    await setAjuste('equipo_fia', c.despachadorFia ? '1' : '0');
+    await setAjuste('equipo_empresa', c.empresaId);
+    if (equipo.value != c) {
+      equipo.value = c;
+      _avisar();
+    }
+  }
+
+  Future<void> _cargarContexto() async {
+    equipo.value = ContextoEquipo(
+      rol: rolDesdeTexto(await ajuste('equipo_rol')),
+      despachadorFia: await ajuste('equipo_fia') == '1',
+      empresaId: await ajuste('equipo_empresa') ?? '',
+    );
+  }
   void _avisar() => cambios.value++;
 
   /// En el PC (Windows) se usa SQLite por FFI en la carpeta privada de la

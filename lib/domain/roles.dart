@@ -124,3 +124,47 @@ bool puede(Rol rol, Permiso p, {bool despachadorFia = false}) => switch (rol) {
 /// Todos los permisos de un rol (para mostrarlos o depurar).
 Set<Permiso> permisosDe(Rol rol, {bool despachadorFia = false}) =>
     {for (final p in Permiso.values) if (puede(rol, p, despachadorFia: despachadorFia)) p};
+
+/// El rol de este usuario en su negocio, como lo informa el servidor
+/// (función mi_contexto). Sin nube (modo local) es el dueño.
+class ContextoEquipo {
+  final Rol rol;
+  final bool despachadorFia;
+  final String empresaId;
+  const ContextoEquipo({this.rol = Rol.dueno, this.despachadorFia = false, this.empresaId = ''});
+
+  factory ContextoEquipo.desdeServidor(Map<String, dynamic> m) => ContextoEquipo(
+        rol: rolDesdeTexto(m['rol'] as String?),
+        despachadorFia: m['despachador_fia'] == true,
+        empresaId: (m['empresa_id'] as String?) ?? '',
+      );
+
+  bool puede(Permiso p) => puedeRol(rol, p, despachadorFia: despachadorFia);
+
+  @override
+  bool operator ==(Object other) =>
+      other is ContextoEquipo &&
+      other.rol == rol &&
+      other.despachadorFia == despachadorFia &&
+      other.empresaId == empresaId;
+
+  @override
+  int get hashCode => Object.hash(rol, despachadorFia, empresaId);
+}
+
+/// Alias de [puede] para usar dentro de [ContextoEquipo].
+bool puedeRol(Rol rol, Permiso p, {bool despachadorFia = false}) =>
+    puede(rol, p, despachadorFia: despachadorFia);
+
+/// Qué descarga cada rol: (tabla local, fuente en la nube). Despachador y
+/// bodeguero bajan productos e inventario desde las vistas sin costos; lo
+/// que el rol no puede ver no se descarga.
+List<(String, String)> fuentesDescarga(ContextoEquipo c) {
+  final sinCostos = c.rol == Rol.despachador || c.rol == Rol.bodeguero;
+  return [
+    if (c.puede(Permiso.verClientes)) ('clientes', 'clientes'),
+    if (c.puede(Permiso.verVentas)) ('ventas', 'ventas'),
+    ('productos', sinCostos ? 'productos_operativos' : 'productos'),
+    ('inventario', sinCostos ? 'inventario_operativo' : 'inventario'),
+  ];
+}

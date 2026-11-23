@@ -1,3 +1,4 @@
+import '../domain/roles.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -175,6 +176,7 @@ class SyncService {
         }
         await _contar();
       }
+      await _actualizarContexto(api);
       if (!_porTiempo || !reloj().isBefore(_proximoPull)) {
         final llegaron = await _descargar(api);
         pullCada = llegaron > 0
@@ -205,13 +207,25 @@ class SyncService {
 
   static const _lote = 500;
 
-  /// Devuelve cuántos registros nuevos llegaron.
+  /// Pregunta al servidor el rol de este usuario. Si el servidor todavía no
+  /// tiene la función (o la rechaza), se sigue con el rol que ya se sabía.
+  Future<void> _actualizarContexto(RemoteApi api) async {
+    try {
+      final c = await api.contexto();
+      if (c != null) await db.guardarContexto(ContextoEquipo.desdeServidor(c));
+    } on RechazoServidor {
+      // Servidor sin la función mi_contexto: no cambia nada.
+    }
+  }
+
+  /// Devuelve cuántos registros nuevos llegaron. Cada rol baja solo lo que
+  /// puede ver (despachador y bodeguero, desde las vistas sin costos).
   Future<int> _descargar(RemoteApi api) async {
     var total = 0;
-    for (final tabla in const ['clientes', 'ventas', 'productos', 'inventario']) {
+    for (final (tabla, fuente) in fuentesDescarga(db.equipo.value)) {
       var cursor = await db.ajuste('pull_$tabla');
       while (true) {
-        final filas = await api.descargar(tabla, cursor, _lote);
+        final filas = await api.descargar(fuente, cursor, _lote);
         if (filas.isEmpty) break;
         total += filas.length;
         switch (tabla) {

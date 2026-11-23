@@ -10,6 +10,7 @@ extension LocalDbNegocio on LocalDb {
         {for (final x in r) x['clave'] as String: x['valor'] as String?});
     modo.value = m;
     tipoNegocio.value = await ajuste('negocio_tipo') ?? '';
+    await _cargarContexto();
     return m;
   }
 

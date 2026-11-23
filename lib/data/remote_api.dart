@@ -31,6 +31,10 @@ abstract class RemoteApi {
 
   /// Llama al asistente de IA del servidor. Devuelve null si no respondió.
   Future<String?> asistente(Map<String, dynamic> cuerpo);
+
+  /// Rol y empresa de este usuario (función mi_contexto del servidor).
+  /// Null si el servidor todavía no la tiene.
+  Future<Map<String, dynamic>?> contexto();
 }
 
 class SupabaseRemote implements RemoteApi {
@@ -86,6 +90,16 @@ class SupabaseRemote implements RemoteApi {
           .limit(limite)
           .timeout(_timeout);
       return List<Map<String, dynamic>>.from(r);
+    } catch (e) {
+      _traducir(e);
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> contexto() async {
+    try {
+      final r = await _sb.rpc('mi_contexto').timeout(_timeout);
+      return r is Map ? Map<String, dynamic>.from(r) : null;
     } catch (e) {
       _traducir(e);
     }

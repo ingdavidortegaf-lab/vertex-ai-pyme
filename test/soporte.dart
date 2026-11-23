@@ -5,6 +5,7 @@ import 'package:vertex_ai_pyme/data/local_db.dart';
 export 'package:vertex_ai_pyme/data/local_db.dart';
 import 'package:vertex_ai_pyme/data/remote_api.dart';
 import 'package:vertex_ai_pyme/domain/conflictos.dart';
+import 'package:vertex_ai_pyme/domain/roles.dart';
 
 /// Abre una base nueva EN MEMORIA con el mismo esquema de la app.
 /// (En pruebas se usa SQLite sin cifrar; en el celular es SQLCipher.)
@@ -18,6 +19,8 @@ Future<LocalDb> baseDePrueba() async {
   final db = LocalDb.instance
     ..usarBase(d)
     ..reloj = DateTime.now;
+  // La instancia es única: el rol de una prueba no debe pasar a la siguiente.
+  db.equipo.value = const ContextoEquipo();
   return db;
 }
 
@@ -44,6 +47,12 @@ class ServidorFalso implements RemoteApi {
   bool sesion = true;
   bool sesionVencida = false;
   String? respuestaIA;
+
+  /// Lo que responde mi_contexto (null: como un servidor sin la función).
+  Map<String, dynamic>? contextoRemoto;
+
+  /// De qué tabla o vista se descargó, en orden.
+  final descargasDe = <String>[];
 
   @override
   bool get haySesion => sesion;
@@ -82,8 +91,16 @@ class ServidorFalso implements RemoteApi {
   Future<List<Map<String, dynamic>>> descargar(
       String tabla, String? desde, int limite) async {
     consultas++;
-    final filas = tablas[tabla]!
-        .values
+    descargasDe.add(tabla);
+    // Las vistas operativas son las mismas filas sin las columnas de costo.
+    final vista = {'productos_operativos': 'productos', 'inventario_operativo': 'inventario'}[tabla];
+    final origen = tablas[vista ?? tabla]!.values.map((f) => vista == null
+        ? f
+        : (Map<String, dynamic>.of(f)
+          ..remove('costo')
+          ..remove('costo_ts')
+          ..remove('costo_unit')));
+    final filas = origen
         .where((f) => desde == null || (f['recibido_at'] as String).compareTo(desde) > 0)
         .toList()
       ..sort((a, b) =>
@@ -93,4 +110,10 @@ class ServidorFalso implements RemoteApi {
 
   @override
   Future<String?> asistente(Map<String, dynamic> cuerpo) async => respuestaIA;
+
+  @override
+  Future<Map<String, dynamic>?> contexto() async {
+    if (sesionVencida) throw const SesionVencida();
+    return contextoRemoto;
+  }
 }

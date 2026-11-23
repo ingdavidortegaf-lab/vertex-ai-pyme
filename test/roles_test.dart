@@ -58,4 +58,25 @@ void main() {
     expect(rolesInvitables, isNot(contains(Rol.dueno)));
     expect(rolesInvitables.toSet(), Rol.values.toSet()..remove(Rol.dueno));
   });
+
+  test('qué descarga cada rol: despachador y bodeguero sin costos y sin lo que no pueden ver', () {
+    List<(String, String)> f(Rol r, {bool fia = false}) =>
+        fuentesDescarga(ContextoEquipo(rol: r, despachadorFia: fia));
+    const completo = [('clientes', 'clientes'), ('ventas', 'ventas'), ('productos', 'productos'), ('inventario', 'inventario')];
+    expect(f(Rol.dueno), completo);
+    expect(f(Rol.administrador), completo);
+    expect(f(Rol.contador), completo);
+    expect(f(Rol.despachador),
+        [('ventas', 'ventas'), ('productos', 'productos_operativos'), ('inventario', 'inventario_operativo')]);
+    expect(f(Rol.despachador, fia: true).first, ('clientes', 'clientes'));
+    expect(f(Rol.bodeguero), [('productos', 'productos_operativos'), ('inventario', 'inventario_operativo')]);
+  });
+
+  test('el contexto del servidor se lee bien y sin datos es el dueño', () {
+    final c = ContextoEquipo.desdeServidor({'rol': 'despachador', 'despachador_fia': true, 'empresa_id': 'e1'});
+    expect(c.rol, Rol.despachador);
+    expect(c.puede(Permiso.venderFiado), isTrue);
+    expect(c.empresaId, 'e1');
+    expect(const ContextoEquipo().rol, Rol.dueno);
+  });
 }
