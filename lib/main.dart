@@ -10,6 +10,7 @@ import 'data/sync_service.dart';
 import 'ui/comun.dart';
 import 'ui/consent_gate.dart';
 import 'ui/home_page.dart';
+import 'ui/perfil_gate.dart';
 import 'ui/registro_negocio_page.dart';
 import 'ui/inactividad.dart';
 import 'ui/tema.dart';
@@ -76,7 +77,7 @@ class VertexApp extends StatelessWidget {
           );
         },
         home: const ConsentGate(
-            child: RegistroGate(child: InactividadGuard(child: HomePage()))),
+            child: RegistroGate(child: InactividadGuard(child: PerfilGate(child: HomePage())))),
       );
 }
 

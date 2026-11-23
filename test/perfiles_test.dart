@@ -20,9 +20,11 @@ void main() {
     expect(s1, isNot(s2));
     final h1 = hashPin('2580', s1, iteraciones: 100), h2 = hashPin('2580', s2, iteraciones: 100);
     expect(h1, isNot(h2));
-    final p = Perfil(id: 'x', nombre: 'Luis', rol: Rol.despachador, pinHash: h1, sal: s1);
-    expect(pinCorrecto('2580', p, iteraciones: 100), isTrue);
-    expect(pinCorrecto('2581', p, iteraciones: 100), isFalse);
+    final p = Perfil(id: 'x', nombre: 'Luis', rol: Rol.despachador, pinHash: h1, sal: s1, iteraciones: 100);
+    expect(pinCorrecto('2580', p), isTrue);
+    expect(pinCorrecto('2581', p), isFalse);
+    expect(pinCorrecto('2580', Perfil(id: 'x', nombre: 'Luis', rol: Rol.despachador, pinHash: h1, sal: s1)),
+        isFalse, reason: 'con otras iteraciones el hash es otro: por eso se guardan con él');
     expect(h1, isNot(contains('2580')), reason: 'el PIN no queda en claro');
     expect(base64Decode(h1).length, sha256.convert([]).bytes.length);
   });

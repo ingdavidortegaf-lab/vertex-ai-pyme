@@ -32,7 +32,7 @@ String mensajeInvitacion({required String negocio, required Rol rol, required St
   final n = negocio.trim().isEmpty ? 'el negocio' : negocio.trim();
   return 'Te invito a trabajar con $n en VERTEX AI Pyme como ${nombreRol(rol).toLowerCase()}.\n'
       '1. Instala la app y crea tu cuenta con tu correo.\n'
-      '2. Entra a Más > Equipo > «Tengo un código».\n'
+      '2. Abre el menú ⋮ (arriba a la derecha) > Equipo > «Tengo un código».\n'
       '3. Escribe este código: ${formatearCodigo(codigo)}\n'
       'Sirve una sola vez y vence en $dias ${dias == 1 ? 'día' : 'días'}.';
 }

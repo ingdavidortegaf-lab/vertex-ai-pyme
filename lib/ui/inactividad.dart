@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config.dart';
+import '../data/local_db.dart';
 import '../data/sync_service.dart';
 import 'comun.dart';
 
@@ -44,9 +45,11 @@ class _InactividadGuardState extends State<InactividadGuard>
   }
 
   Future<void> _revisar() async {
-    if (SyncService.instance.remoto == null) return;
     const limite = Duration(minutes: Config.minutosInactividad);
     if (DateTime.now().difference(_ultimo) < limite) return;
+    // Si se usan perfiles, el siguiente que tome el celular dice quién es.
+    if (LocalDb.instance.perfilActivo.value != null) LocalDb.instance.salirPerfil();
+    if (SyncService.instance.remoto == null) return;
     _ultimo = DateTime.now();
     try {
       final auth = Supabase.instance.client.auth;

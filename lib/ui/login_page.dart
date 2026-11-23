@@ -35,6 +35,20 @@ SupabaseClient? _cliente() {
 /// Correo de la sesión abierta, o null si no hay sesión (o no hay nube).
 String? correoSesion() => _cliente()?.auth.currentUser?.email;
 
+/// Confirma la clave de la cuenta abierta (para recuperar el PIN del dueño).
+/// Necesita internet. Devuelve false si la clave no es o no hay conexión.
+Future<bool> confirmarClaveCuenta(String clave) async {
+  final sb = _cliente();
+  final correo = sb?.auth.currentUser?.email;
+  if (sb == null || correo == null) return false;
+  try {
+    await sb.auth.signInWithPassword(email: correo, password: clave).timeout(const Duration(seconds: 20));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 /// Abre la pantalla de cuenta: entrar, crear cuenta o ver la sesión.
 Future<void> mostrarLogin(BuildContext context) => Navigator.of(context)
     .push(MaterialPageRoute(builder: (_) => const CuentaPage()));

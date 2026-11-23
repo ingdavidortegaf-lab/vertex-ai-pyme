@@ -173,6 +173,7 @@ class FilaMovimiento extends StatelessWidget {
       if (etiqueta != v['concepto']) etiqueta,
       if (mostrarCliente && cliente != null) cliente,
       if (pagos.isNotEmpty) textoPagos(pagos, conValor: false),
+      if ((v['perfil'] as String? ?? '').isNotEmpty) 'por ${v['perfil']}',
       fecha,
     ];
     return ListTile(

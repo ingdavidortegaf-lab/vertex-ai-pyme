@@ -26,6 +26,7 @@ extension LocalDbPerfiles on LocalDb {
       'rol': rolATexto(rol),
       'pin_hash': hashPin(pin, sal, iteraciones: iteraciones),
       'sal': sal,
+      'iteraciones': iteraciones,
       'activo': 1,
       'creado': _ahora(),
     });
@@ -36,7 +37,8 @@ extension LocalDbPerfiles on LocalDb {
   Future<void> cambiarPin(String id, String pin, {int iteraciones = iteracionesPin}) async {
     if (problemaPin(pin) != null) throw ArgumentError('pin');
     final sal = nuevaSal();
-    await db.update('perfiles', {'pin_hash': hashPin(pin, sal, iteraciones: iteraciones), 'sal': sal},
+    await db.update('perfiles',
+        {'pin_hash': hashPin(pin, sal, iteraciones: iteraciones), 'sal': sal, 'iteraciones': iteraciones},
         where: 'id = ?', whereArgs: [id]);
   }
 
@@ -57,12 +59,12 @@ extension LocalDbPerfiles on LocalDb {
 
   /// Entra con el PIN. Tras [intentosAntesDeEsperar] fallos seguidos hay que
   /// esperar [esperaTrasFallos]. Devuelve true si el PIN es correcto.
-  Future<bool> entrarComo(String id, String pin, {int iteraciones = iteracionesPin}) async {
+  Future<bool> entrarComo(String id, String pin) async {
     if (await esperaPin() > 0) return false;
     final f = await db.query('perfiles', where: 'id = ? AND activo = 1', whereArgs: [id]);
     if (f.isEmpty) return false;
     final p = Perfil.desdeFila(f.first);
-    if (pinCorrecto(pin, p, iteraciones: iteraciones)) {
+    if (pinCorrecto(pin, p)) {
       await borrarAjuste('pin_fallos');
       await borrarAjuste('pin_bloqueo_hasta');
       perfilActivo.value = p;
@@ -77,6 +79,14 @@ extension LocalDbPerfiles on LocalDb {
       await setAjuste('pin_fallos', '$fallos');
     }
     return false;
+  }
+
+  /// Quien maneja la cuenta entra sin perfil (por ejemplo, el dueño que
+  /// olvidó su PIN, después de confirmar la clave de la cuenta). Lo que
+  /// registre no lleva nombre de perfil.
+  void entrarComoCuenta() {
+    perfilActivo.value = Perfil(id: '', nombre: '', rol: equipo.value.rol, pinHash: '', sal: '');
+    _avisar();
   }
 
   /// Termina el turno de quien atiende: la app vuelve a preguntar quién es.

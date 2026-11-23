@@ -30,7 +30,17 @@ class Perfil {
   final Rol rol;
   final String pinHash;
   final String sal;
-  const Perfil({required this.id, required this.nombre, required this.rol, required this.pinHash, required this.sal});
+
+  /// Iteraciones con que se calculó el hash: se guardan con él para poder
+  /// subirlas en el futuro sin que los PIN viejos dejen de servir.
+  final int iteraciones;
+  const Perfil(
+      {required this.id,
+      required this.nombre,
+      required this.rol,
+      required this.pinHash,
+      required this.sal,
+      this.iteraciones = iteracionesPin});
 
   factory Perfil.desdeFila(Map<String, Object?> f) => Perfil(
         id: f['id'] as String,
@@ -38,6 +48,7 @@ class Perfil {
         rol: rolDesdeTexto(f['rol'] as String?),
         pinHash: f['pin_hash'] as String,
         sal: f['sal'] as String,
+        iteraciones: (f['iteraciones'] as int?) ?? iteracionesPin,
       );
 }
 
@@ -64,8 +75,8 @@ String hashPin(String pin, String sal, {int iteraciones = iteracionesPin}) {
 }
 
 /// Compara en tiempo constante.
-bool pinCorrecto(String pin, Perfil p, {int iteraciones = iteracionesPin}) {
-  final a = base64Decode(hashPin(pin, p.sal, iteraciones: iteraciones));
+bool pinCorrecto(String pin, Perfil p) {
+  final a = base64Decode(hashPin(pin, p.sal, iteraciones: p.iteraciones));
   final b = base64Decode(p.pinHash);
   if (a.length != b.length) return false;
   var dif = 0;

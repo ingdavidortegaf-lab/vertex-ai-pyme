@@ -4,6 +4,7 @@ import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import 'asistente_page.dart';
 import 'clientes_page.dart';
+import 'equipo_page.dart';
 import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'login_page.dart';
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     LocalDb.instance.modo.addListener(_refrescar);
     // Y al rol del equipo: cada quien ve solo sus secciones.
     LocalDb.instance.equipo.addListener(_refrescar);
+    LocalDb.instance.perfilActivo.addListener(_refrescar);
     // Avisos en el celular (agotados, cobros vencidos, meta cumplida).
     Avisos.instance.vigilar();
   }
@@ -40,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     LocalDb.instance.modo.removeListener(_refrescar);
     LocalDb.instance.equipo.removeListener(_refrescar);
+    LocalDb.instance.perfilActivo.removeListener(_refrescar);
     super.dispose();
   }
 
@@ -125,40 +128,65 @@ class _HomePageState extends State<HomePage> {
               } else if (v == 'ajustar') {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => const RegistroNegocioPage()));
+              } else if (v == 'equipo') {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const EquipoPage()));
+              } else if (v == 'persona') {
+                LocalDb.instance.salirPerfil();
               } else if (v == 'sync') {
                 SyncService.instance.reintentarErrores();
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: 'negocio',
+            itemBuilder: (_) => [
+              if (LocalDb.instance.perfilActivo.value case final quien?)
+                PopupMenuItem(
+                  value: 'persona',
+                  child: ListTile(
+                      leading: const Icon(Icons.switch_account_outlined),
+                      title: const Text('Cambiar de persona'),
+                      subtitle: Text(quien.nombre.isEmpty ? 'Entraste con la cuenta' : 'Atiende ${quien.nombre}'),
+                      contentPadding: EdgeInsets.zero),
+                ),
+              const PopupMenuItem(
+                value: 'equipo',
                 child: ListTile(
-                    leading: Icon(Icons.storefront_outlined),
-                    title: Text('Mi negocio'),
+                    leading: Icon(Icons.groups_outlined),
+                    title: Text('Equipo'),
                     contentPadding: EdgeInsets.zero),
               ),
-              PopupMenuItem(
-                value: 'pagos',
-                child: ListTile(
-                    leading: Icon(Icons.account_balance_wallet_outlined),
-                    title: Text('Datos para recibir pagos'),
-                    contentPadding: EdgeInsets.zero),
-              ),
-              PopupMenuItem(
-                value: 'ajustar',
-                child: ListTile(
-                    leading: Icon(Icons.tune),
-                    title: Text('Ajustar la app a mi negocio'),
-                    contentPadding: EdgeInsets.zero),
-              ),
-              PopupMenuItem(
+              // Los datos del negocio y cómo se ajusta la app: dueño y
+              // administrador (el servidor tampoco deja cambiarlos a otros).
+              if (LocalDb.instance.puede(Permiso.configurarNegocio)) ...const [
+                PopupMenuItem(
+                  value: 'negocio',
+                  child: ListTile(
+                      leading: Icon(Icons.storefront_outlined),
+                      title: Text('Mi negocio'),
+                      contentPadding: EdgeInsets.zero),
+                ),
+                PopupMenuItem(
+                  value: 'pagos',
+                  child: ListTile(
+                      leading: Icon(Icons.account_balance_wallet_outlined),
+                      title: Text('Datos para recibir pagos'),
+                      contentPadding: EdgeInsets.zero),
+                ),
+                PopupMenuItem(
+                  value: 'ajustar',
+                  child: ListTile(
+                      leading: Icon(Icons.tune),
+                      title: Text('Ajustar la app a mi negocio'),
+                      contentPadding: EdgeInsets.zero),
+                ),
+              ],
+              const PopupMenuItem(
                 value: 'sync',
                 child: ListTile(
                     leading: Icon(Icons.sync),
                     title: Text('Sincronizar ahora'),
                     contentPadding: EdgeInsets.zero),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'privacidad',
                 child: ListTile(
                     leading: Icon(Icons.shield_outlined),

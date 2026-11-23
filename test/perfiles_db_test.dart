@@ -32,9 +32,9 @@ void main() {
   test('entrar con PIN, permiso efectivo y salir', () async {
     final luis = await db.crearPerfil('Luis', Rol.despachador, '2580', iteraciones: it);
     expect(db.puede(Permiso.verCostos), isTrue, reason: 'la dueña, sin perfil activo');
-    expect(await db.entrarComo(luis, '0000', iteraciones: it), isFalse);
+    expect(await db.entrarComo(luis, '0000'), isFalse);
     expect(db.perfilActivo.value, isNull);
-    expect(await db.entrarComo(luis, '2580', iteraciones: it), isTrue);
+    expect(await db.entrarComo(luis, '2580'), isTrue);
     expect(db.perfilActivo.value!.nombre, 'Luis');
     expect(db.puede(Permiso.verCostos), isFalse, reason: 'atiende Luis, despachador');
     expect(db.puede(Permiso.venderContado), isTrue);
@@ -47,13 +47,13 @@ void main() {
     db.reloj = () => ahora;
     final luis = await db.crearPerfil('Luis', Rol.despachador, '2580', iteraciones: it);
     for (var i = 0; i < intentosAntesDeEsperar; i++) {
-      expect(await db.entrarComo(luis, '1111', iteraciones: it), isFalse);
+      expect(await db.entrarComo(luis, '1111'), isFalse);
     }
     expect(await db.esperaPin(), greaterThan(0));
-    expect(await db.entrarComo(luis, '2580', iteraciones: it), isFalse, reason: 'bloqueado');
+    expect(await db.entrarComo(luis, '2580'), isFalse, reason: 'bloqueado');
     ahora = ahora.add(esperaTrasFallos + const Duration(seconds: 1));
     expect(await db.esperaPin(), 0);
-    expect(await db.entrarComo(luis, '2580', iteraciones: it), isTrue);
+    expect(await db.entrarComo(luis, '2580'), isTrue);
     db.reloj = DateTime.now;
   });
 
@@ -63,7 +63,7 @@ void main() {
     expect(jsonDecode(cola.last['payload'] as String), isNot(contains('perfil')));
 
     final luis = await db.crearPerfil('Luis', Rol.despachador, '2580', iteraciones: it);
-    await db.entrarComo(luis, '2580', iteraciones: it);
+    await db.entrarComo(luis, '2580');
     final arroz = await db.saveProducto('Arroz', precio: 2500, costo: 2000, stockInicial: 10);
     await db.saveVentaProductos([
       ItemVenta(productoId: arroz, nombre: 'Arroz', cantidad: 2, precio: 2500, costo: 2000, unidad: 'und')
@@ -80,7 +80,7 @@ void main() {
 
   test('quitar un perfil: si estaba atendiendo, se sale; sus ventas conservan el nombre', () async {
     final luis = await db.crearPerfil('Luis', Rol.despachador, '2580', iteraciones: it);
-    await db.entrarComo(luis, '2580', iteraciones: it);
+    await db.entrarComo(luis, '2580');
     await db.saveMovimiento('Venta', 1000);
     await db.quitarPerfil(luis);
     expect(db.perfilActivo.value, isNull);

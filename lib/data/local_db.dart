@@ -209,6 +209,7 @@ class LocalDb {
       rol TEXT NOT NULL,
       pin_hash TEXT NOT NULL,
       sal TEXT NOT NULL,
+      iteraciones INTEGER NOT NULL,
       activo INTEGER NOT NULL DEFAULT 1,
       creado TEXT NOT NULL)''');
     await d.execute("ALTER TABLE ventas ADD COLUMN perfil TEXT NOT NULL DEFAULT ''");
