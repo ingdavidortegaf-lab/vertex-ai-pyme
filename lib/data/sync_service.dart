@@ -246,6 +246,8 @@ class SyncService {
             await db.aplicarVentasRemotas(filas);
           case 'productos':
             await db.aplicarProductosRemotos(filas);
+          case 'turnos':
+            await db.aplicarTurnosRemotos(filas);
           default:
             await db.aplicarInventarioRemoto(filas);
         }

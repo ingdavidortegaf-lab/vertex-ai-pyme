@@ -34,6 +34,7 @@ class ServidorFalso implements RemoteApi {
     'ventas': {},
     'productos': {},
     'inventario': {},
+    'turnos': {},
   };
   int envios = 0;
 
@@ -74,7 +75,8 @@ class ServidorFalso implements RemoteApi {
     // Como el servidor: lo que llega queda en la empresa de quien lo envía.
     if (_miEmpresa != null) fila = {...fila, 'empresa_id': _miEmpresa};
     final t = tablas[tabla]!;
-    if (tabla == 'ventas' || tabla == 'inventario') {
+    if (tabla == 'ventas' && !t.containsKey(id)) _validarVenta(fila);
+    if (tabla == 'ventas' || tabla == 'inventario' || tabla == 'turnos') {
       t.putIfAbsent(id, () => {...fila, 'recibido_at': _marca()});
     } else if (tabla == 'productos') {
       final nuevo = ProductoCampos.fromRemote(fila);
@@ -122,7 +124,13 @@ class ServidorFalso implements RemoteApi {
     if (contextoRemoto != null) return contextoRemoto;
     final m = miembros[yo];
     if (m == null) return null;
-    return {'empresa_id': m.empresa, 'rol': m.rol, 'empresa': 'Mi empresa', 'despachador_fia': fia[m.empresa] ?? false};
+    return {
+      'empresa_id': m.empresa,
+      'rol': m.rol,
+      'empresa': 'Mi empresa',
+      'despachador_fia': fia[m.empresa] ?? false,
+      'descuento_max_pct': descuentoMax[m.empresa] ?? 0,
+    };
   }
 
   // ------------------------------------------------------- equipo simulado
@@ -231,6 +239,35 @@ class ServidorFalso implements RemoteApi {
       _no('22023', 'Esa persona no es empleada de tu negocio');
     }
     miembros[usuario] = (empresa: 'e-propia-${_n++}', rol: 'dueno', correo: m.correo);
+  }
+
+  /// Como el trigger validar_venta del servidor: la anulación corresponde a
+  /// un movimiento existente por el mismo valor, una sola vez; el descuento
+  /// no pasa del tope salvo para el dueño.
+  void _validarVenta(Map<String, dynamic> fila) {
+    final ventas = tablas['ventas']!;
+    if (fila['tipo'] == 'anulacion') {
+      final o = ventas[fila['anula']];
+      if (o == null) _no('23503', 'El movimiento que se anula no existe en este negocio');
+      if (o['tipo'] == 'anulacion' || (o['monto'] as num) != (fila['monto'] as num)) {
+        _no('23514', 'La anulación debe ser por el mismo valor y del mismo cliente');
+      }
+      if (ventas.values.any((v) => v['anula'] == fila['anula'])) _no('23505', 'duplicate key ventas_una_anulacion');
+    }
+    final d = (fila['descuento'] as num?)?.toDouble() ?? 0;
+    if (d > 0 && _miRol != null && _miRol != 'dueno') {
+      final tope = descuentoMax[_miEmpresa] ?? 0;
+      if (d > ((fila['monto'] as num) + d) * tope / 100 + 1) _no('23514', 'El descuento supera el tope');
+    }
+  }
+
+  final descuentoMax = <String, double>{};
+
+  @override
+  Future<void> definirDescuentoMaximo(double pct) async {
+    _puedo();
+    if (_miRol != 'dueno') _no('42501', 'Solo el dueño puede cambiar el tope de descuento');
+    descuentoMax[_miEmpresa!] = pct;
   }
 
   @override

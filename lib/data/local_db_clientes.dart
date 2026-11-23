@@ -95,10 +95,10 @@ extension LocalDbClientes on LocalDb {
   Future<List<ResumenCliente>> resumenClientes() async {
     final r = await db.rawQuery(
         "SELECT c.id, c.nombre, c.telefono, ${LocalDb._saldoSql} AS saldo, "
-        "(SELECT COUNT(*) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS compras, "
-        "(SELECT COALESCE(SUM(v.monto), 0) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS total, "
-        "(SELECT MIN(v.fecha) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS primera, "
-        "(SELECT MAX(v.fecha) FROM ventas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS ultima "
+        "(SELECT COALESCE(SUM(v.signo), 0) FROM ventas_netas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS compras, "
+        "(SELECT COALESCE(SUM(v.monto), 0) FROM ventas_netas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso') AS total, "
+        "(SELECT MIN(v.fecha) FROM ventas_netas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso' AND v.signo = 1) AS primera, "
+        "(SELECT MAX(v.fecha) FROM ventas_netas v WHERE v.cliente_id = c.id AND v.tipo = 'ingreso' AND v.signo = 1) AS ultima "
         'FROM clientes c WHERE c.deleted = 0');
     final ajustes = {
       for (final a in await db.rawQuery(

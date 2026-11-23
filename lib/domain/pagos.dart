@@ -142,10 +142,12 @@ PorMedio porMedio(Iterable<Map<String, Object?>> movs) {
   for (final m in movs) {
     final tipo = m['tipo'] as String;
     final credito = m['credito'] == 1 || m['credito'] == true;
-    final monto = (m['monto'] as num).toDouble();
+    // Las anulaciones (vista ventas_netas) traen signo −1 y el valor en negativo.
+    final signo = (m['signo'] as num?)?.toInt() ?? 1;
+    final monto = (m['monto'] as num).toDouble().abs();
     for (final p in leerPagos(m['pagos'], monto: monto, tipo: tipo, credito: credito)) {
       final destino = tipo == 'egreso' ? sal : ent;
-      destino[p.medio] = (destino[p.medio] ?? 0) + p.monto;
+      destino[p.medio] = (destino[p.medio] ?? 0) + p.monto * signo;
     }
   }
   return PorMedio(ent, sal);

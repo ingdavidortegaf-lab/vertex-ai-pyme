@@ -143,12 +143,18 @@ extension LocalDbInventario on LocalDb {
       {bool fiado = false,
       String? clienteId,
       String? concepto,
-      List<Pago>? pagos}) async {
+      List<Pago>? pagos,
+      double descuento = 0}) async {
     final validos = items.where((i) => i.cantidad > 0).toList();
     if (validos.isEmpty) throw ArgumentError('items');
     if (fiado && clienteId == null) throw ArgumentError('cliente');
-    final total = validos.fold(0.0, (s, i) => s + i.total);
-    if (total <= 0) throw ArgumentError('monto');
+    final bruto = validos.fold(0.0, (s, i) => s + i.total);
+    if (bruto <= 0) throw ArgumentError('monto');
+    _validarDescuento(descuento, bruto);
+    // El descuento se reparte en el precio de cada producto: así la
+    // ganancia por producto también lo refleja.
+    final total = bruto - descuento;
+    final factor = total / bruto;
     String cant(double c) =>
         c == c.roundToDouble() ? c.toInt().toString() : c.toString();
     var texto = concepto?.trim().isNotEmpty == true
@@ -165,6 +171,7 @@ extension LocalDbInventario on LocalDb {
       'tipo': 'ingreso',
       'credito': fiado ? 1 : 0,
       'fecha': _ahora(),
+      if (descuento > 0) 'descuento': descuento,
       ..._quien,
     };
     await db.transaction((t) async {
@@ -182,7 +189,7 @@ extension LocalDbInventario on LocalDb {
         await _insertarInventario(
             t,
             _filaInventario(newId(), i.productoId, -i.cantidad, 'venta',
-                ventaId: id, precio: i.precio, costo: i.costo));
+                ventaId: id, precio: i.precio * factor, costo: i.costo));
       }
     });
     _avisar();

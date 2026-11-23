@@ -17,17 +17,17 @@ void main() {
       ..reloj = (() => ahora)
       ..pullCada = SyncService.pullMin;
 
-    await sync.sync(porTiempo: true); // primera vez: descarga las 4 tablas
-    expect(srv.consultas, 4);
+    await sync.sync(porTiempo: true); // primera vez: descarga las 5 tablas (con turnos)
+    expect(srv.consultas, 5);
     expect(sync.pullCada, const Duration(seconds: 60));
 
     ahora = ahora.add(const Duration(seconds: 30));
     await sync.sync(porTiempo: true); // todavía no toca
-    expect(srv.consultas, 4);
+    expect(srv.consultas, 5);
 
     ahora = ahora.add(const Duration(seconds: 31));
     await sync.sync(porTiempo: true); // ya toca; la próxima en 2 min
-    expect(srv.consultas, 8);
+    expect(srv.consultas, 10);
     expect(sync.pullCada, const Duration(minutes: 2));
 
     for (var i = 0; i < 6; i++) {

@@ -81,7 +81,7 @@ void main() {
     datosDelDueno();
     srv.contextoRemoto = {'rol': 'dueno', 'despachador_fia': false, 'empresa_id': 'e1'};
     await sync.sync();
-    expect(srv.descargasDe.toSet(), {'clientes', 'ventas', 'productos', 'inventario'});
+    expect(srv.descargasDe.toSet(), {'clientes', 'ventas', 'productos', 'inventario', 'turnos'});
     expect((await db.productos()).single.costo, 2000);
   });
 

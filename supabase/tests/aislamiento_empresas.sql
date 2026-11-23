@@ -58,6 +58,8 @@ values ('e0000000-0000-0000-0000-00000000000a', 'Producto de A', now(), 2500, no
         0, now(), false, now(), now());
 insert into public.inventario (id, producto_id, cantidad, motivo, fecha)
 values ('f0000000-0000-0000-0000-00000000000a', 'e0000000-0000-0000-0000-00000000000a', 10, 'entrada', now());
+insert into public.turnos (id, perfil, abre, cierra, base, esperado, contado)
+values ('70000000-0000-0000-0000-00000000000a', 'Cajera de A', now() - interval '1 hour', now(), 0, 1000, 1000);
 
 do $$
 begin
@@ -103,8 +105,9 @@ begin
     raise exception 'FALLO: B ve los miembros de A';
   end if;
   if (select count(*) from public.clientes) + (select count(*) from public.ventas)
-     + (select count(*) from public.productos) + (select count(*) from public.inventario) <> 0 then
-    raise exception 'FALLO: B ve clientes, ventas, productos o inventario de A';
+     + (select count(*) from public.productos) + (select count(*) from public.inventario)
+     + (select count(*) from public.turnos) <> 0 then
+    raise exception 'FALLO: B ve clientes, ventas, productos, inventario o turnos de A';
   end if;
 end $$;
 
@@ -139,6 +142,20 @@ begin
     values (gen_random_uuid(), a, 'e0000000-0000-0000-0000-00000000000a', 5, 'entrada', now());
     raise exception 'FALLO: B insertó inventario en la empresa de A';
   exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into public.turnos (id, empresa_id, abre, cierra, base, esperado, contado)
+    values (gen_random_uuid(), a, now(), now(), 0, 0, 0);
+    raise exception 'FALLO: B insertó un turno en la empresa de A';
+  exception when insufficient_privilege then null;
+  end;
+  -- Anular una venta de A desde B: el servidor no la encuentra en el negocio de B.
+  begin
+    insert into public.ventas (id, concepto, monto, tipo, credito, fecha, anula)
+    select gen_random_uuid(), 'Anulación intrusa', 1, 'anulacion', false, now(), v.id
+    from (select 'd0000000-0000-0000-0000-00000000000a'::uuid as id) v;
+    raise exception 'FALLO: B anuló una venta de A';
+  exception when foreign_key_violation then null;
   end;
 
   -- Editar las filas de A: la política no las deja ver, así que no cambia nada.

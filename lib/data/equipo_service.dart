@@ -98,6 +98,13 @@ class EquipoService {
   Future<void> definirDespachadorFia(bool valor) async {
     await _pedir(() => api.definirDespachadorFia(valor));
     final c = db.equipo.value;
-    await db.guardarContexto(ContextoEquipo(rol: c.rol, despachadorFia: valor, empresaId: c.empresaId));
+    await db.guardarContexto(c.copiar(despachadorFia: valor));
+  }
+
+  /// Tope de descuento para todos menos el dueño (0 = sin descuentos).
+  Future<void> definirDescuentoMaximo(double pct) async {
+    if (!pct.isFinite || pct < 0 || pct > 100) throw ArgumentError('pct');
+    await _pedir(() => api.definirDescuentoMaximo(pct));
+    await db.guardarContexto(db.equipo.value.copiar(descuentoMaxPct: pct));
   }
 }

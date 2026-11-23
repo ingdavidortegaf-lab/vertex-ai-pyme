@@ -10,9 +10,14 @@ extension LocalDbMovimientos on LocalDb {
       bool credito = false,
       String? clienteId,
       String? terceroId,
-      List<Pago>? pagos}) async {
+      List<Pago>? pagos,
+      double descuento = 0}) async {
     if (!LocalDb.tiposMovimiento.contains(tipo)) throw ArgumentError('tipo');
     if (!monto.isFinite || monto <= 0) throw ArgumentError('monto');
+    // Con descuento, [monto] es el valor antes del descuento.
+    if (descuento != 0 && tipo != 'ingreso') throw ArgumentError('descuento');
+    _validarDescuento(descuento, monto);
+    monto -= descuento;
     if (concepto.trim().isEmpty) throw ArgumentError('concepto');
     final fiado = tipo == 'ingreso' && credito;
     if ((fiado || tipo == 'abono') && clienteId == null) {
@@ -28,6 +33,7 @@ extension LocalDbMovimientos on LocalDb {
       'tipo': tipo,
       'credito': fiado ? 1 : 0,
       'fecha': _ahora(),
+      if (descuento > 0) 'descuento': descuento,
       ..._quien,
     };
     await db.transaction((t) async {
@@ -51,7 +57,8 @@ extension LocalDbMovimientos on LocalDb {
   Future<List<Map<String, Object?>>> movimientos(
           {String? clienteId, int limite = 300}) =>
       db.rawQuery(
-          'SELECT v.*, c.nombre AS cliente_nombre FROM ventas v '
+          'SELECT v.*, c.nombre AS cliente_nombre, '
+          '(SELECT COUNT(*) FROM ventas a WHERE a.anula = v.id) AS anulada FROM ventas v '
           'LEFT JOIN clientes c ON c.id = v.cliente_id '
           '${clienteId == null ? '' : 'WHERE v.cliente_id = ? '}'
           'ORDER BY v.fecha DESC LIMIT ?',
@@ -60,7 +67,7 @@ extension LocalDbMovimientos on LocalDb {
   /// Ventas (tipo ingreso) desde una fecha local: (total, cantidad).
   Future<(double, int)> ventasDesde(DateTime desdeLocal) async {
     final r = await db.rawQuery(
-        "SELECT COALESCE(SUM(monto), 0) s, COUNT(*) c FROM ventas "
+        "SELECT COALESCE(SUM(monto), 0) s, COALESCE(SUM(signo), 0) c FROM ventas_netas "
         "WHERE tipo = 'ingreso' AND fecha >= ?",
         [isoUtc(desdeLocal)]);
     return (LocalDb._dbl(r.first['s']), (r.first['c'] as num?)?.toInt() ?? 0);
@@ -72,10 +79,10 @@ extension LocalDbMovimientos on LocalDb {
     final ini = isoUtc(DateTime(now.year, now.month));
     final r = (await db.rawQuery(
             "SELECT COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN monto END), 0) ing, "
-            "COUNT(CASE WHEN tipo = 'ingreso' THEN 1 END) ning, "
+            "COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN signo END), 0) ning, "
             "COALESCE(SUM(CASE WHEN tipo = 'egreso' THEN monto END), 0) egr, "
-            "COUNT(CASE WHEN tipo = 'egreso' THEN 1 END) negr "
-            'FROM ventas WHERE fecha >= ?',
+            "COALESCE(SUM(CASE WHEN tipo = 'egreso' THEN signo END), 0) negr "
+            'FROM ventas_netas WHERE fecha >= ?',
             [ini]))
         .first;
     final deuda = (await db.rawQuery(
@@ -99,7 +106,7 @@ extension LocalDbMovimientos on LocalDb {
   Future<List<TopCliente>> topClientesMes({int limite = 3}) async {
     final now = reloj();
     final r = await db.rawQuery(
-        'SELECT c.nombre, SUM(v.monto) total FROM ventas v '
+        'SELECT c.nombre, SUM(v.monto) total FROM ventas_netas v '
         'JOIN clientes c ON c.id = v.cliente_id '
         "WHERE v.tipo = 'ingreso' AND v.fecha >= ? AND c.deleted = 0 "
         'GROUP BY v.cliente_id ORDER BY total DESC LIMIT ?',
@@ -137,21 +144,21 @@ extension LocalDbMovimientos on LocalDb {
     final a = isoUtc(desde), b = isoUtc(hasta);
     final r = (await db.rawQuery(
             "SELECT COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN monto END), 0) ven, "
-            "COUNT(CASE WHEN tipo = 'ingreso' THEN 1 END) nven, "
+            "COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN signo END), 0) nven, "
             "COALESCE(SUM(CASE WHEN tipo = 'ingreso' AND credito = 1 THEN monto END), 0) fia, "
             "COALESCE(SUM(CASE WHEN tipo = 'egreso' THEN monto END), 0) gas, "
             "COALESCE(SUM(CASE WHEN tipo = 'abono' THEN monto END), 0) abo "
-            'FROM ventas WHERE fecha >= ? AND fecha < ?',
+            'FROM ventas_netas WHERE fecha >= ? AND fecha < ?',
             [a, b]))
         .first;
     final g = await db.rawQuery(
         'SELECT COALESCE(SUM(-cantidad * (COALESCE(precio_unit, 0) - '
-        "COALESCE(costo_unit, 0))), 0) FROM inventario WHERE motivo = 'venta' "
+        "COALESCE(costo_unit, 0))), 0) FROM inventario WHERE motivo IN ('venta','anulacion') "
         'AND fecha >= ? AND fecha < ?',
         [a, b]);
     final ventas = LocalDb._dbl(r['ven']), fiado = LocalDb._dbl(r['fia']);
     final medios = porMedio(await db.rawQuery(
-        'SELECT tipo, credito, monto, pagos FROM ventas WHERE fecha >= ? AND fecha < ?',
+        'SELECT tipo, credito, monto, pagos, signo FROM ventas_netas WHERE fecha >= ? AND fecha < ?',
         [a, b]));
     return ResumenPeriodo(
       medios: medios,
@@ -168,7 +175,7 @@ extension LocalDbMovimientos on LocalDb {
   /// Ventas y gastos por día local entre [desde] y [hasta] (días completos).
   Future<List<DiaSerie>> seriePorDia(DateTime desde, DateTime hasta) async {
     final r = await db.rawQuery(
-        "SELECT tipo, monto, fecha FROM ventas WHERE tipo IN ('ingreso','egreso') "
+        "SELECT tipo, monto, fecha FROM ventas_netas WHERE tipo IN ('ingreso','egreso') "
         'AND fecha >= ? AND fecha < ?',
         [isoUtc(desde), isoUtc(hasta)]);
     final ven = <DateTime, double>{}, gas = <DateTime, double>{};
@@ -193,7 +200,7 @@ extension LocalDbMovimientos on LocalDb {
         'SELECT p.nombre, SUM(-i.cantidad) cant, '
         'SUM(-i.cantidad * COALESCE(i.precio_unit, 0)) total '
         'FROM inventario i JOIN productos p ON p.id = i.producto_id '
-        "WHERE i.motivo = 'venta' AND i.fecha >= ? AND i.fecha < ? "
+        "WHERE i.motivo IN ('venta','anulacion') AND i.fecha >= ? AND i.fecha < ? "
         'GROUP BY i.producto_id ORDER BY total DESC LIMIT ?',
         [isoUtc(desde), isoUtc(hasta), limite]);
     return [

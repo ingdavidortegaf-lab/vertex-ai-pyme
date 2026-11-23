@@ -53,6 +53,7 @@ abstract class RemoteApi {
   Future<void> cambiarRol(String usuario, Rol rol);
   Future<void> quitarMiembro(String usuario);
   Future<void> definirDespachadorFia(bool valor);
+  Future<void> definirDescuentoMaximo(double pct);
 }
 
 class SupabaseRemote implements RemoteApi {
@@ -156,6 +157,10 @@ class SupabaseRemote implements RemoteApi {
   @override
   Future<void> definirDespachadorFia(bool valor) =>
       _rpc('definir_despachador_fia', {'p_valor': valor});
+
+  @override
+  Future<void> definirDescuentoMaximo(double pct) =>
+      _rpc('definir_descuento_maximo', {'p_pct': pct});
 
   @override
   Future<String?> asistente(Map<String, dynamic> cuerpo) async {

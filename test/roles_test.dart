@@ -11,7 +11,8 @@ void main() {
 
   test('el despachador solo vende de contado y registra entradas; no ve costos, utilidad, gastos ni informes', () {
     expect(permisosDe(Rol.despachador),
-        {Permiso.venderContado, Permiso.verVentas, Permiso.verProductos, Permiso.entradaInventario});
+        {Permiso.venderContado, Permiso.aplicarDescuento, Permiso.verVentas, Permiso.verProductos,
+          Permiso.entradaInventario});
     for (final p in [Permiso.verCostos, Permiso.verUtilidad, Permiso.verGastos, Permiso.verInformes,
         Permiso.registrarGasto, Permiso.venderFiado, Permiso.anularMovimiento, Permiso.editarProductos]) {
       expect(puede(Rol.despachador, p), isFalse, reason: '$p');
@@ -62,7 +63,10 @@ void main() {
   test('qué descarga cada rol: despachador y bodeguero sin costos y sin lo que no pueden ver', () {
     List<(String, String)> f(Rol r, {bool fia = false}) =>
         fuentesDescarga(ContextoEquipo(rol: r, despachadorFia: fia));
-    const completo = [('clientes', 'clientes'), ('ventas', 'ventas'), ('productos', 'productos'), ('inventario', 'inventario')];
+    const completo = [
+      ('clientes', 'clientes'), ('ventas', 'ventas'), ('productos', 'productos'), ('inventario', 'inventario'),
+      ('turnos', 'turnos'),
+    ];
     expect(f(Rol.dueno), completo);
     expect(f(Rol.administrador), completo);
     expect(f(Rol.contador), completo);

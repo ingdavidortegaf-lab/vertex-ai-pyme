@@ -37,9 +37,9 @@ extension LocalDbNube on LocalDb {
       final monto = (f['monto'] as num?)?.toDouble() ?? 0;
       final tipo = f['tipo'];
       final fecha = DateTime.tryParse('${f['fecha']}');
-      if (monto <= 0 || !LocalDb.tiposMovimiento.contains(tipo) || fecha == null) {
-        continue;
-      }
+      final anula = f['anula'] as String?;
+      final valido = LocalDb.tiposMovimiento.contains(tipo) || (tipo == 'anulacion' && anula != null);
+      if (monto <= 0 || !valido || fecha == null) continue;
       b.insert(
           'ventas',
           {
@@ -50,6 +50,11 @@ extension LocalDbNube on LocalDb {
             'tipo': tipo,
             'credito': f['credito'] == true ? 1 : 0,
             'perfil': (f['perfil'] as String?) ?? '',
+            'anula': anula,
+            'anula_tipo': f['anula_tipo'] as String?,
+            'descuento': (f['descuento'] as num?)?.toDouble() ?? 0,
+            'turno': f['turno'] as String?,
+            'autoriza': (f['autoriza'] as String?) ?? '',
             'fecha': isoUtc(fecha),
             'pagos': f['pagos'] == null
                 ? null

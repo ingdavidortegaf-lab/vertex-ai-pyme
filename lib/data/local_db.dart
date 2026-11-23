@@ -10,12 +10,14 @@ import '../domain/legal.dart';
 import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
 import '../domain/pagos.dart';
+import '../domain/caja.dart';
 import '../domain/perfiles.dart';
 import '../domain/resumen.dart';
 import '../domain/roles.dart';
 import '../domain/seguimiento.dart';
 
 part 'local_db_asistente.dart';
+part 'local_db_caja.dart';
 part 'local_db_clientes.dart';
 part 'local_db_cotizaciones.dart';
 part 'local_db_documentos.dart';
@@ -40,8 +42,8 @@ class LocalDb {
   /// Fallos del servidor tolerados antes de apartar un registro (no se borra:
   /// queda en estado "error" y se reintenta al abrir la app o a mano).
   static const maxIntentos = 5;
-  static const _tablasSync = {'clientes', 'ventas', 'productos', 'inventario'};
-  static const motivosInventario = {'venta', 'entrada', 'ajuste'};
+  static const _tablasSync = {'clientes', 'ventas', 'productos', 'inventario', 'turnos'};
+  static const motivosInventario = {'venta', 'entrada', 'ajuste', 'anulacion'};
   static const tiposMovimiento = {'ingreso', 'egreso', 'abono'};
 
   Database? _db;
@@ -79,14 +81,20 @@ class LocalDb {
 
   /// Lo que se agrega a cada movimiento sobre quién lo hizo. A la nube solo
   /// va si hay perfil (así sigue funcionando con un servidor sin la columna).
-  Map<String, Object?> get _quien =>
-      _perfilNombre.isEmpty ? const {} : {'perfil': _perfilNombre};
+  Map<String, Object?> get _quien => {
+        if (_perfilNombre.isNotEmpty) 'perfil': _perfilNombre,
+        if (turnoAbierto.value != null) 'turno': turnoAbierto.value!.id,
+      };
+
+  /// Turno de caja abierto en este celular (null si no hay).
+  final turnoAbierto = ValueNotifier<Turno?>(null);
 
   /// Guarda el rol que informó el servidor.
   Future<void> guardarContexto(ContextoEquipo c) async {
     await setAjuste('equipo_rol', rolATexto(c.rol));
     await setAjuste('equipo_fia', c.despachadorFia ? '1' : '0');
     await setAjuste('equipo_empresa', c.empresaId);
+    await setAjuste('equipo_descuento', '${c.descuentoMaxPct}');
     if (equipo.value != c) {
       equipo.value = c;
       _avisar();
@@ -117,7 +125,10 @@ class LocalDb {
       rol: rolDesdeTexto(await ajuste('equipo_rol')),
       despachadorFia: await ajuste('equipo_fia') == '1',
       empresaId: await ajuste('equipo_empresa') ?? '',
+      descuentoMaxPct: double.tryParse(await ajuste('equipo_descuento') ?? '') ?? 0,
     );
+    final t = await db.query('turnos', where: 'cierra IS NULL', orderBy: 'abre DESC', limit: 1);
+    turnoAbierto.value = t.isEmpty ? null : Turno.desdeFila(t.first);
   }
   void _avisar() => cambios.value++;
 
@@ -183,21 +194,99 @@ class LocalDb {
     await crearCuentasPagar(d);
     await agregarTerceros(d);
     await agregarPerfiles(d);
+    await agregarCaja(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 9;
+  static const versionEsquema = 10;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
-    if (viejo < 2) await crearInventario(d); // v2: inventario
-    if (viejo < 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
-    if (viejo < 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
-    if (viejo < 5) await crearDocumentos(d); // v5: archivo de documentos
-    if (viejo < 6) await agregarPagos(d); // v6: medios de pago
-    if (viejo < 7) await crearCuentasPagar(d); // v7: lo que se le debe a proveedores
-    if (viejo < 8) await agregarTerceros(d); // v8: documentos, correo, terceros y pagos fijos
-    if (viejo < 9) await agregarPerfiles(d); // v9: perfiles con PIN y quién hizo cada venta
+    if (viejo < 2 && nuevo >= 2) await crearInventario(d); // v2: inventario
+    if (viejo < 3 && nuevo >= 3) await crearHerramientas(d); // v3: cotizaciones, proveedores
+    if (viejo < 4 && nuevo >= 4) await agregarCodigoYUnidad(d); // v4: código de barras y peso
+    if (viejo < 5 && nuevo >= 5) await crearDocumentos(d); // v5: archivo de documentos
+    if (viejo < 6 && nuevo >= 6) await agregarPagos(d); // v6: medios de pago
+    if (viejo < 7 && nuevo >= 7) await crearCuentasPagar(d); // v7: lo que se le debe a proveedores
+    if (viejo < 8 && nuevo >= 8) await agregarTerceros(d); // v8: documentos, correo, terceros y pagos fijos
+    if (viejo < 9 && nuevo >= 9) await agregarPerfiles(d); // v9: perfiles con PIN y quién hizo cada venta
+    if (viejo < 10 && nuevo >= 10) await agregarCaja(d); // v10: anulaciones, descuentos y turnos
+  }
+
+  /// v10: anulaciones (un movimiento nuevo que apunta al original),
+  /// descuento, turno de caja y quién autorizó. SQLite no deja cambiar un
+  /// CHECK, así que ventas e inventario se rehacen copiando todo.
+  static Future<void> agregarCaja(Database d) async {
+    await d.execute('''CREATE TABLE ventas_v10(
+      id TEXT PRIMARY KEY,
+      cliente_id TEXT,
+      concepto TEXT NOT NULL,
+      monto REAL NOT NULL CHECK (monto > 0),
+      tipo TEXT NOT NULL CHECK (tipo IN ('ingreso','egreso','abono','anulacion')),
+      credito INTEGER NOT NULL DEFAULT 0,
+      fecha TEXT NOT NULL,
+      sync TEXT NOT NULL DEFAULT 'pendiente',
+      pagos TEXT,
+      tercero_id TEXT,
+      perfil TEXT NOT NULL DEFAULT '',
+      anula TEXT,
+      anula_tipo TEXT,
+      descuento REAL NOT NULL DEFAULT 0 CHECK (descuento >= 0),
+      turno TEXT,
+      autoriza TEXT NOT NULL DEFAULT '',
+      CHECK ((tipo = 'anulacion') = (anula IS NOT NULL)))''');
+    const cv = 'id, cliente_id, concepto, monto, tipo, credito, fecha, sync, pagos, tercero_id, perfil';
+    await d.execute('INSERT INTO ventas_v10 ($cv) SELECT $cv FROM ventas');
+    await d.execute('DROP TABLE ventas');
+    await d.execute('ALTER TABLE ventas_v10 RENAME TO ventas');
+    await d.execute('CREATE INDEX ventas_fecha_idx ON ventas(fecha)');
+    await d.execute('CREATE INDEX ventas_cliente_idx ON ventas(cliente_id)');
+    await d.execute('CREATE INDEX ventas_turno_idx ON ventas(turno)');
+    // Un movimiento se anula una sola vez.
+    await d.execute('CREATE UNIQUE INDEX ventas_anula_idx ON ventas(anula) WHERE anula IS NOT NULL');
+
+    await d.execute('''CREATE TABLE inventario_v10(
+      id TEXT PRIMARY KEY,
+      producto_id TEXT NOT NULL,
+      cantidad REAL NOT NULL CHECK (cantidad <> 0),
+      motivo TEXT NOT NULL CHECK (motivo IN ('venta','entrada','ajuste','anulacion')),
+      venta_id TEXT,
+      precio_unit REAL,
+      costo_unit REAL,
+      fecha TEXT NOT NULL,
+      sync TEXT NOT NULL DEFAULT 'pendiente')''');
+    const ci = 'id, producto_id, cantidad, motivo, venta_id, precio_unit, costo_unit, fecha, sync';
+    await d.execute('INSERT INTO inventario_v10 ($ci) SELECT $ci FROM inventario');
+    await d.execute('DROP TABLE inventario');
+    await d.execute('ALTER TABLE inventario_v10 RENAME TO inventario');
+    await d.execute('CREATE INDEX inventario_producto_idx ON inventario(producto_id)');
+    await d.execute('CREATE INDEX inventario_fecha_idx ON inventario(motivo, fecha)');
+    await d.execute('CREATE INDEX inventario_venta_idx ON inventario(venta_id)');
+
+    // Turnos de caja: se abre con una base y se cierra contando el efectivo.
+    // Al cerrarlo se sube completo (en la nube no se edita).
+    await d.execute('''CREATE TABLE turnos(
+      id TEXT PRIMARY KEY,
+      perfil TEXT NOT NULL DEFAULT '',
+      abre TEXT NOT NULL,
+      cierra TEXT,
+      base REAL NOT NULL DEFAULT 0,
+      esperado REAL,
+      contado REAL,
+      nota TEXT NOT NULL DEFAULT '',
+      sync TEXT NOT NULL DEFAULT 'local')''');
+
+    // Movimientos con las anulaciones como movimiento en contra, en su fecha:
+    // la anulación toma el tipo y la forma (fiado o no) del original y su
+    // valor resta. Los informes suman sobre esta vista.
+    await d.execute('''CREATE VIEW ventas_netas AS
+      SELECT v.id, v.cliente_id, v.tercero_id, v.concepto, v.fecha, v.pagos, v.perfil,
+             v.turno, v.descuento, v.sync, v.anula, v.autoriza,
+             CASE WHEN v.tipo = 'anulacion' THEN COALESCE(v.anula_tipo, o.tipo) ELSE v.tipo END AS tipo,
+             CASE WHEN v.tipo = 'anulacion' THEN COALESCE(o.credito, 0) ELSE v.credito END AS credito,
+             CASE WHEN v.tipo = 'anulacion' THEN -v.monto ELSE v.monto END AS monto,
+             CASE WHEN v.tipo = 'anulacion' THEN -1 ELSE 1 END AS signo
+      FROM ventas v LEFT JOIN ventas o ON o.id = v.anula''');
   }
 
   /// v9: perfiles del celular compartido (PIN con hash y sal; solo en este
@@ -370,7 +459,7 @@ class LocalDb {
   static const _saldoSql =
       "COALESCE((SELECT SUM(CASE WHEN v.tipo = 'ingreso' AND v.credito = 1 "
       "THEN v.monto WHEN v.tipo = 'abono' THEN -v.monto ELSE 0 END) "
-      'FROM ventas v WHERE v.cliente_id = c.id), 0)';
+      'FROM ventas_netas v WHERE v.cliente_id = c.id), 0)';
 
   static const _stockSql =
       'COALESCE((SELECT SUM(i.cantidad) FROM inventario i '
@@ -530,7 +619,8 @@ class LocalDb {
         'cuentas_pagar',
         'pagos_fijos_hechos',
         'pagos_fijos',
-        'perfiles'
+        'perfiles',
+        'turnos'
       ]) {
         await t.delete(tabla);
       }

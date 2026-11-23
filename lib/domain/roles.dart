@@ -92,6 +92,7 @@ const _contador = {
 
 const _despachador = {
   Permiso.venderContado,
+  Permiso.aplicarDescuento, // hasta el tope que fije el dueño (lo exige el servidor)
   Permiso.verVentas,
   Permiso.verProductos,
   Permiso.entradaInventario,
@@ -131,12 +132,24 @@ class ContextoEquipo {
   final Rol rol;
   final bool despachadorFia;
   final String empresaId;
-  const ContextoEquipo({this.rol = Rol.dueno, this.despachadorFia = false, this.empresaId = ''});
+
+  /// Tope de descuento (porcentaje del total) para todos menos el dueño.
+  final double descuentoMaxPct;
+  const ContextoEquipo(
+      {this.rol = Rol.dueno, this.despachadorFia = false, this.empresaId = '', this.descuentoMaxPct = 0});
 
   factory ContextoEquipo.desdeServidor(Map<String, dynamic> m) => ContextoEquipo(
         rol: rolDesdeTexto(m['rol'] as String?),
         despachadorFia: m['despachador_fia'] == true,
         empresaId: (m['empresa_id'] as String?) ?? '',
+        descuentoMaxPct: ((m['descuento_max_pct'] as num?)?.toDouble() ?? 0).clamp(0, 100).toDouble(),
+      );
+
+  ContextoEquipo copiar({bool? despachadorFia, double? descuentoMaxPct}) => ContextoEquipo(
+        rol: rol,
+        despachadorFia: despachadorFia ?? this.despachadorFia,
+        empresaId: empresaId,
+        descuentoMaxPct: descuentoMaxPct ?? this.descuentoMaxPct,
       );
 
   bool puede(Permiso p) => puedeRol(rol, p, despachadorFia: despachadorFia);
@@ -146,10 +159,11 @@ class ContextoEquipo {
       other is ContextoEquipo &&
       other.rol == rol &&
       other.despachadorFia == despachadorFia &&
-      other.empresaId == empresaId;
+      other.empresaId == empresaId &&
+      other.descuentoMaxPct == descuentoMaxPct;
 
   @override
-  int get hashCode => Object.hash(rol, despachadorFia, empresaId);
+  int get hashCode => Object.hash(rol, despachadorFia, empresaId, descuentoMaxPct);
 }
 
 /// Alias de [puede] para usar dentro de [ContextoEquipo].
@@ -166,5 +180,6 @@ List<(String, String)> fuentesDescarga(ContextoEquipo c) {
     if (c.puede(Permiso.verVentas)) ('ventas', 'ventas'),
     ('productos', sinCostos ? 'productos_operativos' : 'productos'),
     ('inventario', sinCostos ? 'inventario_operativo' : 'inventario'),
+    if (c.puede(Permiso.verInformes)) ('turnos', 'turnos'),
   ];
 }

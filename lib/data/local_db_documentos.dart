@@ -113,12 +113,15 @@ extension LocalDbDocumentos on LocalDb {
           orderBy: 'fecha DESC',
           limit: limite);
 
+  /// Que el movimiento no esté anulado.
+  static const _vigente = 'NOT EXISTS (SELECT 1 FROM ventas a WHERE a.anula = v.id)';
+
   /// Movimientos entre dos fechas locales (para informes).
   Future<List<Map<String, Object?>>> movimientosEntre(DateTime desde, DateTime hasta) =>
       db.rawQuery(
           'SELECT v.*, c.nombre AS cliente_nombre, c.tipo_doc AS cliente_tipo_doc, '
           'c.documento AS cliente_documento, p.nombre AS tercero_nombre, '
-          'p.tipo_doc AS tercero_tipo_doc, p.documento AS tercero_documento FROM ventas v '
+          'p.tipo_doc AS tercero_tipo_doc, p.documento AS tercero_documento FROM ventas_netas v '
           'LEFT JOIN clientes c ON c.id = v.cliente_id '
           'LEFT JOIN proveedores p ON p.id = v.tercero_id '
           'WHERE v.fecha >= ? AND v.fecha < ? ORDER BY v.fecha',
@@ -128,8 +131,8 @@ extension LocalDbDocumentos on LocalDb {
   /// cuenta de cobro).
   Future<List<Map<String, Object?>>> movimientosDeCredito(String clienteId) =>
       db.rawQuery(
-          "SELECT * FROM ventas WHERE cliente_id = ? AND "
-          "((tipo = 'ingreso' AND credito = 1) OR tipo = 'abono') ORDER BY fecha",
+          "SELECT * FROM ventas v WHERE cliente_id = ? AND "
+          "((tipo = 'ingreso' AND credito = 1) OR tipo = 'abono') AND $_vigente ORDER BY fecha",
           [clienteId]);
 
   /// Fiados y abonos de todos los clientes activos, agrupados por cliente
@@ -138,7 +141,7 @@ extension LocalDbDocumentos on LocalDb {
     final r = await db.rawQuery(
         "SELECT v.* FROM ventas v JOIN clientes c ON c.id = v.cliente_id "
         "WHERE c.deleted = 0 AND ((v.tipo = 'ingreso' AND v.credito = 1) "
-        "OR v.tipo = 'abono') ORDER BY v.fecha");
+        "OR v.tipo = 'abono') AND $_vigente ORDER BY v.fecha");
     final m = <String, List<Map<String, Object?>>>{};
     for (final x in r) {
       (m[x['cliente_id'] as String] ??= []).add(x);

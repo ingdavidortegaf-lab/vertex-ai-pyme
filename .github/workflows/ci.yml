@@ -69,6 +69,11 @@ jobs:
           psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
           -v ON_ERROR_STOP=1 -f supabase/tests/roles_y_permisos.sql
 
+      - name: Caja (anulaciones, descuentos y turnos)
+        run: >
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+          -v ON_ERROR_STOP=1 -f supabase/tests/caja.sql
+
       - name: Apagar Supabase
         if: always()
         run: supabase stop --no-backup

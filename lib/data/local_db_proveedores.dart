@@ -8,7 +8,7 @@ extension LocalDbProveedores on LocalDb {
       'SELECT p.*, '
       'COALESCE((SELECT SUM(c.total - COALESCE((SELECT SUM(x.monto) FROM pagos_proveedor x '
       'WHERE x.cuenta_id = c.id), 0)) FROM cuentas_pagar c WHERE c.proveedor_id = p.id), 0) AS debo, '
-      "COALESCE((SELECT SUM(v.monto) FROM ventas v WHERE v.tercero_id = p.id AND v.tipo = 'egreso'), 0) AS pagado "
+      "COALESCE((SELECT SUM(v.monto) FROM ventas_netas v WHERE v.tercero_id = p.id AND v.tipo = 'egreso'), 0) AS pagado "
       'FROM proveedores p ${clase == null ? '' : 'WHERE p.clase = ? '}'
       'ORDER BY p.nombre COLLATE NOCASE',
       [if (clase != null) clase]);
