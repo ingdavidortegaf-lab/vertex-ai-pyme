@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'cliente_detalle_page.dart';
@@ -10,6 +11,7 @@ import 'herramientas_page.dart';
 import 'ilustraciones.dart';
 import 'inventario_page.dart';
 import 'negocio_page.dart';
+import 'home_page.dart' show SeccionInicio;
 import 'oficina_page.dart';
 import 'pagos_fijos_page.dart';
 import '../domain/obligaciones.dart';
@@ -20,8 +22,9 @@ import 'ventas_page.dart';
 /// celular (funciona sin señal) y se actualiza solo cada vez que cambia un dato.
 class TableroPage extends StatefulWidget {
   /// Cambia de pestaña (0 inicio, 1 movimientos, 2 clientes, 3 asistente).
-  final ValueChanged<int>? onIr;
-  const TableroPage({super.key, this.onIr});
+  /// Ir a otra sección de la barra (si el rol la tiene).
+  final ValueChanged<SeccionInicio>? onIrA;
+  const TableroPage({super.key, this.onIrA});
   @override
   State<TableroPage> createState() => _TableroPageState();
 }
@@ -60,17 +63,19 @@ class _TableroPageState extends State<TableroPage> {
 
   /// Pagos fijos que se pasaron o vencen en los próximos días.
   List<Widget> _seccionFijos(BuildContext context) {
+    if (!LocalDb.instance.puede(Permiso.pagosFijos)) return const [];
     final hoy = DateTime.now();
     final urgentes = ordenarFijos(_fijos, hoy)
-        .where((f) => const [EstadoFijo.vencido, EstadoFijo.pronto].contains(estadoFijo(f, hoy)))
+        .where((f) => const [EstadoFijo.vencido, EstadoFijo.pronto]
+            .contains(estadoFijo(f, hoy)))
         .toList();
     if (urgentes.isEmpty) return const [];
     return [
       TituloSeccion(
         'Pagos fijos por vencer',
         accion: TextButton(
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const PagosFijosPage())),
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PagosFijosPage())),
             child: const Text('Ver todos')),
       ),
       Card(
@@ -95,50 +100,64 @@ class _TableroPageState extends State<TableroPage> {
     final p = Paleta.of(context);
     final nuevo = r.movimientos == 0 && r.nClientes == 0 && d.nVentasHoy == 0;
     final mes = DateFormat('MMMM', 'es_CO').format(DateTime.now());
+    final db = LocalDb.instance;
+    // Botones rápidos según el rol (el bodeguero va directo al inventario).
+    final acciones = <Widget>[
+      if (db.puede(Permiso.venderContado))
+        _AccionRapida(
+          etiqueta: 'Venta',
+          icono: Icons.add_rounded,
+          fondo: p.ventas,
+          tinta: Theme.of(context).brightness == Brightness.light
+              ? Colors.white
+              : const Color(0xFF0B2018),
+          onTap: () => mostrarFormMovimiento(context),
+        ),
+      if (db.puede(Permiso.registrarGasto))
+        _AccionRapida(
+          etiqueta: 'Gasto',
+          icono: Icons.north_east_rounded,
+          fondo: p.gastosFondo,
+          tinta: p.gastos,
+          onTap: () => mostrarFormMovimiento(context, tipoInicial: 'egreso'),
+        ),
+      if (db.puede(Permiso.registrarAbono))
+        _AccionRapida(
+          etiqueta: 'Abono',
+          icono: Icons.payments_outlined,
+          fondo: p.fiadoFondo,
+          tinta: p.fiado,
+          onTap: () => mostrarFormMovimiento(context, tipoInicial: 'abono'),
+        ),
+      if (!db.puede(Permiso.venderContado) &&
+          db.puede(Permiso.entradaInventario))
+        _AccionRapida(
+          etiqueta: 'Inventario',
+          icono: Icons.inventory_2_outlined,
+          fondo: p.ventasFondo,
+          tinta: p.ventas,
+          onTap: () => widget.onIrA?.call(SeccionInicio.catalogo),
+        ),
+    ];
 
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(padding: EdgeInsets.zero, children: [
-        _PizarraDelDia(d: d),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Row(children: [
-            Expanded(
-              child: _AccionRapida(
-                etiqueta: 'Venta',
-                icono: Icons.add_rounded,
-                fondo: p.ventas,
-                tinta: Theme.of(context).brightness == Brightness.light
-                    ? Colors.white
-                    : const Color(0xFF0B2018),
-                onTap: () => mostrarFormMovimiento(context),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _AccionRapida(
-                etiqueta: 'Gasto',
-                icono: Icons.north_east_rounded,
-                fondo: p.gastosFondo,
-                tinta: p.gastos,
-                onTap: () => mostrarFormMovimiento(context, tipoInicial: 'egreso'),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _AccionRapida(
-                etiqueta: 'Abono',
-                icono: Icons.payments_outlined,
-                fondo: p.fiadoFondo,
-                tinta: p.fiado,
-                onTap: () => mostrarFormMovimiento(context, tipoInicial: 'abono'),
-              ),
-            ),
-          ]),
-        ),
+        if (db.puede(Permiso.verVentas)) _PizarraDelDia(d: d),
+        if (acciones.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Row(children: [
+              for (final (i, a) in acciones.indexed) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(child: a),
+              ],
+            ]),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             // Lo urgente primero: pagos fijos vencidos o por vencer.
             ..._seccionFijos(context),
             const TituloSeccion('Herramientas'),
@@ -147,23 +166,26 @@ class _TableroPageState extends State<TableroPage> {
               const SizedBox(height: 16),
               _InvitacionNegocio(onTap: () => mostrarMiNegocio(context)),
             ],
-            if (nuevo) ...[
+            if (nuevo && db.puede(Permiso.crearClientes)) ...[
               const SizedBox(height: 16),
               _Bienvenida(onCliente: () => mostrarFormCliente(context)),
             ],
             if (!nuevo) ...[
-              if (d.metaMensual > 0) ...[
+              if (d.metaMensual > 0 && db.puede(Permiso.verInformes)) ...[
                 TituloSeccion(
                     'Meta de ${mes[0].toUpperCase()}${mes.substring(1)}'),
                 _Meta(ventas: r.ingresos, meta: d.metaMensual),
               ],
-              const TituloSeccion('Reportes'),
-              const ReportesNegocio(),
+              if (db.puede(Permiso.verUtilidad)) ...[
+                const TituloSeccion('Reportes'),
+                const ReportesNegocio(),
+              ],
               if (d.porReponer.isNotEmpty) ...[
                 TituloSeccion(
                   'Por reponer',
                   accion: TextButton(
-                      onPressed: () => widget.onIr?.call(2),
+                      onPressed: () =>
+                          widget.onIrA?.call(SeccionInicio.catalogo),
                       child: const Text('Ver inventario')),
                 ),
                 Card(
@@ -181,38 +203,49 @@ class _TableroPageState extends State<TableroPage> {
                   ]),
                 ),
               ],
-              TituloSeccion(
-                'Te deben',
-                accion: TextButton(
-                    onPressed: () => widget.onIr?.call(3),
-                    child: const Text('Ver clientes')),
-              ),
-              _PorCobrar(d: d, onCliente: _abrirCliente),
-              if (_porPagar > 0.5) ...[
+              if (db.puede(Permiso.verClientes)) ...[
+                TituloSeccion(
+                  'Te deben',
+                  accion: TextButton(
+                      onPressed: () =>
+                          widget.onIrA?.call(SeccionInicio.clientes),
+                      child: const Text('Ver clientes')),
+                ),
+                _PorCobrar(d: d, onCliente: _abrirCliente),
+              ],
+              if (_porPagar > 0.5 && db.puede(Permiso.verProveedores)) ...[
                 TituloSeccion(
                   'Le debes a proveedores',
                   accion: TextButton(
-                      onPressed: () => Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (_) => const CuentasPagarPage())),
+                      onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const CuentasPagarPage())),
                       child: const Text('Ver')),
                 ),
                 Card(
                   child: ListTile(
-                    leading: Icon(Icons.account_balance_outlined, color: p.gastos),
+                    leading:
+                        Icon(Icons.account_balance_outlined, color: p.gastos),
                     title: Text(cop(_porPagar),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: p.gastos)),
-                    subtitle: const Text('Saldo de pedidos que pagaste en parte'),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(color: p.gastos)),
+                    subtitle:
+                        const Text('Saldo de pedidos que pagaste en parte'),
                   ),
                 ),
               ],
-              if (d.topClientes.isNotEmpty) ...[
+              if (d.topClientes.isNotEmpty &&
+                  db.puede(Permiso.verClientes)) ...[
                 const TituloSeccion('Tus mejores clientes del mes'),
                 Card(
                   child: Column(children: [
                     for (final (i, c) in d.topClientes.indexed) ...[
                       if (i > 0) const Divider(indent: 72),
                       ListTile(
-                        leading: AvatarCliente(nombre: c.nombre, clave: c.nombre),
+                        leading:
+                            AvatarCliente(nombre: c.nombre, clave: c.nombre),
                         title: Text(c.nombre,
                             maxLines: 1, overflow: TextOverflow.ellipsis),
                         trailing: Text(cop(c.total),
@@ -260,7 +293,8 @@ class _PizarraDelDia extends StatelessWidget {
                 style: t.titleMedium?.copyWith(color: p.tizaBlanca)),
           ),
         Row(children: [
-          Text('Hoy vendiste', style: t.titleSmall?.copyWith(color: p.tizaSuave)),
+          Text('Hoy vendiste',
+              style: t.titleSmall?.copyWith(color: p.tizaSuave)),
           const Spacer(),
           Flexible(
             child: Text('${hoy[0].toUpperCase()}${hoy.substring(1)}',
@@ -273,8 +307,8 @@ class _PizarraDelDia extends StatelessWidget {
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
           child: Text(cop(d.ventasHoy),
-              style: cifras(t.displaySmall
-                  ?.copyWith(color: p.tizaBlanca, fontSize: 46))),
+              style: cifras(
+                  t.displaySmall?.copyWith(color: p.tizaBlanca, fontSize: 46))),
         ),
         const SizedBox(height: 16),
         if (n > 0)
@@ -299,12 +333,14 @@ class _PizarraDelDia extends StatelessWidget {
           TextSpan(children: [
             TextSpan(
                 text: n == 1 ? '1 venta' : '$n ventas',
-                style: TextStyle(color: p.tizaBlanca, fontWeight: FontWeight.w700)),
+                style: TextStyle(
+                    color: p.tizaBlanca, fontWeight: FontWeight.w700)),
             if (n > 40) const TextSpan(text: ' (se dibujan 40)'),
             const TextSpan(text: '  ·  Esta semana '),
             TextSpan(
                 text: cop(d.ventasSemana),
-                style: TextStyle(color: p.tizaBlanca, fontWeight: FontWeight.w700)),
+                style: TextStyle(
+                    color: p.tizaBlanca, fontWeight: FontWeight.w700)),
           ]),
           style: cifras(t.bodyMedium?.copyWith(color: p.tizaSuave)),
         ),
@@ -338,15 +374,15 @@ class _AccionRapida extends StatelessWidget {
             onTap: onTap,
             child: SizedBox(
               height: 76,
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(icono, color: tinta, size: 26),
-                const SizedBox(height: 4),
-                Text(etiqueta,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge
-                        ?.copyWith(color: tinta, fontWeight: FontWeight.w700)),
-              ]),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icono, color: tinta, size: 26),
+                    const SizedBox(height: 4),
+                    Text(etiqueta,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: tinta, fontWeight: FontWeight.w700)),
+                  ]),
             ),
           ),
         ),
@@ -367,7 +403,8 @@ class _PorCobrar extends StatelessWidget {
     if (deben.isEmpty) {
       return Card(
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           leading: Container(
             width: 44,
             height: 44,
@@ -376,7 +413,8 @@ class _PorCobrar extends StatelessWidget {
             child: Icon(Icons.verified_outlined, color: p.ventas),
           ),
           title: const Text('Nadie te debe'),
-          subtitle: const Text('Cuando vendas fiado, aquí verás a quién cobrarle.'),
+          subtitle:
+              const Text('Cuando vendas fiado, aquí verás a quién cobrarle.'),
         ),
       );
     }
@@ -393,8 +431,7 @@ class _PorCobrar extends StatelessWidget {
                     style: cifras(t.headlineSmall?.copyWith(color: p.fiado))),
               ),
             ),
-            Text(
-                deben.length == 1 ? '1 cliente' : '${deben.length} clientes',
+            Text(deben.length == 1 ? '1 cliente' : '${deben.length} clientes',
                 style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
           ]),
         ),
@@ -471,18 +508,24 @@ class _InvitacionNegocio extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                  color: p.ventasFondo, borderRadius: BorderRadius.circular(16)),
+                  color: p.ventasFondo,
+                  borderRadius: BorderRadius.circular(16)),
               child: Icon(Icons.storefront_outlined, color: p.ventas),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Cuéntanos de tu negocio', style: t.titleMedium),
-                const SizedBox(height: 2),
-                Text('Nombre, tipo y meta de ventas: 3 preguntas, 30 segundos.',
-                    style: t.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant)),
-              ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Cuéntanos de tu negocio', style: t.titleMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                        'Nombre, tipo y meta de ventas: 3 preguntas, 30 segundos.',
+                        style: t.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant)),
+                  ]),
             ),
             const Icon(Icons.chevron_right),
           ]),
@@ -514,7 +557,8 @@ class _Meta extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text('${cop(ventas)} de ${cop(meta)}',
-                    style: cifras(t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant))),
+                    style: cifras(t.bodyMedium
+                        ?.copyWith(color: esquema.onSurfaceVariant))),
               ),
             ),
           ]),
@@ -529,7 +573,10 @@ class _Meta extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(falta > 0 ? 'Te faltan ${cop(falta)} para cumplirla.' : '¡Meta cumplida!',
+          Text(
+              falta > 0
+                  ? 'Te faltan ${cop(falta)} para cumplirla.'
+                  : '¡Meta cumplida!',
               style: t.bodyMedium),
         ]),
       ),
@@ -596,7 +643,12 @@ class _ReportesNegocioState extends State<ReportesNegocio> {
           iniAnt,
           DateTime(iniAnt.year, iniAnt.month, hoy.day + 1),
         ),
-      Periodo.mesPasado => (iniAnt, ini, DateTime(hoy.year, hoy.month - 2), iniAnt),
+      Periodo.mesPasado => (
+          iniAnt,
+          ini,
+          DateTime(hoy.year, hoy.month - 2),
+          iniAnt
+        ),
     };
     final act = await db.resumenPeriodo(a, b);
     final ant = await db.resumenPeriodo(pa, pb);
@@ -627,7 +679,8 @@ class _ReportesNegocioState extends State<ReportesNegocio> {
         final sem = serie.sublist(i, (i + 7).clamp(0, serie.length));
         grupos.add((
           etiqueta: 'Sem ${i ~/ 7 + 1}',
-          detalle: 'Del ${corto.format(sem.first.dia)} al ${corto.format(sem.last.dia)}',
+          detalle:
+              'Del ${corto.format(sem.first.dia)} al ${corto.format(sem.last.dia)}',
           ventas: sem.fold(0.0, (s, x) => s + x.ventas),
           gastos: sem.fold(0.0, (s, x) => s + x.gastos),
         ));
@@ -672,20 +725,29 @@ class _ReportesNegocioState extends State<ReportesNegocio> {
         Row(children: [
           Expanded(
               child: _Kpi(
-                  titulo: 'Ventas', valor: act.ventas, antes: ant.ventas,
-                  subeBien: true, contra: _contra)),
+                  titulo: 'Ventas',
+                  valor: act.ventas,
+                  antes: ant.ventas,
+                  subeBien: true,
+                  contra: _contra)),
           const SizedBox(width: 10),
           Expanded(
               child: _Kpi(
-                  titulo: 'Gastos', valor: act.gastos, antes: ant.gastos,
-                  subeBien: false, contra: _contra)),
+                  titulo: 'Gastos',
+                  valor: act.gastos,
+                  antes: ant.gastos,
+                  subeBien: false,
+                  contra: _contra)),
         ]),
         const SizedBox(height: 10),
         Row(children: [
           Expanded(
               child: _Kpi(
-                  titulo: 'Te queda', valor: act.utilidad, antes: ant.utilidad,
-                  subeBien: true, contra: _contra)),
+                  titulo: 'Te queda',
+                  valor: act.utilidad,
+                  antes: ant.utilidad,
+                  subeBien: true,
+                  contra: _contra)),
           const SizedBox(width: 10),
           Expanded(
               child: act.gananciaProductos > 0 || ant.gananciaProductos > 0
@@ -710,12 +772,14 @@ class _ReportesNegocioState extends State<ReportesNegocio> {
         const SizedBox(height: 10),
         _Panel(
           titulo: '¿Cómo te pagaron?',
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             BarraContadoFiado(contado: act.contado, fiado: act.fiado),
             if (act.abonos > 0) ...[
               const SizedBox(height: 10),
               Text('Además recibiste ${cop(act.abonos)} en abonos de fiados.',
-                  style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
+                  style:
+                      t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant)),
             ],
           ]),
         ),
@@ -726,7 +790,8 @@ class _ReportesNegocioState extends State<ReportesNegocio> {
               ? Text(
                   'Cuando vendas eligiendo productos del inventario, aquí verás '
                   'cuáles se venden más.',
-                  style: t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant))
+                  style:
+                      t.bodyMedium?.copyWith(color: esquema.onSurfaceVariant))
               : BarrasRanking(filas: [
                   for (final x in _top)
                     (
@@ -749,7 +814,8 @@ class _Panel extends StatelessWidget {
   Widget build(BuildContext context) => Card(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Text(titulo, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             child,
@@ -795,14 +861,17 @@ class _Kpi extends StatelessWidget {
             child: Icon(
                 pct == 0
                     ? Icons.remove
-                    : (sube ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded),
+                    : (sube
+                        ? Icons.arrow_upward_rounded
+                        : Icons.arrow_downward_rounded),
                 size: 15,
                 color: color),
           ),
           TextSpan(
               text: ' ${pct > 0 ? '+' : ''}$pct % ',
               style: TextStyle(color: color, fontWeight: FontWeight.w700)),
-          TextSpan(text: contra, style: TextStyle(color: esquema.onSurfaceVariant)),
+          TextSpan(
+              text: contra, style: TextStyle(color: esquema.onSurfaceVariant)),
         ]),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,

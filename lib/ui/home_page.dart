@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import 'asistente_page.dart';
 import 'clientes_page.dart';
@@ -29,6 +30,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     // La app se adapta a las respuestas del registro guiado.
     LocalDb.instance.modo.addListener(_refrescar);
+    // Y al rol del equipo: cada quien ve solo sus secciones.
+    LocalDb.instance.equipo.addListener(_refrescar);
     // Avisos en el celular (agotados, cobros vencidos, meta cumplida).
     Avisos.instance.vigilar();
   }
@@ -36,33 +39,54 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     LocalDb.instance.modo.removeListener(_refrescar);
+    LocalDb.instance.equipo.removeListener(_refrescar);
     super.dispose();
   }
 
   void _refrescar() => setState(() {});
 
+  /// Secciones que el rol actual puede ver, en orden.
+  List<SeccionInicio> get _secciones {
+    final db = LocalDb.instance;
+    return [
+      SeccionInicio.inicio,
+      if (db.puede(Permiso.verVentas)) SeccionInicio.caja,
+      if (db.puede(Permiso.verProductos)) SeccionInicio.catalogo,
+      if (db.puede(Permiso.verClientes)) SeccionInicio.clientes,
+      if (db.puede(Permiso.asistente)) SeccionInicio.asistente,
+    ];
+  }
+
   void _ir(int i) => setState(() => _i = i);
 
-  Widget _page() => switch (_i) {
-        0 => TableroPage(key: const ValueKey('t'), onIr: _ir),
-        1 => const VentasPage(key: ValueKey('v')),
-        2 => const InventarioPage(key: ValueKey('i')),
-        3 => const ClientesPage(key: ValueKey('c')),
-        _ => const AsistentePage(key: ValueKey('a')),
+  /// Ir a una sección por su nombre (si el rol la tiene).
+  void _irA(SeccionInicio s) {
+    final i = _secciones.indexOf(s);
+    if (i >= 0) _ir(i);
+  }
+
+  Widget _page(SeccionInicio s) => switch (s) {
+        SeccionInicio.inicio =>
+          TableroPage(key: const ValueKey('t'), onIrA: _irA),
+        SeccionInicio.caja => const VentasPage(key: ValueKey('v')),
+        SeccionInicio.catalogo => const InventarioPage(key: ValueKey('i')),
+        SeccionInicio.clientes => const ClientesPage(key: ValueKey('c')),
+        SeccionInicio.asistente => const AsistentePage(key: ValueKey('a')),
       };
 
   @override
   Widget build(BuildContext context) {
     final p = Paleta.of(context);
     final t = Theme.of(context).textTheme;
+    final secciones = _secciones;
+    if (_i >= secciones.length) _i = 0;
+    final actual = secciones[_i];
     // Cada sección tiene su tiza: el indicador de la barra toma ese color.
-    final indicador = [
-      p.ventasFondo,
-      p.ventasFondo,
-      p.ventasFondo,
-      p.fiadoFondo,
-      p.asistenteFondo
-    ][_i];
+    final indicador = switch (actual) {
+      SeccionInicio.clientes => p.fiadoFondo,
+      SeccionInicio.asistente => p.asistenteFondo,
+      _ => p.ventasFondo,
+    };
     final quieto = MediaQuery.disableAnimationsOf(context);
     return Scaffold(
       appBar: AppBar(
@@ -157,42 +181,47 @@ class _HomePageState extends State<HomePage> {
         duration: quieto ? Duration.zero : const Duration(milliseconds: 220),
         switchInCurve: Curves.easeOutCubic,
         switchOutCurve: Curves.easeInCubic,
-        child: _page(),
+        child: _page(actual),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _i,
         indicatorColor: indicador,
         onDestinationSelected: _ir,
         destinations: [
-          NavigationDestination(
-              icon: const Icon(Icons.space_dashboard_outlined),
-              selectedIcon: Icon(Icons.space_dashboard, color: p.ventas),
-              label: 'Inicio'),
-          NavigationDestination(
-              icon: const Icon(Icons.receipt_long_outlined),
-              selectedIcon: Icon(Icons.receipt_long, color: p.ventas),
-              label: 'Caja'),
-          NavigationDestination(
-              icon: Icon(LocalDb.instance.modo.value.vendeProductos
-                  ? Icons.inventory_2_outlined
-                  : Icons.handyman_outlined),
-              selectedIcon: Icon(
-                  LocalDb.instance.modo.value.vendeProductos
-                      ? Icons.inventory_2
-                      : Icons.handyman,
-                  color: p.ventas),
-              label: LocalDb.instance.modo.value.nombreCatalogo),
-          NavigationDestination(
-              icon: const Icon(Icons.people_outline),
-              selectedIcon: Icon(Icons.people, color: p.fiado),
-              label: 'Clientes'),
-          NavigationDestination(
-              icon: const Icon(Icons.auto_awesome_outlined),
-              selectedIcon: Icon(Icons.auto_awesome, color: p.asistente),
-              label: 'Asistente'),
+          for (final sec in secciones) _destino(sec, p),
         ],
       ),
     );
+  }
+
+  NavigationDestination _destino(SeccionInicio s, Paleta p) {
+    final modo = LocalDb.instance.modo.value;
+    return switch (s) {
+      SeccionInicio.inicio => NavigationDestination(
+          icon: const Icon(Icons.space_dashboard_outlined),
+          selectedIcon: Icon(Icons.space_dashboard, color: p.ventas),
+          label: 'Inicio'),
+      SeccionInicio.caja => NavigationDestination(
+          icon: const Icon(Icons.receipt_long_outlined),
+          selectedIcon: Icon(Icons.receipt_long, color: p.ventas),
+          label: 'Caja'),
+      SeccionInicio.catalogo => NavigationDestination(
+          icon: Icon(modo.vendeProductos
+              ? Icons.inventory_2_outlined
+              : Icons.handyman_outlined),
+          selectedIcon: Icon(
+              modo.vendeProductos ? Icons.inventory_2 : Icons.handyman,
+              color: p.ventas),
+          label: modo.nombreCatalogo),
+      SeccionInicio.clientes => NavigationDestination(
+          icon: const Icon(Icons.people_outline),
+          selectedIcon: Icon(Icons.people, color: p.fiado),
+          label: 'Clientes'),
+      SeccionInicio.asistente => NavigationDestination(
+          icon: const Icon(Icons.auto_awesome_outlined),
+          selectedIcon: Icon(Icons.auto_awesome, color: p.asistente),
+          label: 'Asistente'),
+    };
   }
 }
 
@@ -298,3 +327,6 @@ class PildoraSync extends StatelessWidget {
     );
   }
 }
+
+/// Secciones de la barra de abajo.
+enum SeccionInicio { inicio, caja, catalogo, clientes, asistente }

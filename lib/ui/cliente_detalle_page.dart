@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/asistente_service.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import '../domain/asistente_local.dart';
 import '../domain/formato.dart';
@@ -67,8 +68,10 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
   Future<void> _mensaje() async {
     setState(() => _generando = true);
     final s = SyncService.instance;
-    final (texto, esIA) = await AsistenteService.mensajeParaCliente(_clienteSaldo,
-        api: s.remoto, hayRed: s.hayRed);
+    final (texto, esIA) = await AsistenteService.mensajeParaCliente(
+        _clienteSaldo,
+        api: s.remoto,
+        hayRed: s.hayRed);
     if (!mounted) return;
     setState(() => _generando = false);
     final ctrl = TextEditingController(text: texto);
@@ -129,59 +132,72 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
       appBar: AppBar(
         title: const Text('Cliente'),
         actions: [
-          IconButton(
-              tooltip: 'Editar',
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: () => mostrarFormCliente(context, cliente: c)),
-          IconButton(
-              tooltip: 'Eliminar',
-              icon: const Icon(Icons.delete_outline),
-              onPressed: _eliminar),
+          if (LocalDb.instance.puede(Permiso.editarClientes)) ...[
+            IconButton(
+                tooltip: 'Editar',
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () => mostrarFormCliente(context, cliente: c)),
+            IconButton(
+                tooltip: 'Eliminar',
+                icon: const Icon(Icons.delete_outline),
+                onPressed: _eliminar),
+          ],
         ],
       ),
       body: ListView(padding: EdgeInsets.zero, children: [
         Container(
           decoration: BoxDecoration(
             color: p.pizarra,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+            borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(28)),
           ),
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               AvatarCliente(nombre: nombre, clave: nombre, tam: 56),
               const SizedBox(width: 14),
               Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(nombre,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: t.titleLarge?.copyWith(color: p.tizaBlanca)),
-                  const SizedBox(height: 2),
-                  Row(children: [
-                    Icon(Icons.phone_android, size: 16, color: p.tizaSuave),
-                    const SizedBox(width: 4),
-                    Text(_tel.isEmpty ? 'Sin celular' : mostrarTelefono(_tel),
-                        style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
-                  ]),
-                  if ((c['documento'] as String? ?? '').isNotEmpty)
-                    Text(mostrarDocumento(c['tipo_doc'] as String? ?? 'CC', c['documento'] as String),
-                        style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
-                  if ((c['correo'] as String? ?? '').isNotEmpty)
-                    Text(c['correo'] as String,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
-                  if (!datosParaFactura(
-                      documento: c['documento'] as String? ?? '', correo: c['correo'] as String? ?? ''))
-                    InkWell(
-                      onTap: () => mostrarFormCliente(context, cliente: c),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text('+ Agregar cédula o NIT y correo',
-                            style: t.labelLarge?.copyWith(color: p.ventasTiza)),
-                      ),
-                    ),
-                ]),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(nombre,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: t.titleLarge?.copyWith(color: p.tizaBlanca)),
+                      const SizedBox(height: 2),
+                      Row(children: [
+                        Icon(Icons.phone_android, size: 16, color: p.tizaSuave),
+                        const SizedBox(width: 4),
+                        Text(
+                            _tel.isEmpty
+                                ? 'Sin celular'
+                                : mostrarTelefono(_tel),
+                            style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
+                      ]),
+                      if ((c['documento'] as String? ?? '').isNotEmpty)
+                        Text(
+                            mostrarDocumento(c['tipo_doc'] as String? ?? 'CC',
+                                c['documento'] as String),
+                            style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
+                      if ((c['correo'] as String? ?? '').isNotEmpty)
+                        Text(c['correo'] as String,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: t.bodyMedium?.copyWith(color: p.tizaSuave)),
+                      if (!datosParaFactura(
+                          documento: c['documento'] as String? ?? '',
+                          correo: c['correo'] as String? ?? ''))
+                        InkWell(
+                          onTap: () => mostrarFormCliente(context, cliente: c),
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text('+ Agregar cédula o NIT y correo',
+                                style: t.labelLarge
+                                    ?.copyWith(color: p.ventasTiza)),
+                          ),
+                        ),
+                    ]),
               ),
               iconoSync(c['sync']),
             ]),
@@ -199,7 +215,8 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             FilledButton.icon(
               style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFF1C7A43),
@@ -219,20 +236,23 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
             ),
             const SizedBox(height: 10),
             Row(children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () =>
-                      mostrarFormMovimiento(context, clienteId: widget.clienteId),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Venta'),
+              if (LocalDb.instance.puede(Permiso.venderContado))
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => mostrarFormMovimiento(context,
+                        clienteId: widget.clienteId),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Venta'),
+                  ),
                 ),
-              ),
-              if (debe) ...[
-                const SizedBox(width: 10),
+              if (debe && LocalDb.instance.puede(Permiso.registrarAbono)) ...[
+                if (LocalDb.instance.puede(Permiso.venderContado))
+                  const SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                        foregroundColor: p.fiado, side: BorderSide(color: p.fiado)),
+                        foregroundColor: p.fiado,
+                        side: BorderSide(color: p.fiado)),
                     onPressed: () => mostrarFormMovimiento(context,
                         clienteId: widget.clienteId, tipoInicial: 'abono'),
                     icon: const Icon(Icons.payments_outlined),
@@ -251,7 +271,8 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
             ),
             const SizedBox(height: 8),
             TextButton.icon(
-              onPressed: () => generarAutorizacionCliente(context, widget.clienteId),
+              onPressed: () =>
+                  generarAutorizacionCliente(context, widget.clienteId),
               icon: const Icon(Icons.verified_user_outlined),
               label: const Text('Formato de autorización de datos (Ley 1581)'),
             ),
@@ -259,9 +280,11 @@ class _ClienteDetallePageState extends State<ClienteDetallePage> {
             const TituloSeccion('Historial'),
             if (_movs.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
                 child: Text('Todavía no hay movimientos con este cliente.',
-                    style: t.bodyLarge?.copyWith(color: esquema.onSurfaceVariant)),
+                    style:
+                        t.bodyLarge?.copyWith(color: esquema.onSurfaceVariant)),
               )
             else
               Card(

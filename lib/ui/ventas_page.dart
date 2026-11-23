@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
@@ -85,12 +86,17 @@ class _VentasPageState extends State<VentasPage> {
     final dias = _cargado
         ? _dias()
         : const <(String, double, List<Map<String, Object?>>)>[];
+    final db = LocalDb.instance;
+    final registra =
+        db.puede(Permiso.venderContado) || db.puede(Permiso.registrarGasto);
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => mostrarFormMovimiento(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Registrar'),
-      ),
+      floatingActionButton: registra
+          ? FloatingActionButton.extended(
+              onPressed: () => mostrarFormMovimiento(context),
+              icon: const Icon(Icons.add),
+              label: const Text('Registrar'),
+            )
+          : null,
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
@@ -210,7 +216,10 @@ Future<void> mostrarFormMovimiento(BuildContext context,
   final String id;
   if (r.items.isNotEmpty) {
     id = await LocalDb.instance.saveVentaProductos(r.items,
-        fiado: r.fiado, clienteId: r.clienteId, concepto: r.concepto, pagos: r.pagos);
+        fiado: r.fiado,
+        clienteId: r.clienteId,
+        concepto: r.concepto,
+        pagos: r.pagos);
   } else {
     var concepto = r.concepto.trim();
     if (concepto.isEmpty) concepto = r.tipo == 'abono' ? 'Abono' : 'Venta';
@@ -269,7 +278,20 @@ class _FormMovimientoState extends State<_FormMovimiento> {
   final _form = GlobalKey<FormState>();
   final _concepto = TextEditingController();
   final _monto = TextEditingController();
-  late String _tipo = widget.tipoInicial;
+  late String _tipo = _tiposPermitidos.contains(widget.tipoInicial)
+      ? widget.tipoInicial
+      : _tiposPermitidos.first;
+
+  /// Tipos de movimiento que el rol puede registrar (la venta siempre va).
+  List<String> get _tiposPermitidos {
+    final db = LocalDb.instance;
+    return [
+      'ingreso',
+      if (db.puede(Permiso.registrarGasto)) 'egreso',
+      if (db.puede(Permiso.registrarAbono)) 'abono',
+    ];
+  }
+
   bool _fiado = false;
   late String? _clienteId = widget.clienteId;
   late List<ClienteSaldo> _clientes = widget.clientes;
@@ -424,7 +446,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                     style: Theme.of(c).textTheme.titleLarge),
               ),
               // Crear el cliente ahí mismo, sin salir de la venta.
-              if (_tipo != 'abono')
+              if (_tipo != 'abono' &&
+                  LocalDb.instance.puede(Permiso.crearClientes))
                 ListTile(
                   key: const ValueKey('nuevo_cliente_venta'),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -530,7 +553,11 @@ class _FormMovimientoState extends State<_FormMovimiento> {
       _errorCliente = errCliente;
       _errorPago = errPago;
     });
-    if (!okForm || errCliente != null || errPago != null || monto == null || monto <= 0) {
+    if (!okForm ||
+        errCliente != null ||
+        errPago != null ||
+        monto == null ||
+        monto <= 0) {
       return;
     }
     Navigator.pop(
@@ -567,38 +594,42 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Text('Registrar', style: t.headlineSmall),
             const SizedBox(height: 16),
-            SegmentedButton<String>(
-              showSelectedIcon: false,
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith(
-                    (s) => s.contains(WidgetState.selected) ? fondo : null),
-                foregroundColor: WidgetStateProperty.resolveWith(
-                    (s) => s.contains(WidgetState.selected) ? tinta : null),
+            if (_tiposPermitidos.length > 1)
+              SegmentedButton<String>(
+                showSelectedIcon: false,
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.resolveWith(
+                      (s) => s.contains(WidgetState.selected) ? fondo : null),
+                  foregroundColor: WidgetStateProperty.resolveWith(
+                      (s) => s.contains(WidgetState.selected) ? tinta : null),
+                ),
+                segments: [
+                  for (final t in _tiposPermitidos)
+                    switch (t) {
+                      'egreso' => const ButtonSegment(
+                          value: 'egreso',
+                          icon: Icon(Icons.north_east_rounded),
+                          label: Text('Gasto')),
+                      'abono' => const ButtonSegment(
+                          value: 'abono',
+                          icon: Icon(Icons.payments_outlined),
+                          label: Text('Abono')),
+                      _ => const ButtonSegment(
+                          value: 'ingreso',
+                          icon: Icon(Icons.south_west_rounded),
+                          label: Text('Venta')),
+                    },
+                ],
+                selected: {_tipo},
+                onSelectionChanged: (s) => setState(() {
+                  _tipo = s.first;
+                  _errorCliente = null;
+                  if (_tipo == 'abono' &&
+                      (cliente == null || cliente.saldo <= 0)) {
+                    _clienteId = null;
+                  }
+                }),
               ),
-              segments: const [
-                ButtonSegment(
-                    value: 'ingreso',
-                    icon: Icon(Icons.south_west_rounded),
-                    label: Text('Venta')),
-                ButtonSegment(
-                    value: 'egreso',
-                    icon: Icon(Icons.north_east_rounded),
-                    label: Text('Gasto')),
-                ButtonSegment(
-                    value: 'abono',
-                    icon: Icon(Icons.payments_outlined),
-                    label: Text('Abono')),
-              ],
-              selected: {_tipo},
-              onSelectionChanged: (s) => setState(() {
-                _tipo = s.first;
-                _errorCliente = null;
-                if (_tipo == 'abono' &&
-                    (cliente == null || cliente.saldo <= 0)) {
-                  _clienteId = null;
-                }
-              }),
-            ),
             if (_tipo == 'ingreso' && widget.productos.isNotEmpty) ...[
               const SizedBox(height: 16),
               for (final i in _items)
@@ -726,6 +757,7 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               ]),
             ],
             if (_tipo == 'ingreso' &&
+                LocalDb.instance.puede(Permiso.venderFiado) &&
                 (LocalDb.instance.modo.value.fia || _fiado)) ...[
               const SizedBox(height: 8),
               SwitchListTile(
@@ -741,7 +773,9 @@ class _FormMovimientoState extends State<_FormMovimiento> {
               const SizedBox(height: 12),
               SelectorPago(
                 key: ValueKey('pago_$_tipo'),
-                titulo: _tipo == 'egreso' ? '¿Con qué pagó el gasto?' : '¿Cómo pagó?',
+                titulo: _tipo == 'egreso'
+                    ? '¿Con qué pagó el gasto?'
+                    : '¿Cómo pagó?',
                 total: (_tipo == 'ingreso' && _carrito.isNotEmpty)
                     ? _totalCarrito
                     : (parseMonto(_monto.text) ?? 0),
@@ -749,7 +783,8 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 onChanged: (l) => _pagos = l,
               ),
             ],
-            if (_tipo != 'egreso') ...[
+            if (_tipo != 'egreso' &&
+                LocalDb.instance.puede(Permiso.verClientes)) ...[
               const SizedBox(height: 8),
               Material(
                 color: esquema.surfaceContainerLow,
@@ -794,10 +829,13 @@ class _FormMovimientoState extends State<_FormMovimiento> {
                 ),
                 child: ListTile(
                   key: const ValueKey('tercero_gasto'),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
                   leading: const Icon(Icons.storefront_outlined),
-                  title: Text(_terceroNombre ?? '¿A quién le pagaste? (opcional)'),
-                  subtitle: const Text('Proveedor, arrendador, servicios, empleado'),
+                  title:
+                      Text(_terceroNombre ?? '¿A quién le pagaste? (opcional)'),
+                  subtitle:
+                      const Text('Proveedor, arrendador, servicios, empleado'),
                   trailing: const Icon(Icons.expand_more),
                   onTap: _elegirTercero,
                 ),

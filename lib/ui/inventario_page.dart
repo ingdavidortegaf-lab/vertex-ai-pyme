@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../domain/ejemplos.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
@@ -66,39 +67,51 @@ class _InventarioPageState extends State<InventarioPage> {
             x.codigo.contains(f.trim()))
         .toList();
 
+    final db = LocalDb.instance;
+    final edita = db.puede(Permiso.editarProductos);
+    final veCostos = db.puede(Permiso.verCostos);
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => mostrarFormProducto(context),
-        icon: const Icon(Icons.add_box_outlined),
-        label: Text(LocalDb.instance.modo.value.vendeProductos
-            ? 'Producto'
-            : 'Servicio'),
-      ),
+      floatingActionButton: edita
+          ? FloatingActionButton.extended(
+              onPressed: () => mostrarFormProducto(context),
+              icon: const Icon(Icons.add_box_outlined),
+              label: Text(LocalDb.instance.modo.value.vendeProductos
+                  ? 'Producto'
+                  : 'Servicio'),
+            )
+          : null,
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
               ? EstadoVacio(
                   ilustracion: const IlustracionPizarra(),
                   titulo: 'Aún no hay productos',
-                  texto: 'Agrega lo que vendes con su precio, su costo y '
-                      'cuántos tienes. Al vender, el stock baja solo.',
-                  accion: FilledButton.icon(
-                    onPressed: () => mostrarFormProducto(context),
-                    icon: const Icon(Icons.add_box_outlined),
-                    label: const Text('Agregar el primero'),
-                  ),
+                  texto: edita
+                      ? 'Agrega lo que vendes con su precio, su costo y '
+                          'cuántos tienes. Al vender, el stock baja solo.'
+                      : 'Todavía no hay productos. El dueño o el '
+                          'administrador los agregan.',
+                  accion: edita
+                      ? FilledButton.icon(
+                          onPressed: () => mostrarFormProducto(context),
+                          icon: const Icon(Icons.add_box_outlined),
+                          label: const Text('Agregar el primero'),
+                        )
+                      : null,
                 )
               : ListView(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
                   children: [
                       Row(children: [
-                        Expanded(
-                          child: _Dato(
-                              titulo: 'Valor a costo',
-                              valor: cop(valor),
-                              color: esquema.onSurface),
-                        ),
-                        const SizedBox(width: 10),
+                        if (veCostos) ...[
+                          Expanded(
+                            child: _Dato(
+                                titulo: 'Valor a costo',
+                                valor: cop(valor),
+                                color: esquema.onSurface),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
                         Expanded(
                           child: _Dato(
                               titulo: 'Por reponer',
@@ -257,7 +270,7 @@ class _FilaProducto extends StatelessWidget {
       ),
       title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(
-          '${cop(x.precio)}${esPorPeso(x.unidad) ? '/${x.unidad}' : ''}${x.costo > 0 ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}'),
+          '${cop(x.precio)}${esPorPeso(x.unidad) ? '/${x.unidad}' : ''}${x.costo > 0 && LocalDb.instance.puede(Permiso.verUtilidad) ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}'),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         EtiquetaStock(x: x),
         const SizedBox(width: 6),
@@ -269,6 +282,11 @@ class _FilaProducto extends StatelessWidget {
 }
 
 Future<void> _acciones(BuildContext context, ProductoStock x) async {
+  final db = LocalDb.instance;
+  final entra = db.puede(Permiso.entradaInventario);
+  final ajusta = db.puede(Permiso.ajusteInventario);
+  final edita = db.puede(Permiso.editarProductos);
+  if (!entra && !ajusta && !edita) return; // el contador solo consulta
   final accion = await showModalBottomSheet<String>(
     context: context,
     builder: (c) => SafeArea(
@@ -283,35 +301,39 @@ Future<void> _acciones(BuildContext context, ProductoStock x) async {
         ),
         const Divider(),
         if (!x.esServicio) ...[
+          if (entra)
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              leading: const Icon(Icons.add_circle_outline),
+              title: const Text('Llegó mercancía'),
+              subtitle: const Text('Suma unidades al stock'),
+              onTap: () => Navigator.pop(c, 'entrada'),
+            ),
+          if (ajusta)
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              leading: const Icon(Icons.fact_check_outlined),
+              title: const Text('Corregir por conteo'),
+              subtitle: const Text('Ajusta a lo que hay de verdad'),
+              onTap: () => Navigator.pop(c, 'ajuste'),
+            ),
+        ],
+        if (edita) ...[
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-            leading: const Icon(Icons.add_circle_outline),
-            title: const Text('Llegó mercancía'),
-            subtitle: const Text('Suma unidades al stock'),
-            onTap: () => Navigator.pop(c, 'entrada'),
+            leading: const Icon(Icons.edit_outlined),
+            title: const Text('Editar precio, costo o mínimo'),
+            onTap: () => Navigator.pop(c, 'editar'),
           ),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-            leading: const Icon(Icons.fact_check_outlined),
-            title: const Text('Corregir por conteo'),
-            subtitle: const Text('Ajusta a lo que hay de verdad'),
-            onTap: () => Navigator.pop(c, 'ajuste'),
+            leading: Icon(Icons.delete_outline,
+                color: Theme.of(c).colorScheme.error),
+            title: Text('Eliminar producto',
+                style: TextStyle(color: Theme.of(c).colorScheme.error)),
+            onTap: () => Navigator.pop(c, 'eliminar'),
           ),
         ],
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          leading: const Icon(Icons.edit_outlined),
-          title: const Text('Editar precio, costo o mínimo'),
-          onTap: () => Navigator.pop(c, 'editar'),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-          leading:
-              Icon(Icons.delete_outline, color: Theme.of(c).colorScheme.error),
-          title: Text('Eliminar producto',
-              style: TextStyle(color: Theme.of(c).colorScheme.error)),
-          onTap: () => Navigator.pop(c, 'eliminar'),
-        ),
         const SizedBox(height: 8),
       ]),
     ),
@@ -512,7 +534,8 @@ class _FormProductoState extends State<_FormProducto> {
               maxLength: 80,
               decoration: InputDecoration(
                   labelText: 'Nombre',
-                  hintText: 'Ej.: ${ejemplosPara(LocalDb.instance.tipoNegocio.value).producto}',
+                  hintText:
+                      'Ej.: ${ejemplosPara(LocalDb.instance.tipoNegocio.value).producto}',
                   counterText: ''),
               validator: (v) => (v ?? '').trim().length < 2
                   ? 'Escribe el nombre del producto'

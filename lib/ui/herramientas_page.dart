@@ -4,6 +4,7 @@ import 'pagos_fijos_page.dart';
 import 'terceros_page.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import '../domain/documentos.dart';
 import '../domain/formato.dart';
@@ -31,6 +32,22 @@ part 'herramientas_pedido.dart';
 // ingreso de la mercancía) y promociones.
 
 /// Accesos a las herramientas, para el Inicio.
+/// Permiso que pide cada herramienta del menú (por su título).
+const _permisoHerramienta = {
+  'Pagos fijos': Permiso.pagosFijos,
+  'Proveedores y terceros': Permiso.verProveedores,
+  'Cierre de caja': Permiso.verGastos,
+  'Comprobantes': Permiso.verVentas,
+  'Cotizaciones': Permiso.cotizaciones,
+  'Pedir mercancía': Permiso.gestionarProveedores,
+  'Lo que debo': Permiso.verGastos,
+  'Promociones': Permiso.promociones,
+  'Seguimiento': Permiso.seguimiento,
+  'Informes': Permiso.verInformes,
+  'Cartera': Permiso.verClientes,
+  'Documentos': Permiso.verVentas,
+};
+
 class HerramientasGrid extends StatelessWidget {
   const HerramientasGrid({super.key});
 
@@ -141,11 +158,20 @@ class HerramientasGrid extends StatelessWidget {
         () => ir(const DocumentosPage())
       ),
     ];
+    // Cada herramienta se ve solo si el rol la permite. Lo que no esté en la
+    // tabla queda para el dueño (configurarNegocio), por seguridad.
+    final db = LocalDb.instance;
+    final visibles = [
+      for (final it in items)
+        if (db.puede(_permisoHerramienta[it.$2] ?? Permiso.configurarNegocio))
+          it
+    ];
+    if (visibles.isEmpty) return const SizedBox.shrink();
     return LayoutBuilder(builder: (context, box) {
       final ancho = (box.maxWidth - 10) / 2;
       return Wrap(spacing: 10, runSpacing: 10, children: [
         for (final (i, (icono, titulo, sub, fondo, tinta, onTap))
-            in items.indexed)
+            in visibles.indexed)
           Aparecer(
             orden: i,
             child: SizedBox(

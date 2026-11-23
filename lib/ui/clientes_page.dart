@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/local_db.dart';
+import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
 import 'cliente_detalle_page.dart';
@@ -66,65 +67,79 @@ class _ClientesPageState extends State<ClientesPage> {
         : _items.where((c) {
             final nombre = _sinTildes(c['nombre'] as String);
             final tel = (c['telefono'] as String?) ?? '';
-            final doc = ((c['documento'] as String?) ?? '').replaceAll(RegExp(r'\D'), '');
+            final doc = ((c['documento'] as String?) ?? '')
+                .replaceAll(RegExp(r'\D'), '');
             return nombre.contains(f) ||
-                (digitos.length >= 3 && (tel.contains(digitos) || doc.contains(digitos)));
+                (digitos.length >= 3 &&
+                    (tel.contains(digitos) || doc.contains(digitos)));
           }).toList();
-    final deudores = _items.where((c) => ((c['saldo'] as num?) ?? 0) > 0).length;
+    final deudores =
+        _items.where((c) => ((c['saldo'] as num?) ?? 0) > 0).length;
 
+    final crea = LocalDb.instance.puede(Permiso.crearClientes);
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => mostrarFormCliente(context),
-        icon: const Icon(Icons.person_add_alt),
-        label: const Text('Cliente'),
-      ),
+      floatingActionButton: crea
+          ? FloatingActionButton.extended(
+              onPressed: () => mostrarFormCliente(context),
+              icon: const Icon(Icons.person_add_alt),
+              label: const Text('Cliente'),
+            )
+          : null,
       body: !_cargado
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
               ? EstadoVacio(
                   ilustracion: const IlustracionPizarra(),
                   titulo: 'Aún no hay clientes',
-                  texto: 'Agrega a tus clientes para venderles fiado, ver quién '
+                  texto:
+                      'Agrega a tus clientes para venderles fiado, ver quién '
                       'te debe y cobrarles por WhatsApp.',
-                  accion: FilledButton.icon(
-                    onPressed: () => mostrarFormCliente(context),
-                    icon: const Icon(Icons.person_add_alt),
-                    label: const Text('Agregar el primero'),
-                  ),
+                  accion: crea
+                      ? FilledButton.icon(
+                          onPressed: () => mostrarFormCliente(context),
+                          icon: const Icon(Icons.person_add_alt),
+                          label: const Text('Agregar el primero'),
+                        )
+                      : null,
                 )
-              : ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: [
-                  TextField(
-                    onChanged: (v) => setState(() => _filtro = v),
-                    textInputAction: TextInputAction.search,
-                    decoration: const InputDecoration(
-                      hintText: 'Buscar por nombre, celular o cédula',
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                    child: Text(
-                      '${_items.length == 1 ? '1 cliente' : '${_items.length} clientes'}'
-                      '${deudores > 0 ? ' · $deudores con saldo pendiente' : ''}',
-                      style: t.labelLarge?.copyWith(color: esquema.onSurfaceVariant),
-                    ),
-                  ),
-                  if (lista.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text('Ningún cliente coincide con «${_filtro.trim()}».',
-                          textAlign: TextAlign.center, style: t.bodyLarge),
-                    )
-                  else
-                    Card(
-                      child: Column(children: [
-                        for (final (i, c) in lista.indexed) ...[
-                          if (i > 0) const Divider(indent: 72),
-                          _FilaCliente(c: c, p: p),
-                        ],
-                      ]),
-                    ),
-                ]),
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
+                  children: [
+                      TextField(
+                        onChanged: (v) => setState(() => _filtro = v),
+                        textInputAction: TextInputAction.search,
+                        decoration: const InputDecoration(
+                          hintText: 'Buscar por nombre, celular o cédula',
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                        child: Text(
+                          '${_items.length == 1 ? '1 cliente' : '${_items.length} clientes'}'
+                          '${deudores > 0 ? ' · $deudores con saldo pendiente' : ''}',
+                          style: t.labelLarge
+                              ?.copyWith(color: esquema.onSurfaceVariant),
+                        ),
+                      ),
+                      if (lista.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                              'Ningún cliente coincide con «${_filtro.trim()}».',
+                              textAlign: TextAlign.center,
+                              style: t.bodyLarge),
+                        )
+                      else
+                        Card(
+                          child: Column(children: [
+                            for (final (i, c) in lista.indexed) ...[
+                              if (i > 0) const Divider(indent: 72),
+                              _FilaCliente(c: c, p: p),
+                            ],
+                          ]),
+                        ),
+                    ]),
     );
   }
 }
@@ -148,7 +163,8 @@ class _FilaCliente extends StatelessWidget {
           [
             tel.isEmpty ? 'Sin celular' : mostrarTelefono(tel),
             if ((c['documento'] as String? ?? '').isNotEmpty)
-              mostrarDocumento(c['tipo_doc'] as String? ?? 'CC', c['documento'] as String),
+              mostrarDocumento(
+                  c['tipo_doc'] as String? ?? 'CC', c['documento'] as String),
           ].join(' · '),
           maxLines: 1,
           overflow: TextOverflow.ellipsis),
@@ -177,7 +193,8 @@ Future<String?> mostrarFormCliente(BuildContext context,
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    builder: (_) => _FormCliente(cliente: cliente, nombreInicial: nombreInicial),
+    builder: (_) =>
+        _FormCliente(cliente: cliente, nombreInicial: nombreInicial),
   );
   if (r == null) return null;
   final id = await LocalDb.instance.saveCliente(r.nombre, r.telefono,
@@ -195,7 +212,8 @@ Future<String?> mostrarFormCliente(BuildContext context,
 
 class _DatosCliente {
   final String nombre, telefono, tipoDoc, documento, correo;
-  const _DatosCliente(this.nombre, this.telefono, this.tipoDoc, this.documento, this.correo);
+  const _DatosCliente(
+      this.nombre, this.telefono, this.tipoDoc, this.documento, this.correo);
 }
 
 class _FormCliente extends StatefulWidget {
@@ -217,8 +235,9 @@ class _FormClienteState extends State<_FormCliente> {
       correo: widget.cliente?['correo'] as String? ?? '');
 
   /// Los datos de factura se muestran abiertos si ya hay alguno.
-  late bool _verDatos = (widget.cliente?['documento'] as String? ?? '').isNotEmpty ||
-      (widget.cliente?['correo'] as String? ?? '').isNotEmpty;
+  late bool _verDatos =
+      (widget.cliente?['documento'] as String? ?? '').isNotEmpty ||
+          (widget.cliente?['correo'] as String? ?? '').isNotEmpty;
 
   /// Autorización del cliente (Ley 1581): casilla SIN premarcar,
   /// obligatoria para registrar un cliente nuevo.
@@ -255,8 +274,10 @@ class _FormClienteState extends State<_FormCliente> {
     if (_errorAutoriza != null) return;
     final nombre = _nombre.text.trim().replaceAll(RegExp(r'\s+'), ' ');
     final tel = _tel.valor ?? '';
-    Navigator.pop(context,
-        _DatosCliente(nombre, tel, _id.tipo, _id.documentoNormal, _id.correoNormal));
+    Navigator.pop(
+        context,
+        _DatosCliente(
+            nombre, tel, _id.tipo, _id.documentoNormal, _id.correoNormal));
   }
 
   @override
@@ -270,7 +291,8 @@ class _FormClienteState extends State<_FormCliente> {
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Form(
           key: _form,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(children: [
               AvatarCliente(
                   nombre: nombre.isEmpty ? '?' : nombre,
@@ -291,15 +313,21 @@ class _FormClienteState extends State<_FormCliente> {
               textInputAction: TextInputAction.next,
               maxLength: 80,
               decoration: InputDecoration(
-                  labelText: _id.esEmpresa ? 'Razón social de la empresa' : 'Nombre completo',
+                  labelText: _id.esEmpresa
+                      ? 'Razón social de la empresa'
+                      : 'Nombre completo',
                   hintText: _id.esEmpresa
                       ? 'Ej.: ${ejemplosPara(LocalDb.instance.tipoNegocio.value).empresa}'
                       : 'Ej.: Ana María Pérez Rojas',
-                  prefixIcon: Icon(_id.esEmpresa ? Icons.business_outlined : Icons.person_outline)),
+                  prefixIcon: Icon(_id.esEmpresa
+                      ? Icons.business_outlined
+                      : Icons.person_outline)),
               validator: (v) {
                 final t = (v ?? '').trim();
                 if (t.length < 2) {
-                  return _id.esEmpresa ? 'Escribe el nombre de la empresa' : 'Escribe el nombre del cliente';
+                  return _id.esEmpresa
+                      ? 'Escribe el nombre de la empresa'
+                      : 'Escribe el nombre del cliente';
                 }
                 if (!_id.esEmpresa && RegExp(r'[0-9@]').hasMatch(t)) {
                   return 'El nombre no debe llevar números ni correos';
@@ -321,7 +349,8 @@ class _FormClienteState extends State<_FormCliente> {
                 ),
               )
             else
-              CamposIdentificacion(ctrl: _id, alCambiarTipo: () => setState(() {})),
+              CamposIdentificacion(
+                  ctrl: _id, alCambiarTipo: () => setState(() {})),
             const SizedBox(height: 12),
             if (widget.cliente == null) ...[
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -336,11 +365,14 @@ class _FormClienteState extends State<_FormCliente> {
                     padding: const EdgeInsets.only(top: 10),
                     child: Text.rich(TextSpan(style: t.bodyMedium, children: [
                       const TextSpan(
-                          text: 'El cliente me autorizó, de manera previa, expresa e '
+                          text:
+                              'El cliente me autorizó, de manera previa, expresa e '
                               'informada, a guardar sus datos conforme a la '),
-                      enlace(context, 'Política de Tratamiento de Datos', () => verPolitica(context)),
+                      enlace(context, 'Política de Tratamiento de Datos',
+                          () => verPolitica(context)),
                       const TextSpan(
-                          text: '. Después puedes imprimir o enviarle el formato de '
+                          text:
+                              '. Después puedes imprimir o enviarle el formato de '
                               'autorización desde su ficha.'),
                     ])),
                   ),
@@ -356,7 +388,9 @@ class _FormClienteState extends State<_FormCliente> {
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _guardar,
-              child: Text(widget.cliente == null ? 'Guardar cliente' : 'Guardar cambios'),
+              child: Text(widget.cliente == null
+                  ? 'Guardar cliente'
+                  : 'Guardar cambios'),
             ),
           ]),
         ),
