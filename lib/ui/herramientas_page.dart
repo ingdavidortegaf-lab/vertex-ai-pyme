@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../domain/identificacion.dart' as ident;
 import 'pagos_fijos_page.dart';
 import 'terceros_page.dart';
+import 'facturacion_page.dart';
 import 'turnos_page.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
@@ -39,6 +40,7 @@ const _permisoHerramienta = {
   'Proveedores y terceros': Permiso.verProveedores,
   'Cierre de caja': Permiso.verGastos,
   'Turnos de caja': Permiso.verInformes,
+  'Factura electrónica': Permiso.configurarNegocio,
   'Comprobantes': Permiso.verVentas,
   'Cotizaciones': Permiso.cotizaciones,
   'Pedir mercancía': Permiso.gestionarProveedores,
@@ -91,6 +93,14 @@ class HerramientasGrid extends StatelessWidget {
         p.ventasFondo,
         p.ventas,
         () => ir(const TurnosPage())
+      ),
+      (
+        Icons.receipt_long_outlined,
+        'Factura electrónica',
+        'Datos del negocio y facturas en cola',
+        p.asistenteFondo,
+        p.asistente,
+        () => ir(const FacturacionPage())
       ),
       (
         Icons.receipt_outlined,

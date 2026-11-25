@@ -427,6 +427,7 @@ Future<void> mostrarFormProducto(BuildContext context,
       stockInicial: r.stock,
       codigo: r.codigo,
       unidad: r.unidad,
+      iva: r.iva,
       id: producto?.id);
   SyncService.instance.sync();
   avisar(producto == null ? 'Producto guardado' : 'Producto actualizado');
@@ -436,8 +437,11 @@ class _DatosProducto {
   final String nombre;
   final double precio, costo, minimo, stock;
   final String codigo, unidad;
+
+  /// Porcentaje de IVA (−1 = sin definir).
+  final double iva;
   const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo,
-      this.stock, this.codigo, this.unidad);
+      this.stock, this.codigo, this.unidad, this.iva);
 }
 
 class _FormProducto extends StatefulWidget {
@@ -464,6 +468,8 @@ class _FormProductoState extends State<_FormProducto> {
           ? cantidadTexto(widget.producto!.minimo)
           : '');
   final _stock = TextEditingController();
+  late final _iva = TextEditingController(
+      text: (widget.producto?.iva ?? -1) >= 0 ? cantidadTexto(widget.producto!.iva) : '');
   late final _codigo =
       TextEditingController(text: widget.producto?.codigo ?? '');
   late String _unidad =
@@ -472,7 +478,7 @@ class _FormProductoState extends State<_FormProducto> {
 
   @override
   void dispose() {
-    for (final c in [_nombre, _precio, _costo, _minimo, _stock, _codigo]) {
+    for (final c in [_nombre, _precio, _costo, _minimo, _stock, _codigo, _iva]) {
       c.dispose();
     }
     super.dispose();
@@ -490,6 +496,7 @@ class _FormProductoState extends State<_FormProducto> {
           _numero(_stock.text) ?? 0,
           _codigo.text.replaceAll(RegExp(r'\s'), ''),
           _unidad,
+          _iva.text.trim().isEmpty ? -1 : (_numero(_iva.text) ?? -1),
         ));
   }
 
@@ -620,6 +627,23 @@ class _FormProductoState extends State<_FormProducto> {
                 ),
               ),
             ]),
+            const SizedBox(height: 12),
+            TextFormField(
+              key: const ValueKey('campo_iva'),
+              controller: _iva,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
+                labelText: 'IVA % (para la factura electrónica)',
+                suffixText: '%',
+                helperText: 'El que le corresponde a este producto según tu contador. Vacío si aún no lo sabes.',
+                helperMaxLines: 2,
+              ),
+              validator: (v) {
+                if ((v ?? '').trim().isEmpty) return null;
+                final x = _numero(v!);
+                return x == null || x < 0 || x > 100 ? 'Escribe un porcentaje de 0 a 100' : null;
+              },
+            ),
             if (!_servicio) ...[
               const SizedBox(height: 12),
               Row(children: [
