@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'asistente_service.dart';
+import '../domain/facturacion.dart';
+import 'facturacion_service.dart';
 import 'local_db.dart';
 import 'remote_api.dart';
 
@@ -84,6 +86,10 @@ class SyncService {
   Duration pullCada = pullMin;
   DateTime _proximoPull = DateTime.fromMillisecondsSinceEpoch(0);
   DateTime Function() reloj = DateTime.now;
+
+  /// Proveedor tecnológico de factura electrónica. No hay uno real: se
+  /// conecta implementando ProveedorFacturacion.
+  ProveedorFacturacion facturador = const SinProveedor();
   Timer? _timer;
   StreamSubscription<List<ConnectivityResult>>? _sub;
 
@@ -197,6 +203,10 @@ class SyncService {
       // Lo que necesita internet y quedó en cola (preguntas a la IA).
       try {
         await AsistenteService.procesarPendientes(api, db);
+      } catch (_) {}
+      // Facturas electrónicas en cola.
+      try {
+        await FacturacionService.procesarCola(db, facturador);
       } catch (_) {}
     } on SesionVencida {
       estado.value = EstadoSync.sesionVencida;

@@ -327,3 +327,52 @@ class FacturaEmitida {
         comprador: (f['comprador'] as String?) ?? '',
       );
 }
+
+/// No se pudo armar la factura. [mensaje] se muestra tal cual.
+class ErrorFactura implements Exception {
+  final String mensaje;
+  const ErrorFactura(this.mensaje);
+  @override
+  String toString() => mensaje;
+}
+
+/// Vuelve a armar la factura guardada en la cola (para enviarla después).
+FacturaElectronica facturaDesdeMapa(Map<String, dynamic> m) {
+  final e = Map<String, dynamic>.from(m['emisor'] as Map);
+  final c = Map<String, dynamic>.from(m['comprador'] as Map);
+  return FacturaElectronica(
+    id: m['id'] as String,
+    ventaId: m['venta_id'] as String,
+    numero: m['numero'] as String,
+    fecha: DateTime.parse(m['fecha'] as String),
+    emisor: DatosEmisor(
+      razonSocial: '${e['razon_social'] ?? ''}',
+      nit: '${e['nit'] ?? ''}',
+      dv: '${e['dv'] ?? ''}',
+      responsabilidad: '${e['responsabilidad'] ?? ''}',
+      direccion: '${e['direccion'] ?? ''}',
+      municipio: '${e['municipio'] ?? ''}',
+      correo: '${e['correo'] ?? ''}',
+      telefono: '${e['telefono'] ?? ''}',
+      resolucion: '${e['resolucion'] ?? ''}',
+      prefijo: '${e['prefijo'] ?? ''}',
+    ),
+    comprador: CompradorFE(
+      nombre: '${c['nombre'] ?? ''}',
+      tipoDoc: '${c['tipo_doc'] ?? ''}',
+      documento: '${c['documento'] ?? ''}',
+      correo: '${c['correo'] ?? ''}',
+    ),
+    lineas: [
+      for (final x in (m['lineas'] as List))
+        LineaFE(
+          descripcion: '${(x as Map)['descripcion']}',
+          cantidad: (x['cantidad'] as num).toDouble(),
+          unidad: '${x['unidad']}',
+          precioConIva: (x['precio_con_iva'] as num).toDouble(),
+          ivaPct: (x['iva_pct'] as num).toDouble(),
+        )
+    ],
+    pagos: [for (final p in (m['pagos'] as List? ?? const [])) Map<String, Object?>.from(p as Map)],
+  );
+}
