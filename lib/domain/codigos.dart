@@ -72,20 +72,43 @@ double pesoEnUnidad(int gramos, String unidad) {
 
 bool esPorPeso(String unidad) => unidad == 'kg' || unidad == 'lb';
 
+/// Unidades que se venden en fracciones: kilos y libras (gramera), metros
+/// (cable, manguera, cadena), litros y galones (pintura, thinner, aceite).
+bool esFraccionable(String unidad) => const {'kg', 'lb', 'm', 'l', 'gal'}.contains(unidad);
+
 /// Servicio (corte, domicilio, consulta, reparación…): no lleva inventario.
 bool esServicio(String unidad) => unidad == 'serv';
 
-/// Precio con su unidad: «$2.500 c/u», «$9.000/kg» o «$30.000» (servicio).
-String precioConUnidad(double precio, String unidad) => esPorPeso(unidad)
-    ? '${cop(precio)}/$unidad'
-    : esServicio(unidad)
-        ? cop(precio)
-        : '${cop(precio)} c/u';
+/// Nombre de cada unidad de venta para mostrar.
+const nombresUnidad = {
+  'und': 'Unidad',
+  'kg': 'Kilo',
+  'lb': 'Libra',
+  'm': 'Metro',
+  'l': 'Litro',
+  'gal': 'Galón',
+  'caja': 'Caja',
+  'paq': 'Paquete',
+  'serv': 'Servicio',
+};
 
-/// «3», «0,750 kg», «1,5 lb».
+/// Precio con su unidad: «$2.500 c/u», «$9.000/kg», «$4.200/m»,
+/// «$60.000/caja» o «$30.000» (servicio).
+String precioConUnidad(double precio, String unidad) => switch (unidad) {
+      'serv' => cop(precio),
+      'und' => '${cop(precio)} c/u',
+      _ => '${cop(precio)}/$unidad',
+    };
+
+/// «3», «0,750 kg», «1,5 lb», «12,5 m», «2 cajas».
 String cantidadConUnidad(double c, String unidad) {
-  if (!esPorPeso(unidad)) {
-    return c == c.roundToDouble() ? c.toInt().toString() : c.toStringAsFixed(1);
+  if (!esFraccionable(unidad)) {
+    final n = c == c.roundToDouble() ? c.toInt().toString() : c.toStringAsFixed(1);
+    return switch (unidad) {
+      'caja' => '$n ${c == 1 ? 'caja' : 'cajas'}',
+      'paq' => '$n ${c == 1 ? 'paquete' : 'paquetes'}',
+      _ => n,
+    };
   }
   final s = c.toStringAsFixed(3).replaceFirst(RegExp(r'0+$'), '').replaceFirst(RegExp(r'\.$'), '');
   return '${s.replaceAll('.', ',')} $unidad';

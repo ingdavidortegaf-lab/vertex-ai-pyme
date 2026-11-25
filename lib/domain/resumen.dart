@@ -64,11 +64,19 @@ class ProductoStock {
   /// Código de barras (o código interno / PLU de gramera).
   final String codigo;
 
-  /// Unidad de venta: 'und', 'kg' o 'lb' (por peso, con gramera).
+  /// Unidad de venta (ver `nombresUnidad`): 'und', por peso ('kg', 'lb'),
+  /// por medida ('m', 'l', 'gal'), por empaque ('caja', 'paq') o 'serv'.
   final String unidad;
 
   /// Porcentaje de IVA que escribió el dueño (−1 = sin definir).
   final double iva;
+
+  /// Precio por mayor y desde qué cantidad aplica (0 = no hay).
+  final double precioMayor;
+  final double cantidadMayor;
+
+  /// Próximo vencimiento «AAAA-MM-DD» ('' = no se lleva).
+  final String vence;
   const ProductoStock({
     required this.id,
     required this.nombre,
@@ -80,7 +88,33 @@ class ProductoStock {
     this.codigo = '',
     this.unidad = 'und',
     this.iva = -1,
+    this.precioMayor = 0,
+    this.cantidadMayor = 0,
+    this.vence = '',
   });
+
+  bool get tienePrecioMayor => precioMayor > 0 && cantidadMayor > 0;
+
+  /// Precio de una línea según la cantidad: desde [cantidadMayor] aplica el
+  /// precio por mayor (ferreterías, contratistas, tenderos que compran por
+  /// bulto).
+  double precioPara(double cantidad) =>
+      tienePrecioMayor && cantidad >= cantidadMayor ? precioMayor : precio;
+
+  /// Días que faltan para el vencimiento (negativo: ya venció); null si no
+  /// se lleva la fecha.
+  int? diasParaVencer(DateTime hoy) {
+    if (vence.isEmpty) return null;
+    final d = DateTime.tryParse(vence);
+    if (d == null) return null;
+    return DateTime(d.year, d.month, d.day).difference(DateTime(hoy.year, hoy.month, hoy.day)).inDays;
+  }
+
+  /// Vence en los próximos [dias] o ya venció.
+  bool porVencer(DateTime hoy, {int dias = 30}) {
+    final n = diasParaVencer(hoy);
+    return n != null && n <= dias && !agotado;
+  }
 
   /// Los servicios no llevan inventario: nunca se agotan.
   bool get esServicio => unidad == 'serv';

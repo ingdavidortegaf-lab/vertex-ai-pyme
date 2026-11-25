@@ -21,6 +21,9 @@ extension LocalDbInventario on LocalDb {
           codigo: (x['codigo'] as String?) ?? '',
           unidad: (x['unidad'] as String?) ?? 'und',
           iva: LocalDb._dbl(x['iva'] ?? -1),
+          precioMayor: LocalDb._dbl(x['precio_mayor']),
+          cantidadMayor: LocalDb._dbl(x['cantidad_mayor']),
+          vence: (x['vence'] as String?) ?? '',
         )
     ];
   }
@@ -55,9 +58,18 @@ extension LocalDbInventario on LocalDb {
       String codigo = '',
       String unidad = 'und',
       double? iva,
+      double? precioMayor,
+      double? cantidadMayor,
+      String? vence,
       String? id}) async {
     if (nombre.trim().isEmpty) throw ArgumentError('nombre');
     if (iva != null && !ivaValido(iva)) throw ArgumentError('iva');
+    for (final x in [precioMayor, cantidadMayor]) {
+      if (x != null && (!x.isFinite || x < 0)) throw ArgumentError('mayor');
+    }
+    if (vence != null && vence.isNotEmpty && fechaVenceValida(vence) != vence) {
+      throw ArgumentError('vence');
+    }
     if (!ProductoCampos.unidades.contains(unidad)) throw ArgumentError('unidad');
     if (!precio.isFinite || precio < 0 || !costo.isFinite || costo < 0) {
       throw ArgumentError('precio');
@@ -76,6 +88,9 @@ extension LocalDbInventario on LocalDb {
         'unidad': unidad,
         // Si no se dice, el IVA se deja como estaba (al crear: sin definir).
         if (iva != null) 'iva': iva,
+        if (precioMayor != null) 'precio_mayor': precioMayor,
+        if (cantidadMayor != null) 'cantidad_mayor': cantidadMayor,
+        if (vence != null) 'vence': vence,
       };
       final Map<String, Object?> row;
       if (prev.isEmpty) {
@@ -111,6 +126,39 @@ extension LocalDbInventario on LocalDb {
     });
     if (cambio) _avisar();
     return pid;
+  }
+
+  /// Importa productos pegados desde Excel. Si ya existe uno con el mismo
+  /// código (o, sin código, con el mismo nombre) se actualizan sus datos y
+  /// NO se toca su stock; los nuevos entran con su stock inicial.
+  Future<({int nuevos, int actualizados})> importarProductos(List<FilaImportada> filas) async {
+    final existentes = await productos();
+    final porCodigo = {for (final p in existentes) if (p.codigo.isNotEmpty) p.codigo: p};
+    final porNombre = {for (final p in existentes) p.nombre.toLowerCase(): p};
+    var nuevos = 0, actualizados = 0;
+    for (final f in filas) {
+      final ya = (f.codigo.isNotEmpty ? porCodigo[f.codigo] : null) ?? porNombre[f.nombre.toLowerCase()];
+      final id = await saveProducto(f.nombre,
+          precio: f.precio,
+          costo: f.costo > 0 ? f.costo : (ya?.costo ?? 0),
+          minimo: f.minimo > 0 ? f.minimo : (ya?.minimo ?? 0),
+          stockInicial: ya == null ? f.stock : 0,
+          codigo: f.codigo.isNotEmpty ? f.codigo : (ya?.codigo ?? ''),
+          unidad: f.unidad,
+          iva: f.iva >= 0 ? f.iva : null,
+          precioMayor: f.precioMayor > 0 ? f.precioMayor : null,
+          cantidadMayor: f.cantidadMayor > 0 ? f.cantidadMayor : null,
+          id: ya?.id);
+      if (ya == null) {
+        nuevos++;
+        final p = ProductoStock(id: id, nombre: f.nombre, codigo: f.codigo);
+        if (f.codigo.isNotEmpty) porCodigo[f.codigo] = p;
+        porNombre[f.nombre.toLowerCase()] = p;
+      } else {
+        actualizados++;
+      }
+    }
+    return (nuevos: nuevos, actualizados: actualizados);
   }
 
   Future<void> deleteProducto(String id) async {

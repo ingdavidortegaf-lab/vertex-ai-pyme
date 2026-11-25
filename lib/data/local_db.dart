@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../domain/conflictos.dart';
 import '../domain/documentos.dart';
 import '../domain/identificacion.dart';
+import '../domain/importar.dart';
 import '../domain/legal.dart';
 import '../domain/obligaciones.dart';
 import '../domain/modo_negocio.dart';
@@ -198,10 +199,11 @@ class LocalDb {
     await agregarPerfiles(d);
     await agregarCaja(d);
     await agregarFacturacion(d);
+    await agregarMayoreoYVencimiento(d);
   }
 
   /// Versión actual del esquema local.
-  static const versionEsquema = 11;
+  static const versionEsquema = 12;
 
   /// Migraciones: los datos anteriores se conservan en cada versión.
   static Future<void> migrar(Database d, int viejo, int nuevo) async {
@@ -215,6 +217,23 @@ class LocalDb {
     if (viejo < 9 && nuevo >= 9) await agregarPerfiles(d); // v9: perfiles con PIN y quién hizo cada venta
     if (viejo < 10 && nuevo >= 10) await agregarCaja(d); // v10: anulaciones, descuentos y turnos
     if (viejo < 11 && nuevo >= 11) await agregarFacturacion(d); // v11: IVA por producto y factura electrónica
+    if (viejo < 12 && nuevo >= 12) await agregarMayoreoYVencimiento(d); // v12: precio por mayor y vencimiento
+  }
+
+  /// v12: precio por mayor (desde una cantidad) y fecha de vencimiento por
+  /// producto. Se unen por campo como los demás. Las unidades nuevas (metro,
+  /// litro, galón, caja, paquete) no cambian el esquema: la columna ya es
+  /// texto.
+  static Future<void> agregarMayoreoYVencimiento(Database d) async {
+    const inicio = '1970-01-01T00:00:00.000Z';
+    for (final c in const [
+      'precio_mayor REAL NOT NULL DEFAULT 0',
+      'cantidad_mayor REAL NOT NULL DEFAULT 0',
+      "vence TEXT NOT NULL DEFAULT ''",
+    ]) {
+      await d.execute('ALTER TABLE productos ADD COLUMN $c');
+      await d.execute("ALTER TABLE productos ADD COLUMN ${c.split(' ').first}_ts TEXT NOT NULL DEFAULT '$inicio'");
+    }
   }
 
   /// v11: IVA por producto (−1 = sin definir; se une por campo como los

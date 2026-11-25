@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
 import '../domain/roles.dart';
+import '../domain/codigos.dart';
 import '../domain/formato.dart';
 import '../domain/resumen.dart';
 import 'cliente_detalle_page.dart';
@@ -48,12 +50,21 @@ class _TableroPageState extends State<TableroPage> {
   double _porPagar = 0;
   List<PagoFijo> _fijos = [];
 
+  /// Productos que vencen en los próximos 30 días (o ya vencieron).
+  List<ProductoStock> _porVencer = const [];
+
   Future<void> _load() async {
     final d = await LocalDb.instance.datosAsistente();
     final pp = await LocalDb.instance.totalPorPagar();
     final fijos = await LocalDb.instance.pagosFijos();
+    final hoy = DateTime.now();
+    final vencer = LocalDb.instance.puede(Permiso.verProductos)
+        ? ((await LocalDb.instance.productos()).where((x) => x.porVencer(hoy)).toList()
+          ..sort((a, b) => a.vence.compareTo(b.vence)))
+        : const <ProductoStock>[];
     if (mounted) {
       setState(() {
+        _porVencer = vencer;
         _d = d;
         _porPagar = pp;
         _fijos = fijos;
@@ -74,8 +85,8 @@ class _TableroPageState extends State<TableroPage> {
       TituloSeccion(
         'Pagos fijos por vencer',
         accion: TextButton(
-            onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const PagosFijosPage())),
+            onPressed: () =>
+                Navigator.of(context).push(rutaVertex(const PagosFijosPage())),
             child: const Text('Ver todos')),
       ),
       Card(
@@ -89,8 +100,8 @@ class _TableroPageState extends State<TableroPage> {
     ];
   }
 
-  void _abrirCliente(String id) => Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => ClienteDetallePage(clienteId: id)));
+  void _abrirCliente(String id) =>
+      Navigator.of(context).push(rutaVertex(ClienteDetallePage(clienteId: id)));
 
   @override
   Widget build(BuildContext context) {
@@ -156,110 +167,139 @@ class _TableroPageState extends State<TableroPage> {
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            // Lo urgente primero: pagos fijos vencidos o por vencer.
-            ..._seccionFijos(context),
-            const TituloSeccion('Herramientas'),
-            const HerramientasGrid(),
-            if (d.nombreNegocio.isEmpty) ...[
-              const SizedBox(height: 16),
-              _InvitacionNegocio(onTap: () => mostrarMiNegocio(context)),
-            ],
-            if (nuevo && db.puede(Permiso.crearClientes)) ...[
-              const SizedBox(height: 16),
-              _Bienvenida(onCliente: () => mostrarFormCliente(context)),
-            ],
-            if (!nuevo) ...[
-              if (d.metaMensual > 0 && db.puede(Permiso.verInformes)) ...[
-                TituloSeccion(
-                    'Meta de ${mes[0].toUpperCase()}${mes.substring(1)}'),
-                _Meta(ventas: r.ingresos, meta: d.metaMensual),
+          child: _Columnas(
+            principal: [
+              // Lo urgente primero: pagos fijos vencidos o por vencer.
+              ..._seccionFijos(context),
+              // En el computador las herramientas tienen su propia sección.
+              if (!esEscritorio(context)) ...[
+                const TituloSeccion('Herramientas'),
+                const HerramientasGrid(),
               ],
-              if (db.puede(Permiso.verUtilidad)) ...[
-                const TituloSeccion('Reportes'),
-                const ReportesNegocio(),
+              if (d.nombreNegocio.isEmpty) ...[
+                const SizedBox(height: 16),
+                _InvitacionNegocio(onTap: () => mostrarMiNegocio(context)),
               ],
-              if (d.porReponer.isNotEmpty) ...[
+              if (nuevo && db.puede(Permiso.crearClientes)) ...[
+                const SizedBox(height: 16),
+                _Bienvenida(onCliente: () => mostrarFormCliente(context)),
+              ],
+              if (!nuevo) ...[
+                if (d.metaMensual > 0 && db.puede(Permiso.verInformes)) ...[
+                  TituloSeccion(
+                      'Meta de ${mes[0].toUpperCase()}${mes.substring(1)}'),
+                  _Meta(ventas: r.ingresos, meta: d.metaMensual),
+                ],
+                if (db.puede(Permiso.verUtilidad)) ...[
+                  const TituloSeccion('Reportes'),
+                  const ReportesNegocio(),
+                ],
+              ],
+            ],
+            lateral: [
+              if (_porVencer.isNotEmpty) ...[
                 TituloSeccion(
-                  'Por reponer',
+                  'Por vencer',
                   accion: TextButton(
-                      onPressed: () =>
-                          widget.onIrA?.call(SeccionInicio.catalogo),
+                      onPressed: () => widget.onIrA?.call(SeccionInicio.catalogo),
                       child: const Text('Ver inventario')),
                 ),
                 Card(
                   child: Column(children: [
-                    for (final (i, x) in d.porReponer.take(4).indexed) ...[
+                    for (final (i, x) in _porVencer.take(5).indexed) ...[
                       if (i > 0) const Divider(indent: 16),
                       ListTile(
-                        title: Text(x.nombre,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
-                        subtitle: Text(
-                            'Mínimo ${cantidadTexto(x.minimo)} · ${cop(x.precio)}'),
-                        trailing: EtiquetaStock(x: x),
+                        key: ValueKey('vence_${x.nombre}'),
+                        leading: Icon(Icons.event_busy_outlined, color: p.gastos),
+                        title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(textoVence(x, DateTime.now()) ?? ''),
+                        trailing: Text(cantidadConUnidad(x.stock, x.unidad)),
                       ),
                     ],
                   ]),
                 ),
               ],
-              if (db.puede(Permiso.verClientes)) ...[
-                TituloSeccion(
-                  'Te deben',
-                  accion: TextButton(
-                      onPressed: () =>
-                          widget.onIrA?.call(SeccionInicio.clientes),
-                      child: const Text('Ver clientes')),
-                ),
-                _PorCobrar(d: d, onCliente: _abrirCliente),
-              ],
-              if (_porPagar > 0.5 && db.puede(Permiso.verProveedores)) ...[
-                TituloSeccion(
-                  'Le debes a proveedores',
-                  accion: TextButton(
-                      onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (_) => const CuentasPagarPage())),
-                      child: const Text('Ver')),
-                ),
-                Card(
-                  child: ListTile(
-                    leading:
-                        Icon(Icons.account_balance_outlined, color: p.gastos),
-                    title: Text(cop(_porPagar),
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(color: p.gastos)),
-                    subtitle:
-                        const Text('Saldo de pedidos que pagaste en parte'),
+              if (!nuevo) ...[
+                if (d.porReponer.isNotEmpty) ...[
+                  TituloSeccion(
+                    'Por reponer',
+                    accion: TextButton(
+                        onPressed: () =>
+                            widget.onIrA?.call(SeccionInicio.catalogo),
+                        child: const Text('Ver inventario')),
                   ),
-                ),
-              ],
-              if (d.topClientes.isNotEmpty &&
-                  db.puede(Permiso.verClientes)) ...[
-                const TituloSeccion('Tus mejores clientes del mes'),
-                Card(
-                  child: Column(children: [
-                    for (final (i, c) in d.topClientes.indexed) ...[
-                      if (i > 0) const Divider(indent: 72),
-                      ListTile(
-                        leading:
-                            AvatarCliente(nombre: c.nombre, clave: c.nombre),
-                        title: Text(c.nombre,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
-                        trailing: Text(cop(c.total),
-                            style: cifras(Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: p.ventas))),
-                      ),
-                    ],
-                  ]),
-                ),
+                  Card(
+                    child: Column(children: [
+                      for (final (i, x) in d.porReponer.take(4).indexed) ...[
+                        if (i > 0) const Divider(indent: 16),
+                        ListTile(
+                          title: Text(x.nombre,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                          subtitle: Text(
+                              'Mínimo ${cantidadTexto(x.minimo)} · ${cop(x.precio)}'),
+                          trailing: EtiquetaStock(x: x),
+                        ),
+                      ],
+                    ]),
+                  ),
+                ],
+                if (db.puede(Permiso.verClientes)) ...[
+                  TituloSeccion(
+                    'Te deben',
+                    accion: TextButton(
+                        onPressed: () =>
+                            widget.onIrA?.call(SeccionInicio.clientes),
+                        child: const Text('Ver clientes')),
+                  ),
+                  _PorCobrar(d: d, onCliente: _abrirCliente),
+                ],
+                if (_porPagar > 0.5 && db.puede(Permiso.verProveedores)) ...[
+                  TituloSeccion(
+                    'Le debes a proveedores',
+                    accion: TextButton(
+                        onPressed: () => Navigator.of(context)
+                            .push(rutaVertex(const CuentasPagarPage())),
+                        child: const Text('Ver')),
+                  ),
+                  Card(
+                    child: ListTile(
+                      leading:
+                          Icon(Icons.account_balance_outlined, color: p.gastos),
+                      title: Text(cop(_porPagar),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(color: p.gastos)),
+                      subtitle:
+                          const Text('Saldo de pedidos que pagaste en parte'),
+                    ),
+                  ),
+                ],
+                if (d.topClientes.isNotEmpty &&
+                    db.puede(Permiso.verClientes)) ...[
+                  const TituloSeccion('Tus mejores clientes del mes'),
+                  Card(
+                    child: Column(children: [
+                      for (final (i, c) in d.topClientes.indexed) ...[
+                        if (i > 0) const Divider(indent: 72),
+                        ListTile(
+                          leading:
+                              AvatarCliente(nombre: c.nombre, clave: c.nombre),
+                          title: Text(c.nombre,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                          trailing: Text(cop(c.total),
+                              style: cifras(Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(color: p.ventas))),
+                        ),
+                      ],
+                    ]),
+                  ),
+                ],
               ],
             ],
-          ]),
+          ),
         ),
       ]),
     );
@@ -900,4 +940,37 @@ class _Kpi extends StatelessWidget {
       ),
     );
   }
+}
+
+/// En el celular, una sola columna. En el computador, dos: a la izquierda lo
+/// del negocio (pagos, meta, reportes) y a la derecha las listas (por
+/// reponer, quién debe, mejores clientes).
+class _Columnas extends StatelessWidget {
+  final List<Widget> principal, lateral;
+  const _Columnas({required this.principal, required this.lateral});
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        if (box.maxWidth < 960) {
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [...principal, ...lateral]);
+        }
+        return AnchoContenido(
+          maxAncho: 1400,
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+                flex: 3,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: principal)),
+            const SizedBox(width: 24),
+            Expanded(
+                flex: 2,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: lateral)),
+          ]),
+        );
+      });
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'escritorio.dart';
 import '../domain/ejemplos.dart';
 import '../data/local_db.dart';
 import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import '../domain/formato.dart';
+import '../domain/importar.dart';
 import '../domain/resumen.dart';
 import 'comun.dart';
 import 'escaner.dart';
@@ -25,7 +28,8 @@ class _InventarioPageState extends State<InventarioPage> {
   List<ProductoStock> _items = [];
   bool _cargado = false;
   String _filtro = '';
-  bool _soloReponer = false;
+  /// 'todos', 'reponer' o 'vencer'.
+  String _vista = 'todos';
 
   @override
   void initState() {
@@ -56,11 +60,17 @@ class _InventarioPageState extends State<InventarioPage> {
     final p = Paleta.of(context);
     final esquema = Theme.of(context).colorScheme;
     final reponer = _items.where((x) => x.agotado || x.bajo).length;
+    final hoy = DateTime.now();
+    final vencer = _items.where((x) => x.porVencer(hoy)).length;
     final valor =
         _items.fold(0.0, (s, x) => s + (x.stock > 0 ? x.stock * x.costo : 0));
     final f = _filtro.trim().toLowerCase();
     final lista = _items
-        .where((x) => !_soloReponer || x.agotado || x.bajo)
+        .where((x) => switch (_vista) {
+              'reponer' => x.agotado || x.bajo,
+              'vencer' => x.porVencer(hoy),
+              _ => true,
+            })
         .where((x) =>
             f.isEmpty ||
             x.nombre.toLowerCase().contains(f) ||
@@ -92,15 +102,25 @@ class _InventarioPageState extends State<InventarioPage> {
                       : 'Todavía no hay productos. El dueño o el '
                           'administrador los agregan.',
                   accion: edita
-                      ? FilledButton.icon(
-                          onPressed: () => mostrarFormProducto(context),
-                          icon: const Icon(Icons.add_box_outlined),
-                          label: const Text('Agregar el primero'),
-                        )
+                      ? Wrap(spacing: 10, runSpacing: 10, alignment: WrapAlignment.center, children: [
+                          FilledButton.icon(
+                            onPressed: () => mostrarFormProducto(context),
+                            icon: const Icon(Icons.add_box_outlined),
+                            label: const Text('Agregar el primero'),
+                          ),
+                          OutlinedButton.icon(
+                            key: const ValueKey('importar_excel'),
+                            onPressed: () => importarDesdeExcel(context),
+                            icon: const Icon(Icons.upload_file_outlined),
+                            label: const Text('Traerlos de Excel'),
+                          ),
+                        ])
                       : null,
                 )
               : ListView(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
+                  padding: esEscritorio(context)
+                      ? const EdgeInsets.fromLTRB(24, 16, 24, 96)
+                      : const EdgeInsets.fromLTRB(12, 12, 12, 96),
                   children: [
                       Row(children: [
                         if (veCostos) ...[
@@ -125,39 +145,61 @@ class _InventarioPageState extends State<InventarioPage> {
                         ),
                       ]),
                       const SizedBox(height: 12),
-                      TextField(
-                        onChanged: (v) => setState(() => _filtro = v),
-                        decoration: const InputDecoration(
-                            hintText: 'Buscar producto',
-                            prefixIcon: Icon(Icons.search)),
-                      ),
-                      const SizedBox(height: 10),
                       Row(children: [
+                        Expanded(
+                          child: TextField(
+                            onChanged: (v) => setState(() => _filtro = v),
+                            decoration: const InputDecoration(
+                                hintText: 'Buscar producto',
+                                prefixIcon: Icon(Icons.search)),
+                          ),
+                        ),
+                        if (edita) ...[
+                          const SizedBox(width: 8),
+                          IconButton.outlined(
+                            key: const ValueKey('importar_excel'),
+                            tooltip: 'Importar desde Excel',
+                            onPressed: () => importarDesdeExcel(context),
+                            icon: const Icon(Icons.upload_file_outlined),
+                          ),
+                        ],
+                      ]),
+                      const SizedBox(height: 10),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
                         ChoiceChip(
                           label: Text('Todos (${_items.length})'),
-                          selected: !_soloReponer,
-                          onSelected: (_) =>
-                              setState(() => _soloReponer = false),
+                          selected: _vista == 'todos',
+                          onSelected: (_) => setState(() => _vista = 'todos'),
                         ),
-                        const SizedBox(width: 8),
                         ChoiceChip(
                           label: Text('Por reponer ($reponer)'),
-                          selected: _soloReponer,
-                          onSelected: (_) =>
-                              setState(() => _soloReponer = true),
+                          selected: _vista == 'reponer',
+                          onSelected: (_) => setState(() => _vista = 'reponer'),
                         ),
+                        if (vencer > 0 || _vista == 'vencer')
+                          ChoiceChip(
+                            key: const ValueKey('filtro_vencer'),
+                            avatar: Icon(Icons.event_busy_outlined, size: 18, color: p.gastos),
+                            label: Text('Por vencer ($vencer)'),
+                            selected: _vista == 'vencer',
+                            onSelected: (_) => setState(() => _vista = 'vencer'),
+                          ),
                       ]),
                       const SizedBox(height: 12),
                       if (lista.isEmpty)
                         Padding(
                           padding: const EdgeInsets.all(24),
                           child: Text(
-                              _soloReponer
-                                  ? 'Nada por reponer. ¡Todo está surtido!'
-                                  : 'Ningún producto coincide.',
+                              switch (_vista) {
+                                'reponer' => 'Nada por reponer. ¡Todo está surtido!',
+                                'vencer' => 'Nada vence en los próximos 30 días.',
+                                _ => 'Ningún producto coincide.',
+                              },
                               textAlign: TextAlign.center,
                               style: t.bodyLarge),
                         )
+                      else if (esEscritorio(context))
+                        _TablaProductos(lista: lista, veCostos: veCostos)
                       else
                         Card(
                           child: Column(children: [
@@ -270,7 +312,7 @@ class _FilaProducto extends StatelessWidget {
       ),
       title: Text(x.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(
-          '${cop(x.precio)}${esPorPeso(x.unidad) ? '/${x.unidad}' : ''}${x.costo > 0 && LocalDb.instance.puede(Permiso.verUtilidad) ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}'),
+          '${x.unidad == 'und' ? cop(x.precio) : precioConUnidad(x.precio, x.unidad)}${x.tienePrecioMayor ? ' · por mayor ${cop(x.precioMayor)}' : ''}${x.costo > 0 && LocalDb.instance.puede(Permiso.verUtilidad) ? ' · gana ${(x.margen * 100).round()} %' : ''}${x.codigo.isEmpty ? '' : ' · ${x.codigo}'}${x.porVencer(DateTime.now()) ? ' · ${textoVence(x, DateTime.now())}' : ''}'),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         EtiquetaStock(x: x),
         const SizedBox(width: 6),
@@ -428,6 +470,9 @@ Future<void> mostrarFormProducto(BuildContext context,
       codigo: r.codigo,
       unidad: r.unidad,
       iva: r.iva,
+      precioMayor: r.precioMayor,
+      cantidadMayor: r.cantidadMayor,
+      vence: r.vence,
       id: producto?.id);
   SyncService.instance.sync();
   avisar(producto == null ? 'Producto guardado' : 'Producto actualizado');
@@ -440,8 +485,14 @@ class _DatosProducto {
 
   /// Porcentaje de IVA (−1 = sin definir).
   final double iva;
+
+  /// Precio por mayor y desde qué cantidad (0 = no hay); vencimiento
+  /// «AAAA-MM-DD» ('' = no se lleva).
+  final double precioMayor, cantidadMayor;
+  final String vence;
   const _DatosProducto(this.nombre, this.precio, this.costo, this.minimo,
-      this.stock, this.codigo, this.unidad, this.iva);
+      this.stock, this.codigo, this.unidad, this.iva,
+      {this.precioMayor = 0, this.cantidadMayor = 0, this.vence = ''});
 }
 
 class _FormProducto extends StatefulWidget {
@@ -474,11 +525,20 @@ class _FormProductoState extends State<_FormProducto> {
       TextEditingController(text: widget.producto?.codigo ?? '');
   late String _unidad =
       widget.producto?.unidad ?? LocalDb.instance.modo.value.unidadInicial;
+  late final _precioMayor = TextEditingController(
+      text: (widget.producto?.precioMayor ?? 0) > 0
+          ? cop(widget.producto!.precioMayor).substring(1)
+          : '');
+  late final _cantidadMayor = TextEditingController(
+      text: (widget.producto?.cantidadMayor ?? 0) > 0
+          ? cantidadTexto(widget.producto!.cantidadMayor)
+          : '');
+  late String _vence = widget.producto?.vence ?? '';
   bool get _servicio => _unidad == 'serv';
 
   @override
   void dispose() {
-    for (final c in [_nombre, _precio, _costo, _minimo, _stock, _codigo, _iva]) {
+    for (final c in [_nombre, _precio, _costo, _minimo, _stock, _codigo, _iva, _precioMayor, _cantidadMayor]) {
       c.dispose();
     }
     super.dispose();
@@ -497,6 +557,9 @@ class _FormProductoState extends State<_FormProducto> {
           _codigo.text.replaceAll(RegExp(r'\s'), ''),
           _unidad,
           _iva.text.trim().isEmpty ? -1 : (_numero(_iva.text) ?? -1),
+          precioMayor: parseMonto(_precioMayor.text) ?? 0,
+          cantidadMayor: _numero(_cantidadMayor.text) ?? 0,
+          vence: _servicio ? '' : _vence,
         ));
   }
 
@@ -506,22 +569,16 @@ class _FormProductoState extends State<_FormProducto> {
     final nuevo = widget.producto == null;
     final modo = LocalDb.instance.modo.value;
     // Solo se ofrecen las formas de vender que el negocio usa (y la actual).
-    final segmentos = [
-      if (modo.vendeProductos || _unidad == 'und')
-        const ButtonSegment(value: 'und', label: Text('Unidad')),
-      if ((modo.vendeProductos && modo.gramera) || _unidad == 'kg')
-        const ButtonSegment(
-            value: 'kg', icon: Icon(Icons.scale_outlined), label: Text('Kilo')),
-      if ((modo.vendeProductos && modo.gramera) || _unidad == 'lb')
-        const ButtonSegment(
-            value: 'lb',
-            icon: Icon(Icons.scale_outlined),
-            label: Text('Libra')),
-      if (modo.vendeServicios || _unidad == 'serv')
-        const ButtonSegment(
-            value: 'serv',
-            icon: Icon(Icons.handyman_outlined),
-            label: Text('Servicio')),
+    final unidades = [
+      if (modo.vendeProductos || _unidad == 'und') 'und',
+      if ((modo.vendeProductos && modo.gramera) || _unidad == 'kg') 'kg',
+      if ((modo.vendeProductos && modo.gramera) || _unidad == 'lb') 'lb',
+      if (modo.vendeProductos || _unidad == 'm') 'm',
+      if (modo.vendeProductos || _unidad == 'l') 'l',
+      if (modo.vendeProductos || _unidad == 'gal') 'gal',
+      if (modo.vendeProductos || _unidad == 'caja') 'caja',
+      if (modo.vendeProductos || _unidad == 'paq') 'paq',
+      if (modo.vendeServicios || _unidad == 'serv') 'serv',
     ];
     final que = _servicio ? 'servicio' : 'producto';
     return Padding(
@@ -549,14 +606,23 @@ class _FormProductoState extends State<_FormProducto> {
                   : null,
             ),
             const SizedBox(height: 12),
-            if (segmentos.length > 1) ...[
-              Text('Se vende por', style: t.titleSmall),
-              const SizedBox(height: 8),
-              SegmentedButton<String>(
-                showSelectedIcon: false,
-                segments: segmentos,
-                selected: {_unidad},
-                onSelectionChanged: (s) => setState(() => _unidad = s.first),
+            if (unidades.length > 1) ...[
+              DropdownButtonFormField<String>(
+                key: const ValueKey('campo_unidad'),
+                initialValue: _unidad,
+                decoration: const InputDecoration(labelText: 'Se vende por'),
+                items: [
+                  for (final u in unidades)
+                    DropdownMenuItem(
+                      value: u,
+                      child: Text(switch (u) {
+                        'kg' || 'lb' => '${nombresUnidad[u]} (gramera)',
+                        'm' || 'l' || 'gal' => '${nombresUnidad[u]} (se vende en fracciones)',
+                        _ => nombresUnidad[u]!,
+                      }),
+                    ),
+                ],
+                onChanged: (u) => setState(() => _unidad = u ?? _unidad),
               ),
               const SizedBox(height: 12),
             ],
@@ -603,9 +669,9 @@ class _FormProductoState extends State<_FormProducto> {
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                      labelText: esPorPeso(_unidad)
-                          ? 'Precio por $_unidad'
-                          : 'Precio de venta',
+                      labelText: _unidad == 'und' || _servicio
+                          ? 'Precio de venta'
+                          : 'Precio por ${nombresUnidad[_unidad]!.toLowerCase()}',
                       prefixText: r'$ '),
                   validator: (v) => parseMonto(v ?? '') == null
                       ? 'Precio mayor a cero'
@@ -647,6 +713,48 @@ class _FormProductoState extends State<_FormProducto> {
             if (!_servicio) ...[
               const SizedBox(height: 12),
               Row(children: [
+                Expanded(
+                  child: TextFormField(
+                    key: const ValueKey('campo_precio_mayor'),
+                    controller: _precioMayor,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                        labelText: 'Precio por mayor (opcional)', prefixText: r'$ '),
+                    validator: (v) {
+                      final hay = (v ?? '').trim().isNotEmpty;
+                      if (!hay) return null;
+                      final x = parseMonto(v!);
+                      if (x == null || x <= 0) return 'Precio no válido';
+                      final normal = parseMonto(_precio.text);
+                      if (normal != null && x >= normal) return 'Debe ser menor que el precio normal';
+                      if ((_numero(_cantidadMayor.text) ?? 0) <= 0) return 'Di desde cuánto aplica';
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextFormField(
+                    key: const ValueKey('campo_cantidad_mayor'),
+                    controller: _cantidadMayor,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                        labelText: 'Desde',
+                        suffixText: _unidad == 'und' ? 'unidades' : _unidad,
+                        hintText: 'Ej.: 12'),
+                    validator: (v) => (v ?? '').trim().isNotEmpty && ((_numero(v!) ?? 0) <= 0)
+                        ? 'Cantidad no válida'
+                        : null,
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              _CampoVence(
+                valor: _vence,
+                onChanged: (v) => setState(() => _vence = v),
+              ),
+              const SizedBox(height: 12),
+              Row(children: [
                 if (nuevo) ...[
                   Expanded(
                     child: TextFormField(
@@ -685,6 +793,250 @@ class _FormProductoState extends State<_FormProducto> {
           ]),
         ),
       ),
+    );
+  }
+}
+
+
+/// En el computador el inventario se ve como tabla: código, producto,
+/// precio, costo y margen (si el rol los ve), stock e IVA. Un clic abre las
+/// mismas acciones que en el celular (entrada, ajuste, editar).
+class _TablaProductos extends StatelessWidget {
+  final List<ProductoStock> lista;
+  final bool veCostos;
+  const _TablaProductos({required this.lista, required this.veCostos});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final p = Paleta.of(context);
+    final cs = Theme.of(context).colorScheme;
+    final cab = t.labelLarge?.copyWith(color: cs.onSurfaceVariant);
+    Widget celda(String texto, {int flex = 2, bool derecha = false, TextStyle? estilo}) => Expanded(
+          flex: flex,
+          child: Text(texto,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: derecha ? TextAlign.right : TextAlign.left,
+              style: estilo),
+        );
+    Widget fila(List<Widget> hijos) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(children: [
+            for (final (i, h) in hijos.indexed) ...[if (i > 0) const SizedBox(width: 12), h],
+          ]),
+        );
+    return Card(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        fila([
+          celda('Código', estilo: cab),
+          celda('Producto', flex: 5, estilo: cab),
+          celda('Precio', derecha: true, estilo: cab),
+          if (veCostos) ...[
+            celda('Costo', derecha: true, estilo: cab),
+            celda('Margen', flex: 1, derecha: true, estilo: cab),
+          ],
+          celda('Stock', derecha: true, estilo: cab),
+          celda('IVA', flex: 1, derecha: true, estilo: cab),
+          celda('Vence', derecha: true, estilo: cab),
+        ]),
+        const Divider(height: 1),
+        for (final (i, x) in lista.indexed) ...[
+          if (i > 0) const Divider(height: 1, indent: 16, endIndent: 16),
+          InkWell(
+            key: ValueKey('tabla_${x.nombre}'),
+            onTap: () => _acciones(context, x),
+            child: fila([
+              celda(x.codigo.isEmpty ? '—' : x.codigo,
+                  estilo: t.bodyMedium?.copyWith(color: cs.outline)),
+              celda(x.nombre, flex: 5, estilo: t.bodyLarge),
+              celda(precioConUnidad(x.precio, x.unidad), derecha: true, estilo: cifras(t.bodyLarge)),
+              if (veCostos) ...[
+                celda(x.costo > 0 ? cop(x.costo) : '—', derecha: true, estilo: cifras(t.bodyMedium)),
+                celda(x.costo > 0 && x.precio > 0 ? '${(x.margen * 100).round()} %' : '—',
+                    flex: 1,
+                    derecha: true,
+                    estilo: cifras(t.bodyMedium?.copyWith(color: x.margen < 0 ? p.gastos : null))),
+              ],
+              Expanded(
+                flex: 2,
+                child: Align(alignment: Alignment.centerRight, child: EtiquetaStock(x: x)),
+              ),
+              celda(x.iva < 0 ? '—' : '${cantidadTexto(x.iva)} %',
+                  flex: 1, derecha: true, estilo: t.bodyMedium),
+              celda(textoVence(x, DateTime.now()) ?? '—',
+                  derecha: true,
+                  estilo: t.bodyMedium?.copyWith(
+                      color: x.porVencer(DateTime.now()) ? p.gastos : null,
+                      fontWeight: x.porVencer(DateTime.now()) ? FontWeight.w700 : null)),
+            ]),
+          ),
+        ],
+      ]),
+    );
+  }
+}
+
+/// Fecha de vencimiento (opcional): alimentos, droguería, agro. Se elige en
+/// el calendario; la app avisa 30 días antes.
+class _CampoVence extends StatelessWidget {
+  final String valor;
+  final ValueChanged<String> onChanged;
+  const _CampoVence({required this.valor, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final f = DateTime.tryParse(valor);
+    String iso(DateTime d) =>
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    return InputDecorator(
+      decoration: const InputDecoration(
+        labelText: 'Vence (opcional)',
+        helperText: 'Para alimentos o medicamentos: la app avisa 30 días antes.',
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Text(f == null ? 'Sin fecha' : DateFormat('d MMM y', 'es_CO').format(f)),
+        ),
+        TextButton(
+          key: const ValueKey('campo_vence'),
+          onPressed: () async {
+            final hoy = DateTime.now();
+            final d = await showDatePicker(
+              context: context,
+              initialDate: f ?? hoy.add(const Duration(days: 90)),
+              firstDate: DateTime(hoy.year - 1),
+              lastDate: DateTime(hoy.year + 10),
+              helpText: 'Fecha de vencimiento',
+            );
+            if (d != null) onChanged(iso(d));
+          },
+          child: Text(f == null ? 'Elegir' : 'Cambiar'),
+        ),
+        if (f != null)
+          IconButton(
+            tooltip: 'Quitar la fecha',
+            onPressed: () => onChanged(''),
+            icon: const Icon(Icons.close),
+          ),
+      ]),
+    );
+  }
+}
+
+/// «Vence en 12 días», «Vence hoy», «Venció hace 3 días» o la fecha; null
+/// si no se lleva.
+String? textoVence(ProductoStock x, DateTime hoy) {
+  final n = x.diasParaVencer(hoy);
+  if (n == null) return null;
+  if (n < 0) return n == -1 ? 'Venció ayer' : 'Venció hace ${-n} días';
+  if (n == 0) return 'Vence hoy';
+  if (n <= 30) return n == 1 ? 'Vence mañana' : 'Vence en $n días';
+  return DateFormat('d MMM y', 'es_CO').format(DateTime.parse(x.vence));
+}
+
+/// Importar productos copiados de Excel: se pegan, se revisan y se guardan.
+Future<void> importarDesdeExcel(BuildContext context) async {
+  final r = await showDialog<List<FilaImportada>>(
+    context: context,
+    builder: (_) => const _DialogoImportar(),
+  );
+  if (r == null || r.isEmpty) return;
+  final n = await LocalDb.instance.importarProductos(r);
+  SyncService.instance.sync();
+  avisar([
+    if (n.nuevos > 0) n.nuevos == 1 ? '1 producto nuevo' : '${n.nuevos} productos nuevos',
+    if (n.actualizados > 0)
+      n.actualizados == 1 ? '1 actualizado' : '${n.actualizados} actualizados',
+  ].join(' y '));
+}
+
+class _DialogoImportar extends StatefulWidget {
+  const _DialogoImportar();
+  @override
+  State<_DialogoImportar> createState() => _DialogoImportarState();
+}
+
+class _DialogoImportarState extends State<_DialogoImportar> {
+  final _texto = TextEditingController();
+  ResultadoImportar? _r;
+
+  @override
+  void dispose() {
+    _texto.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final r = _r;
+    return AlertDialog(
+      title: const Text('Traer productos de Excel'),
+      content: SizedBox(
+        width: 640,
+        child: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(
+                'En Excel selecciona las columnas con la fila de títulos, cópialas (Ctrl+C) y pégalas aquí '
+                '(Ctrl+V). Títulos que entiendo: Nombre, Precio, Costo, Stock, Código, Unidad, Mínimo, IVA, '
+                'Precio por mayor y Desde.',
+                style: t.bodyMedium),
+            const SizedBox(height: 4),
+            Text(
+                'Si un producto ya existe (mismo código o mismo nombre) se actualizan su precio y sus datos; '
+                'su stock no se cambia.',
+                style: t.bodySmall),
+            const SizedBox(height: 12),
+            TextField(
+              key: const ValueKey('importar_texto'),
+              controller: _texto,
+              minLines: 6,
+              maxLines: 12,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+              decoration: const InputDecoration(
+                hintText: 'Nombre   Precio   Costo   Stock   Código\nCable 12   4200   3000   500   7701234',
+                alignLabelWithHint: true,
+              ),
+              onChanged: (_) => setState(() => _r = null),
+            ),
+            if (r != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                  r.filas.isEmpty
+                      ? 'No encontré productos para importar.'
+                      : 'Listos para importar: ${r.filas.length} ${r.filas.length == 1 ? 'producto' : 'productos'}.',
+                  key: const ValueKey('importar_resumen'),
+                  style: t.titleSmall),
+              for (final f in r.filas.take(5))
+                Text('• ${f.nombre} · ${precioConUnidad(f.precio, f.unidad)}', style: t.bodySmall),
+              if (r.filas.length > 5) Text('… y ${r.filas.length - 5} más', style: t.bodySmall),
+              if (r.errores.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('Estas filas no entran (corrígelas en Excel y vuelve a pegarlas):',
+                    style: t.bodySmall?.copyWith(color: Theme.of(context).colorScheme.error)),
+                for (final e in r.errores.take(8)) Text('• $e', style: t.bodySmall),
+                if (r.errores.length > 8) Text('… y ${r.errores.length - 8} más', style: t.bodySmall),
+              ],
+            ],
+          ]),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        if (r == null || r.filas.isEmpty)
+          FilledButton(
+            key: const ValueKey('importar_revisar'),
+            onPressed: () => setState(() => _r = leerProductosPegados(_texto.text)),
+            child: const Text('Revisar'),
+          )
+        else
+          FilledButton(
+            key: const ValueKey('importar_guardar'),
+            onPressed: () => Navigator.pop(context, r.filas),
+            child: Text('Importar ${r.filas.length}'),
+          ),
+      ],
     );
   }
 }

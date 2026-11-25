@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config.dart';
@@ -51,7 +52,7 @@ Future<bool> confirmarClaveCuenta(String clave) async {
 
 /// Abre la pantalla de cuenta: entrar, crear cuenta o ver la sesión.
 Future<void> mostrarLogin(BuildContext context) => Navigator.of(context)
-    .push(MaterialPageRoute(builder: (_) => const CuentaPage()));
+    .push(rutaVertex(const CuentaPage()));
 
 /// Cuenta en la nube. Necesita conexión solo para entrar o crear la cuenta;
 /// la sesión se conserva en el celular. Bloqueo de 5 minutos tras 5 intentos

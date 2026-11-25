@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import '../data/local_db.dart';
 import '../domain/formato.dart';
 import '../domain/modo_negocio.dart';
@@ -35,7 +36,10 @@ class _RegistroGateState extends State<RegistroGate> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (_listo!) return widget.child;
-    return RegistroNegocioPage(onListo: () => setState(() => _listo = true));
+    return PaginaCentrada(
+        maxAncho: 720,
+        child:
+            RegistroNegocioPage(onListo: () => setState(() => _listo = true)));
   }
 }
 
@@ -150,8 +154,7 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
       await db.setAjuste('negocio_tipo', _tipo);
       await db.setAjuste('negocio_nit', _nit.text.trim());
       await db.setAjuste('negocio_direccion', _dir.text.trim());
-      await db.setAjuste(
-          'negocio_telefono', _tel.valor ?? '');
+      await db.setAjuste('negocio_telefono', _tel.valor ?? '');
       await db.setAjuste(
           'negocio_meta', (parseMonto(_meta.text) ?? 0).toStringAsFixed(0));
       await db.setAjuste('negocio_logo', _logo);
@@ -395,12 +398,12 @@ class _RegistroNegocioPageState extends State<RegistroNegocioPage> {
           ],
           // En la versión web (Safari) no hay avisos del sistema.
           if (!kIsWeb)
-          _interruptor(
-              'Avisos en el celular',
-              'Se agotó un producto, cobros vencidos, meta cumplida',
-              _modo.avisos,
-              (v) => _modo = _modo.copia(avisos: v),
-              Icons.notifications_active_outlined),
+            _interruptor(
+                'Avisos en el celular',
+                'Se agotó un producto, cobros vencidos, meta cumplida',
+                _modo.avisos,
+                (v) => _modo = _modo.copia(avisos: v),
+                Icons.notifications_active_outlined),
         ],
       );
 

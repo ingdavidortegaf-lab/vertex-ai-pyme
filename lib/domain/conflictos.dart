@@ -152,11 +152,15 @@ class ProductoCampos {
     'deleted',
     'codigo',
     'unidad',
-    'iva'
+    'iva',
+    'precio_mayor',
+    'cantidad_mayor',
+    'vence'
   ];
 
-  /// Unidades de venta: por unidad o por peso (gramera).
-  static const unidades = ['und', 'kg', 'lb', 'serv'];
+  /// Unidades de venta: por unidad, por peso (gramera), por medida
+  /// (metro, litro, galón), por empaque (caja, paquete) o servicio.
+  static const unidades = ['und', 'kg', 'lb', 'm', 'l', 'gal', 'caja', 'paq', 'serv'];
 
   /// Fecha para campos que no existían en versiones anteriores: cualquier
   /// cambio real gana sobre ella al unir.
@@ -177,6 +181,13 @@ class ProductoCampos {
 
   /// Porcentaje de IVA (−1 = sin definir).
   double get iva => (valores['iva'] as num).toDouble();
+
+  /// Precio por mayor y desde qué cantidad aplica (0 = no hay).
+  double get precioMayor => (valores['precio_mayor'] as num).toDouble();
+  double get cantidadMayor => (valores['cantidad_mayor'] as num).toDouble();
+
+  /// Próximo vencimiento, «AAAA-MM-DD» ('' = no vence o no se lleva).
+  String get vence => valores['vence'] as String;
 
   DateTime get updatedAt =>
       ts.values.reduce((a, b) => b.isAfter(a) ? b : a);
@@ -203,12 +214,20 @@ class ProductoCampos {
       'codigo': (r['codigo'] as String?) ?? '',
       'unidad': unidades.contains(r['unidad']) ? r['unidad'] as String : 'und',
       'iva': _iva(r['iva']),
+      'precio_mayor': _positivo(r['precio_mayor']),
+      'cantidad_mayor': _positivo(r['cantidad_mayor']),
+      'vence': fechaVenceValida(r['vence']),
     };
     final t = {
       for (final c in campos)
         c: r['${c}_ts'] is String ? DateTime.parse(r['${c}_ts'] as String) : _inicio
     };
     return ProductoCampos(r['id'] as String, v, t);
+  }
+
+  static double _positivo(Object? v) {
+    final x = (v as num?)?.toDouble() ?? 0;
+    return x.isFinite && x > 0 ? x : 0;
   }
 
   static double _iva(Object? v) {
@@ -237,4 +256,15 @@ Duration esperaReintento(int intentos) {
   final n = intentos < 1 ? 1 : (intentos > 8 ? 8 : intentos);
   final seg = 15 * (1 << (n - 1));
   return Duration(seconds: seg > 1800 ? 1800 : seg);
+}
+
+/// Fecha de vencimiento en formato «AAAA-MM-DD»; cualquier otra cosa se toma
+/// como «sin fecha» ('').
+String fechaVenceValida(Object? v) {
+  final s = (v as String?)?.trim() ?? '';
+  if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(s)) return '';
+  final d = DateTime.tryParse(s);
+  if (d == null) return '';
+  final iso = '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  return iso == s ? s : '';
 }

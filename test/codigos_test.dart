@@ -81,6 +81,6 @@ void main() {
     ]);
     expect((await db.productos()).single.stock, closeTo(4.25, 0.0001));
     expect((await db.movimientos()).single['monto'], 18000);
-    expect(() => db.saveProducto('X', precio: 1, unidad: 'caja'), throwsArgumentError);
+    expect(() => db.saveProducto('X', precio: 1, unidad: 'bulto'), throwsArgumentError);
   });
 }

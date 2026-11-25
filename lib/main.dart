@@ -61,21 +61,9 @@ class VertexApp extends StatelessWidget {
         theme: temaVertex(Brightness.light),
         darkTheme: temaVertex(Brightness.dark),
         themeMode: ThemeMode.system,
-        // En el PC la app se ve como en el celular, centrada, para que no se
-        // estire en pantallas anchas.
-        builder: (context, child) {
-          final ancho = MediaQuery.sizeOf(context).width;
-          if (ancho <= 720 || child == null) return child ?? const SizedBox();
-          return ColoredBox(
-            color: const Color(0xFF17362C),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: ClipRect(child: child),
-              ),
-            ),
-          );
-        },
+        // En el computador la app usa toda la pantalla: menú lateral y
+        // contenido ancho (ver ui/escritorio.dart). Los formularios y el
+        // registro se ven centrados, sin estirarse.
         home: const ConsentGate(
             child: RegistroGate(child: InactividadGuard(child: PerfilGate(child: HomePage())))),
       );

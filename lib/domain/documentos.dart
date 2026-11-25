@@ -63,7 +63,7 @@ class LineaDoc {
   final double cantidad;
   final double precio;
 
-  /// 'und', 'kg' o 'lb'.
+  /// Unidad de venta (ver `nombresUnidad`).
   final String unidad;
   const LineaDoc(this.nombre, this.cantidad, this.precio, [this.unidad = 'und']);
   double get total => cantidad * precio;
@@ -92,9 +92,9 @@ String _encabezado(PerfilNegocio n) {
 
 String _lineas(List<LineaDoc> l) => [
       for (final x in l)
-        x.cantidad == 1 && !esPorPeso(x.unidad)
+        x.cantidad == 1 && !esFraccionable(x.unidad)
             ? '• ${x.nombre}: ${cop(x.total)}'
-            : !esPorPeso(x.unidad)
+            : !esFraccionable(x.unidad)
                 ? '• ${x.cantidadTexto} × ${x.nombre} (${x.precioTexto}): ${cop(x.total)}'
                 : '• ${x.nombre} ${x.cantidadTexto} (${x.precioTexto}): ${cop(x.total)}'
     ].join('\n');

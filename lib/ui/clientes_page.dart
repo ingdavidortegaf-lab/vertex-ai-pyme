@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import '../data/local_db.dart';
 import '../domain/roles.dart';
 import '../data/sync_service.dart';
@@ -78,69 +79,71 @@ class _ClientesPageState extends State<ClientesPage> {
 
     final crea = LocalDb.instance.puede(Permiso.crearClientes);
     return Scaffold(
-      floatingActionButton: crea
-          ? FloatingActionButton.extended(
-              onPressed: () => mostrarFormCliente(context),
-              icon: const Icon(Icons.person_add_alt),
-              label: const Text('Cliente'),
-            )
-          : null,
-      body: !_cargado
-          ? const Center(child: CircularProgressIndicator())
-          : _items.isEmpty
-              ? EstadoVacio(
-                  ilustracion: const IlustracionPizarra(),
-                  titulo: 'Aún no hay clientes',
-                  texto:
-                      'Agrega a tus clientes para venderles fiado, ver quién '
-                      'te debe y cobrarles por WhatsApp.',
-                  accion: crea
-                      ? FilledButton.icon(
-                          onPressed: () => mostrarFormCliente(context),
-                          icon: const Icon(Icons.person_add_alt),
-                          label: const Text('Agregar el primero'),
-                        )
-                      : null,
-                )
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
-                  children: [
-                      TextField(
-                        onChanged: (v) => setState(() => _filtro = v),
-                        textInputAction: TextInputAction.search,
-                        decoration: const InputDecoration(
-                          hintText: 'Buscar por nombre, celular o cédula',
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                        child: Text(
-                          '${_items.length == 1 ? '1 cliente' : '${_items.length} clientes'}'
-                          '${deudores > 0 ? ' · $deudores con saldo pendiente' : ''}',
-                          style: t.labelLarge
-                              ?.copyWith(color: esquema.onSurfaceVariant),
-                        ),
-                      ),
-                      if (lista.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                              'Ningún cliente coincide con «${_filtro.trim()}».',
-                              textAlign: TextAlign.center,
-                              style: t.bodyLarge),
-                        )
-                      else
-                        Card(
-                          child: Column(children: [
-                            for (final (i, c) in lista.indexed) ...[
-                              if (i > 0) const Divider(indent: 72),
-                              _FilaCliente(c: c, p: p),
-                            ],
-                          ]),
-                        ),
-                    ]),
-    );
+        floatingActionButton: crea
+            ? FloatingActionButton.extended(
+                onPressed: () => mostrarFormCliente(context),
+                icon: const Icon(Icons.person_add_alt),
+                label: const Text('Cliente'),
+              )
+            : null,
+        body: AnchoContenido(
+          maxAncho: 1000,
+          child: !_cargado
+              ? const Center(child: CircularProgressIndicator())
+              : _items.isEmpty
+                  ? EstadoVacio(
+                      ilustracion: const IlustracionPizarra(),
+                      titulo: 'Aún no hay clientes',
+                      texto:
+                          'Agrega a tus clientes para venderles fiado, ver quién '
+                          'te debe y cobrarles por WhatsApp.',
+                      accion: crea
+                          ? FilledButton.icon(
+                              onPressed: () => mostrarFormCliente(context),
+                              icon: const Icon(Icons.person_add_alt),
+                              label: const Text('Agregar el primero'),
+                            )
+                          : null,
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
+                      children: [
+                          TextField(
+                            onChanged: (v) => setState(() => _filtro = v),
+                            textInputAction: TextInputAction.search,
+                            decoration: const InputDecoration(
+                              hintText: 'Buscar por nombre, celular o cédula',
+                              prefixIcon: Icon(Icons.search),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                            child: Text(
+                              '${_items.length == 1 ? '1 cliente' : '${_items.length} clientes'}'
+                              '${deudores > 0 ? ' · $deudores con saldo pendiente' : ''}',
+                              style: t.labelLarge
+                                  ?.copyWith(color: esquema.onSurfaceVariant),
+                            ),
+                          ),
+                          if (lista.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Text(
+                                  'Ningún cliente coincide con «${_filtro.trim()}».',
+                                  textAlign: TextAlign.center,
+                                  style: t.bodyLarge),
+                            )
+                          else
+                            Card(
+                              child: Column(children: [
+                                for (final (i, c) in lista.indexed) ...[
+                                  if (i > 0) const Divider(indent: 72),
+                                  _FilaCliente(c: c, p: p),
+                                ],
+                              ]),
+                            ),
+                        ]),
+        ));
   }
 }
 
@@ -180,8 +183,8 @@ class _FilaCliente extends StatelessWidget {
         const SizedBox(width: 6),
         iconoSync(c['sync']),
       ]),
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => ClienteDetallePage(clienteId: c['id'] as String))),
+      onTap: () => Navigator.of(context)
+          .push(rutaVertex(ClienteDetallePage(clienteId: c['id'] as String))),
     );
   }
 }

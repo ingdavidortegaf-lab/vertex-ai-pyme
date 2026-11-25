@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import 'package:flutter/services.dart';
 import '../data/local_db.dart';
 import '../domain/perfiles.dart';
@@ -52,7 +53,7 @@ class _PerfilGateState extends State<PerfilGate> {
     final l = _perfiles;
     if (l == null) return const Scaffold(body: SizedBox.shrink());
     if (l.isEmpty || db.perfilActivo.value != null) return widget.child;
-    return QuienAtiendePage(perfiles: l);
+    return PaginaCentrada(maxAncho: 560, child: QuienAtiendePage(perfiles: l));
   }
 }
 
@@ -71,7 +72,8 @@ class QuienAtiendePage extends StatelessWidget {
           children: [
             Text('¿Quién atiende?', style: t.headlineSmall),
             const SizedBox(height: 6),
-            Text('Toca tu nombre y escribe tu PIN. Lo que registres quedará a tu nombre.',
+            Text(
+                'Toca tu nombre y escribe tu PIN. Lo que registres quedará a tu nombre.',
                 style: t.bodyMedium),
             const SizedBox(height: 20),
             for (final p in perfiles)
@@ -79,7 +81,8 @@ class QuienAtiendePage extends StatelessWidget {
                 child: ListTile(
                   key: ValueKey('perfil_${p.nombre}'),
                   minVerticalPadding: 14,
-                  leading: AvatarCliente(nombre: p.nombre, clave: p.id, tam: 40),
+                  leading:
+                      AvatarCliente(nombre: p.nombre, clave: p.id, tam: 40),
                   title: Text(p.nombre, style: t.titleMedium),
                   subtitle: Text(nombreRol(p.rol)),
                   trailing: const Icon(Icons.chevron_right),
@@ -110,7 +113,8 @@ Future<void> _recuperarConCuenta(BuildContext context) async {
     builder: (c, ctrl) => AlertDialog(
       title: const Text('Entrar con la cuenta'),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('Escribe la clave de la cuenta ${correoSesion() ?? ''}. Se necesita internet.'),
+        Text(
+            'Escribe la clave de la cuenta ${correoSesion() ?? ''}. Se necesita internet.'),
         const SizedBox(height: 12),
         TextField(
           controller: ctrl,
@@ -121,8 +125,11 @@ Future<void> _recuperarConCuenta(BuildContext context) async {
         ),
       ]),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
-        FilledButton(onPressed: () => Navigator.pop(c, ctrl.text), child: const Text('Entrar')),
+        TextButton(
+            onPressed: () => Navigator.pop(c), child: const Text('Cancelar')),
+        FilledButton(
+            onPressed: () => Navigator.pop(c, ctrl.text),
+            child: const Text('Entrar')),
       ],
     ),
   );
@@ -148,14 +155,16 @@ Future<bool> pedirPin(BuildContext context, Perfil p) async =>
 /// Un dueño o administrador del celular autoriza algo con su PIN (por
 /// ejemplo, anular cuando atiende un despachador). Devuelve su nombre, o
 /// null si no autorizó.
-Future<String?> autorizarSupervisor(BuildContext context, {required String que}) async {
+Future<String?> autorizarSupervisor(BuildContext context,
+    {required String que}) async {
   final supervisores = [
     for (final p in await LocalDb.instance.perfiles())
       if (p.rol == Rol.dueno || p.rol == Rol.administrador) p
   ];
   if (!context.mounted) return null;
   if (supervisores.isEmpty) {
-    avisar('No hay un perfil de dueño o administrador en este celular para autorizar.');
+    avisar(
+        'No hay un perfil de dueño o administrador en este celular para autorizar.');
     return null;
   }
   final elegido = supervisores.length == 1
@@ -169,7 +178,8 @@ Future<String?> autorizarSupervisor(BuildContext context, {required String que})
                 SimpleDialogOption(
                   key: ValueKey('autoriza_${p.nombre}'),
                   onPressed: () => Navigator.pop(c, p),
-                  child: Text('${p.nombre} (${nombreRol(p.rol).toLowerCase()})'),
+                  child:
+                      Text('${p.nombre} (${nombreRol(p.rol).toLowerCase()})'),
                 ),
             ],
           ),
@@ -179,7 +189,8 @@ Future<String?> autorizarSupervisor(BuildContext context, {required String que})
         context: context,
         isScrollControlled: true,
         showDragHandle: true,
-        builder: (_) => _TecladoPin(perfil: elegido, soloAutorizar: true, que: que),
+        builder: (_) =>
+            _TecladoPin(perfil: elegido, soloAutorizar: true, que: que),
       ) ??
       false;
   return ok ? elegido.nombre : null;
@@ -191,7 +202,8 @@ class _TecladoPin extends StatefulWidget {
   /// Solo revisa el PIN (quien atiende no cambia).
   final bool soloAutorizar;
   final String que;
-  const _TecladoPin({required this.perfil, this.soloAutorizar = false, this.que = ''});
+  const _TecladoPin(
+      {required this.perfil, this.soloAutorizar = false, this.que = ''});
   @override
   State<_TecladoPin> createState() => _TecladoPinState();
 }
@@ -282,12 +294,17 @@ class _TecladoPinState extends State<_TecladoPin> {
           ),
         );
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.fromLTRB(
+          20, 0, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text(widget.perfil.nombre, style: t.titleLarge),
         const SizedBox(height: 4),
-        Text(widget.soloAutorizar ? 'Escribe tu PIN para autorizar ${widget.que}' : 'Escribe tu PIN',
-            textAlign: TextAlign.center, style: t.bodyMedium),
+        Text(
+            widget.soloAutorizar
+                ? 'Escribe tu PIN para autorizar ${widget.que}'
+                : 'Escribe tu PIN',
+            textAlign: TextAlign.center,
+            style: t.bodyMedium),
         const SizedBox(height: 16),
         Semantics(
           label: '${_pin.length} números escritos',
@@ -300,7 +317,10 @@ class _TecladoPinState extends State<_TecladoPin> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: i < _pin.length ? cs.primary : Colors.transparent,
-                  border: Border.all(color: i < 4 || i < _pin.length ? cs.primary : cs.outlineVariant),
+                  border: Border.all(
+                      color: i < 4 || i < _pin.length
+                          ? cs.primary
+                          : cs.outlineVariant),
                 ),
               ),
           ]),
@@ -331,7 +351,8 @@ class _TecladoPinState extends State<_TecladoPin> {
                 child: TextButton(
                   key: const ValueKey('tecla_borrar'),
                   onPressed: _borrar,
-                  child: const Icon(Icons.backspace_outlined, semanticLabel: 'Borrar'),
+                  child: const Icon(Icons.backspace_outlined,
+                      semanticLabel: 'Borrar'),
                 ),
               ),
             ),
@@ -344,9 +365,14 @@ class _TecladoPinState extends State<_TecladoPin> {
                 height: 56,
                 child: FilledButton(
                   key: const ValueKey('tecla_entrar'),
-                  onPressed: _pin.length >= 4 && _espera == 0 && !_revisando ? _entrar : null,
+                  onPressed: _pin.length >= 4 && _espera == 0 && !_revisando
+                      ? _entrar
+                      : null,
                   child: _revisando
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2))
                       : Text(widget.soloAutorizar ? 'Autorizar' : 'Entrar'),
                 ),
               ),
@@ -354,8 +380,10 @@ class _TecladoPinState extends State<_TecladoPin> {
           ),
         ]),
         const SizedBox(height: 8),
-        Text('¿Olvidaste el PIN? Pide a quien maneja el negocio que te lo cambie en Equipo.',
-            textAlign: TextAlign.center, style: t.bodySmall),
+        Text(
+            '¿Olvidaste el PIN? Pide a quien maneja el negocio que te lo cambie en Equipo.',
+            textAlign: TextAlign.center,
+            style: t.bodySmall),
       ]),
     );
   }

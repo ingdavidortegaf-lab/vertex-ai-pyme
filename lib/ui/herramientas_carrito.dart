@@ -59,7 +59,7 @@ class _Carrito extends StatelessWidget {
             IconButton(
               tooltip: 'Quitar',
               onPressed: () {
-                final n = c - (esPorPeso(p.unidad) ? 0.25 : 1);
+                final n = c - (esFraccionable(p.unidad) ? 0.25 : 1);
                 if (n <= 0) {
                   cantidades.remove(p.id);
                 } else {
@@ -70,13 +70,13 @@ class _Carrito extends StatelessWidget {
               icon: const Icon(Icons.remove_circle_outline),
             ),
             SizedBox(
-                width: esPorPeso(p.unidad) ? 64 : 32,
+                width: esFraccionable(p.unidad) ? 64 : 32,
                 child: Text(cantidadConUnidad(c, p.unidad),
                     textAlign: TextAlign.center, style: cifras(t.titleSmall))),
             IconButton(
               tooltip: 'Agregar',
               onPressed: () {
-                cantidades[p.id] = c + (esPorPeso(p.unidad) ? 0.25 : 1);
+                cantidades[p.id] = c + (esFraccionable(p.unidad) ? 0.25 : 1);
                 onCambio();
               },
               icon: const Icon(Icons.add_circle_outline),

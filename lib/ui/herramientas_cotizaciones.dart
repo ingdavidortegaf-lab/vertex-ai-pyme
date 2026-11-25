@@ -163,7 +163,7 @@ class _CotizacionesPageState extends State<CotizacionesPage> {
       appBar: AppBar(title: const Text('Cotizaciones')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const NuevaCotizacionPage())),
+            rutaVertex(const NuevaCotizacionPage())),
         icon: const Icon(Icons.add),
         label: const Text('Cotización'),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import '../data/local_db.dart';
 import '../domain/formato.dart';
 import '../domain/seguimiento.dart';
@@ -159,7 +160,7 @@ class _SeguimientoPageState extends State<SeguimientoPage> {
                       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                         TextButton(
                           onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => ClienteDetallePage(clienteId: c.id))),
+                              rutaVertex(ClienteDetallePage(clienteId: c.id))),
                           child: const Text('Ver'),
                         ),
                         if (!c.autorizo)

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -69,7 +70,7 @@ TextSpan enlace(BuildContext context, String texto, VoidCallback alTocar) => Tex
     );
 
 void verPolitica(BuildContext context) => Navigator.of(context)
-    .push(MaterialPageRoute(builder: (_) => const PoliticaPage()));
+    .push(rutaVertex(const PoliticaPage()));
 
 /// El aviso de privacidad.
 class AvisoOficial extends StatelessWidget {

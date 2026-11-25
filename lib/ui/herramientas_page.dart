@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'escritorio.dart';
 import '../domain/identificacion.dart' as ident;
 import 'pagos_fijos_page.dart';
 import 'terceros_page.dart';
@@ -59,7 +60,7 @@ class HerramientasGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = Paleta.of(context);
     void ir(Widget w) =>
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
+        Navigator.of(context).push(rutaVertex(w));
     final modo = LocalDb.instance.modo.value;
     final items = [
       (
@@ -188,7 +189,9 @@ class HerramientasGrid extends StatelessWidget {
     ];
     if (visibles.isEmpty) return const SizedBox.shrink();
     return LayoutBuilder(builder: (context, box) {
-      final ancho = (box.maxWidth - 10) / 2;
+      // Dos columnas en el celular; más en el computador.
+      final cols = box.maxWidth < 600 ? 2 : columnasPara(box.maxWidth, minimo: 240, max: 5);
+      final ancho = (box.maxWidth - 10 * (cols - 1)) / cols;
       return Wrap(spacing: 10, runSpacing: 10, children: [
         for (final (i, (icono, titulo, sub, fondo, tinta, onTap))
             in visibles.indexed)
