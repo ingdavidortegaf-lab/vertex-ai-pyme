@@ -6,6 +6,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../domain/documentos.dart';
+import '../domain/facturacion.dart';
 import '../domain/formato.dart';
 import 'archivo.dart';
 
@@ -25,6 +26,9 @@ class DocImprimible {
 
   /// Encabezado de la columna de precio («Precio» o «Costo aprox.»).
   final String etiquetaPrecio;
+
+  /// Factura electrónica de esta venta, si la tiene.
+  final FacturaEmitida? fe;
   const DocImprimible({
     required this.titulo,
     required this.numero,
@@ -36,7 +40,12 @@ class DocImprimible {
     this.notas = const [],
     this.etiquetaCliente = 'Cliente',
     this.etiquetaPrecio = 'Precio',
+    this.fe,
   });
+
+  /// Solo una factura aceptada por la DIAN (con CUFE) es factura
+  /// electrónica; todo lo demás lleva la leyenda de que no lo es.
+  bool get esFacturaElectronica => fe?.aceptada ?? false;
 
   String get archivo =>
       '${titulo.toLowerCase().replaceAll(' ', '_')}_$numero.pdf';
@@ -173,9 +182,28 @@ Future<Uint8List> pdfDocumento(DocImprimible d, PdfPageFormat formato) async {
         for (final x in d.notas)
           pw.Text(x, style: estilo, textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
         pw.SizedBox(height: 6),
-        pw.Text('Documento generado con VERTEX AI Pyme. No es factura electrónica DIAN.',
-            style: pw.TextStyle(fontSize: base - 1, color: PdfColors.grey700),
-            textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
+        if (d.esFacturaElectronica) ...[
+          pw.Text('Factura electrónica de venta N.º ${d.fe!.numero}', style: negrita,
+              textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
+          pw.Text('CUFE: ${d.fe!.cufe}', style: pw.TextStyle(fontSize: base - 2),
+              textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
+          if ((d.fe!.qr ?? '').isNotEmpty)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 6),
+              child: pw.Align(
+                alignment: rollo ? pw.Alignment.center : pw.Alignment.centerLeft,
+                child: pw.BarcodeWidget(
+                    barcode: pw.Barcode.qrCode(), data: d.fe!.qr!, width: 80, height: 80),
+              ),
+            ),
+        ] else ...[
+          if (d.fe != null)
+            pw.Text('Factura electrónica N.º ${d.fe!.numero}: ${estadoFETexto(d.fe!.estado).toLowerCase()}.',
+                style: estilo, textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
+          pw.Text('Documento generado con VERTEX AI Pyme. No es factura electrónica DIAN.',
+              style: pw.TextStyle(fontSize: base - 1, color: PdfColors.grey700),
+              textAlign: rollo ? pw.TextAlign.center : pw.TextAlign.left),
+        ],
       ],
     ),
   ));

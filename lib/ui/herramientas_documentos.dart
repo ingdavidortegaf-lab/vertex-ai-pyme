@@ -22,7 +22,10 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
       clientePdf = '$clientePdf · ${ident.mostrarDocumento(c?['tipo_doc'] as String? ?? 'CC', doc)}';
     }
   }
+  // Si la DIAN ya aceptó su factura electrónica, sale como factura con CUFE y QR.
+  final fe = await db.facturaDeVenta(ventaId);
   final texto = textoComprobante(
+    facturaElectronica: fe != null && fe.aceptada ? (numero: fe.numero, cufe: fe.cufe!) : null,
     negocio: negocio,
     ventaId: ventaId,
     fecha: DateTime.parse(v['fecha'] as String).toLocal(),
@@ -47,8 +50,9 @@ Future<void> enviarComprobante(BuildContext context, String ventaId) async {
       reutilizar: true);
   final numero = documento['numero'] as String;
   final doc = DocImprimible(
-    titulo: 'Comprobante de venta',
-    numero: numero,
+    titulo: fe != null && fe.aceptada ? 'Factura electrónica de venta' : 'Comprobante de venta',
+    fe: fe,
+    numero: fe != null && fe.aceptada ? fe.numero : numero,
     fecha: DateTime.parse(v['fecha'] as String).toLocal(),
     negocio: negocio,
     cliente: clientePdf,

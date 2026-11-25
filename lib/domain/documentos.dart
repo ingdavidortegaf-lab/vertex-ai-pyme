@@ -112,11 +112,14 @@ String textoComprobante({
   bool fiado = false,
   double saldoCliente = 0,
   String? formaPago,
+  ({String numero, String cufe})? facturaElectronica,
 }) {
   final b = StringBuffer()
     ..writeln(_encabezado(negocio))
     ..writeln()
-    ..writeln('*Comprobante de venta N.º ${numeroDoc(ventaId)}*')
+    ..writeln(facturaElectronica == null
+        ? '*Comprobante de venta N.º ${numeroDoc(ventaId)}*'
+        : '*Factura electrónica de venta N.º ${facturaElectronica.numero}*')
     ..writeln('Fecha: ${_fecha.format(fecha)}');
   if (cliente != null && cliente.trim().isNotEmpty) b.writeln('Cliente: $cliente');
   b
@@ -130,8 +133,12 @@ String textoComprobante({
   }
   b
     ..writeln()
-    ..writeln('¡Gracias por su compra!')
-    ..write('_Comprobante de venta; no es factura electrónica._');
+    ..writeln('¡Gracias por su compra!');
+  if (facturaElectronica == null) {
+    b.write('_Comprobante de venta; no es factura electrónica._');
+  } else {
+    b.write('CUFE: ${facturaElectronica.cufe}');
+  }
   return b.toString();
 }
 
