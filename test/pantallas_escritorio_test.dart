@@ -6,7 +6,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:vertex_ai_pyme/data/sync_service.dart';
 import 'package:vertex_ai_pyme/ui/comun.dart';
+import 'package:vertex_ai_pyme/domain/resumen.dart';
 import 'package:vertex_ai_pyme/ui/home_page.dart';
+import 'package:vertex_ai_pyme/ui/oficina_page.dart';
 import 'package:vertex_ai_pyme/ui/punto_venta_page.dart';
 import 'package:vertex_ai_pyme/ui/tema.dart';
 import 'soporte.dart';
@@ -188,4 +190,70 @@ void main() {
 
     await cerrar(tester);
   });
+
+  testWidgets('Ctrl+K busca un cliente y lo abre', (tester) async {
+    await productos(tester);
+    await tester.runAsync(() => db.saveCliente('Carlos Rojas', '3001234567'));
+    await abrir(tester, const HomePage());
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyK);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await esperar(tester);
+    await tester.enterText(find.byKey(const ValueKey('buscador_global')), 'cem');
+    await esperar(tester, 1);
+    expect(find.byKey(const ValueKey('resultado_Cemento gris 50 kg')), findsOneWidget);
+    await tester.enterText(find.byKey(const ValueKey('buscador_global')), 'carl');
+    await esperar(tester, 1);
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await esperar(tester, 4);
+    expect(find.text('Carlos Rojas'), findsWidgets);
+    expect(find.byKey(const ValueKey('buscador_global')), findsNothing);
+    await cerrar(tester);
+  });
+
+  testWidgets('devolver un producto desde Movimientos', (tester) async {
+    await productos(tester);
+    await tester.runAsync(() async {
+      final p = await db.productos();
+      final c = p.firstWhere((x) => x.nombre.startsWith('Cemento'));
+      final a = p.firstWhere((x) => x.nombre.startsWith('Arroz'));
+      await db.saveVentaProductos([
+        ItemVenta(productoId: c.id, nombre: c.nombre, cantidad: 2, precio: c.precio, costo: c.costo),
+        ItemVenta(productoId: a.id, nombre: a.nombre, cantidad: 1, precio: a.precio, costo: a.costo),
+      ]);
+    });
+    await abrir(tester, const HomePage());
+    await tester.tap(find.byKey(const ValueKey('menu_caja')));
+    await esperar(tester);
+    await tester.longPress(find.textContaining('2 × Cemento'));
+    await esperar(tester);
+    await tester.tap(find.byKey(const ValueKey('opcion_devolver')));
+    await esperar(tester);
+    await tester.tap(find.byKey(const ValueKey('devolver_mas_Cemento gris 50 kg')));
+    await esperar(tester, 1);
+    await tester.tap(find.byKey(const ValueKey('confirmar_devolucion')));
+    await esperar(tester, 5);
+    expect(find.textContaining('devuelve \$34.000'), findsOneWidget);
+    final stock = {for (final p in (await tester.runAsync(db.productos))!) p.nombre: p.stock};
+    expect(stock['Cemento gris 50 kg'], 39);
+    expect(stock['Arroz 500 g'], 59);
+    await cerrar(tester);
+  });
+
+  testWidgets('informes: ventas por vendedor y ganancia por producto', (tester) async {
+    await productos(tester);
+    await tester.runAsync(() async {
+      final c = (await db.productos()).firstWhere((x) => x.nombre.startsWith('Cemento'));
+      await db.saveVentaProductos([
+        ItemVenta(productoId: c.id, nombre: c.nombre, cantidad: 2, precio: c.precio, costo: c.costo),
+      ]);
+    });
+    await abrir(tester, const InformesPage(), tam: const Size(1200, 3200));
+    await esperar(tester, 4);
+    expect(find.byKey(const ValueKey('utilidad_Cemento gris 50 kg')), findsOneWidget);
+    expect(find.byKey(const ValueKey('vendedor_Cuenta principal')), findsOneWidget);
+    expect(find.byKey(const ValueKey('exportar_movimientos')), findsOneWidget);
+    await cerrar(tester);
+  });
 }
+

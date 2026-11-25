@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'escritorio.dart';
+import 'exportar_ui.dart';
+import '../domain/exportar.dart';
 import '../domain/ejemplos.dart';
 import '../data/local_db.dart';
 import '../domain/roles.dart';
@@ -153,6 +155,14 @@ class _InventarioPageState extends State<InventarioPage> {
                                 hintText: 'Buscar producto',
                                 prefixIcon: Icon(Icons.search)),
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.outlined(
+                          key: const ValueKey('exportar_inventario'),
+                          tooltip: 'Exportar a Excel',
+                          onPressed: () => exportarCsv(nombreCsv('inventario', DateTime.now()),
+                              csvProductos(_items, conCostos: veCostos)),
+                          icon: const Icon(Icons.table_view_outlined),
                         ),
                         if (edita) ...[
                           const SizedBox(width: 8),
@@ -323,12 +333,17 @@ class _FilaProducto extends StatelessWidget {
   }
 }
 
+/// Las acciones de un producto (para abrirlas desde el buscador global).
+Future<void> accionesProducto(BuildContext context, ProductoStock x) => _acciones(context, x);
+
 Future<void> _acciones(BuildContext context, ProductoStock x) async {
   final db = LocalDb.instance;
   final entra = db.puede(Permiso.entradaInventario);
   final ajusta = db.puede(Permiso.ajusteInventario);
   final edita = db.puede(Permiso.editarProductos);
-  if (!entra && !ajusta && !edita) return; // el contador solo consulta
+  // El kárdex lo ve quien ve el inventario (también el contador).
+  final kardex = !x.esServicio && db.puede(Permiso.verProductos);
+  if (!entra && !ajusta && !edita && !kardex) return;
   final accion = await showModalBottomSheet<String>(
     context: context,
     builder: (c) => SafeArea(
@@ -360,6 +375,15 @@ Future<void> _acciones(BuildContext context, ProductoStock x) async {
               onTap: () => Navigator.pop(c, 'ajuste'),
             ),
         ],
+        if (kardex)
+          ListTile(
+            key: const ValueKey('accion_kardex'),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+            leading: const Icon(Icons.history),
+            title: const Text('Historial (kárdex)'),
+            subtitle: const Text('Entradas, ventas y ajustes con su saldo'),
+            onTap: () => Navigator.pop(c, 'kardex'),
+          ),
         if (edita) ...[
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -382,6 +406,8 @@ Future<void> _acciones(BuildContext context, ProductoStock x) async {
   );
   if (accion == null || !context.mounted) return;
   switch (accion) {
+    case 'kardex':
+      await Navigator.of(context).push(rutaVertex(KardexPage(producto: x), maxAncho: 960));
     case 'editar':
       await mostrarFormProducto(context, producto: x);
     case 'eliminar':

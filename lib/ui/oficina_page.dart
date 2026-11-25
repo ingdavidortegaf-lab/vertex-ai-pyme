@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../domain/codigos.dart';
+import '../domain/exportar.dart';
+import 'exportar_ui.dart';
+import '../domain/roles.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import '../data/local_db.dart';
@@ -77,6 +81,7 @@ class InformesPage extends StatefulWidget {
 class _InformesPageState extends State<InformesPage> {
   Periodo _p = Periodo.semanaActual;
   DatosInforme? _d;
+  List<UtilidadProducto> _utilidad = const [];
   bool _generando = false;
 
   @override
@@ -87,7 +92,13 @@ class _InformesPageState extends State<InformesPage> {
 
   Future<void> _load() async {
     final d = await cargarInforme(_p, DateTime.now());
-    if (mounted) setState(() => _d = d);
+    final u = await LocalDb.instance.utilidadPorProducto(d.desde, d.hasta);
+    if (mounted) {
+      setState(() {
+        _d = d;
+        _utilidad = u;
+      });
+    }
   }
 
   Future<void> _generar() async {
@@ -242,6 +253,36 @@ class _InformesPageState extends State<InformesPage> {
                 : const Icon(Icons.picture_as_pdf_outlined),
             label: Text(_generando ? 'Generando…' : 'Generar informe en PDF'),
           ),
+          const SizedBox(height: 24),
+          Text('Exportar a Excel', style: t.titleMedium),
+          const SizedBox(height: 4),
+          Text('Archivos que abre Excel con doble clic, para tu contador o para tus propias cuentas.',
+              style: t.bodySmall),
+          const SizedBox(height: 10),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            OutlinedButton.icon(
+              key: const ValueKey('exportar_movimientos'),
+              onPressed: () => exportarCsv(
+                  nombreCsv('movimientos', d.desde), csvMovimientos(d.movimientos)),
+              icon: const Icon(Icons.table_view_outlined),
+              label: const Text('Movimientos del periodo'),
+            ),
+            OutlinedButton.icon(
+              key: const ValueKey('exportar_cartera'),
+              onPressed: () => exportarCsv(nombreCsv('cartera', DateTime.now()), csvCartera(d.deudores)),
+              icon: const Icon(Icons.table_view_outlined),
+              label: const Text('Quién debe (cartera)'),
+            ),
+            OutlinedButton.icon(
+              key: const ValueKey('exportar_productos'),
+              onPressed: () => exportarCsv(nombreCsv('inventario', DateTime.now()),
+                  csvProductos(d.productos, conCostos: LocalDb.instance.puede(Permiso.verCostos))),
+              icon: const Icon(Icons.table_view_outlined),
+              label: const Text('Inventario'),
+            ),
+          ]),
+          ..._ventasPorVendedor(d, t, pal),
+          ..._utilidadPorProducto(t, pal),
         ],
       ]),
     );
@@ -249,6 +290,76 @@ class _InformesPageState extends State<InformesPage> {
 }
 
 // --------------------------------------------------------------- cartera
+extension _DetalleInforme on _InformesPageState {
+  /// Quién vendió cuánto (perfiles del celular compartido o la cuenta).
+  List<Widget> _ventasPorVendedor(DatosInforme d, TextTheme t, Paleta pal) {
+    final l = ventasPorVendedor(d.movimientos);
+    if (l.isEmpty) return const [];
+    final max = l.first.total <= 0 ? 1.0 : l.first.total;
+    return [
+      const SizedBox(height: 24),
+      Text('Ventas por vendedor', style: t.titleMedium),
+      const SizedBox(height: 8),
+      Card(
+        child: Column(children: [
+          for (final (i, v) in l.indexed) ...[
+            if (i > 0) const Divider(height: 1, indent: 16),
+            ListTile(
+              key: ValueKey('vendedor_${v.nombre}'),
+              title: Text(v.nombre),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: (v.total / max).clamp(0, 1).toDouble(),
+                      minHeight: 6,
+                      color: pal.ventas,
+                      backgroundColor: pal.ventasFondo,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text('${v.ventas} ${v.ventas == 1 ? 'venta' : 'ventas'} · promedio ${cop(v.promedio)}'),
+                ]),
+              ),
+              trailing: Text(cop(v.total), style: cifras(t.titleSmall?.copyWith(color: pal.ventas))),
+            ),
+          ],
+        ]),
+      ),
+    ];
+  }
+
+  /// Qué productos dejan más ganancia (con el costo de cada venta).
+  List<Widget> _utilidadPorProducto(TextTheme t, Paleta pal) {
+    if (_utilidad.isEmpty || !LocalDb.instance.puede(Permiso.verUtilidad)) return const [];
+    return [
+      const SizedBox(height: 24),
+      Text('Ganancia por producto', style: t.titleMedium),
+      const SizedBox(height: 4),
+      Text('Precio de venta menos el costo de cada unidad vendida. Sin costo, la ganancia sale igual a la venta.',
+          style: t.bodySmall),
+      const SizedBox(height: 8),
+      Card(
+        child: Column(children: [
+          for (final (i, u) in _utilidad.take(15).indexed) ...[
+            if (i > 0) const Divider(height: 1, indent: 16),
+            ListTile(
+              key: ValueKey('utilidad_${u.nombre}'),
+              title: Text(u.nombre, maxLines: 1, overflow: TextOverflow.ellipsis),
+              subtitle: Text('Vendido ${cantidadConUnidad(u.cantidad, u.unidad)} · ${cop(u.ingresos)}'
+                  '${u.costo > 0 ? ' · margen ${(u.margen * 100).round()} %' : ''}'),
+              trailing: Text(cop(u.utilidad),
+                  style: cifras(t.titleSmall?.copyWith(color: u.utilidad < 0 ? pal.gastos : pal.ventas))),
+            ),
+          ],
+        ]),
+      ),
+    ];
+  }
+}
+
 class CarteraPage extends StatefulWidget {
   const CarteraPage({super.key});
   @override

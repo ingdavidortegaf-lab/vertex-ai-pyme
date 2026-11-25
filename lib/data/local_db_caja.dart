@@ -67,6 +67,78 @@ extension LocalDbCaja on LocalDb {
     return nuevo;
   }
 
+  /// Productos de una venta (para devolver algunos): id, nombre, cantidad
+  /// vendida, precio y costo unitarios con el descuento ya repartido.
+  Future<List<ItemVenta>> productosDeVenta(String ventaId) async {
+    final r = await db.rawQuery(
+        'SELECT i.producto_id, p.nombre, p.unidad, -i.cantidad AS cantidad, i.precio_unit, i.costo_unit '
+        "FROM inventario i JOIN productos p ON p.id = i.producto_id WHERE i.venta_id = ? AND i.motivo = 'venta' "
+        'ORDER BY i.rowid',
+        [ventaId]);
+    return [
+      for (final x in r)
+        ItemVenta(
+          productoId: x['producto_id'] as String,
+          nombre: x['nombre'] as String,
+          cantidad: LocalDb._dbl(x['cantidad']),
+          precio: LocalDb._dbl(x['precio_unit']),
+          costo: LocalDb._dbl(x['costo_unit']),
+          unidad: (x['unidad'] as String?) ?? 'und',
+        ),
+    ];
+  }
+
+  /// Devuelve algunos productos de una venta. Como las ventas solo se
+  /// agregan, se hace así: se anula la venta completa (todo vuelve al
+  /// inventario) y se registra una venta nueva con lo que el cliente se
+  /// queda, al mismo precio, del mismo cliente y con el mismo medio de pago.
+  /// [devueltos] es producto → cantidad devuelta. Devuelve cuánto dinero se
+  /// le regresa (o se le descuenta de la deuda, si era fiado) y el id de la
+  /// venta nueva (null si devolvió todo).
+  Future<({double devolver, String? nuevaVenta})> devolverProductos(
+      String ventaId, Map<String, double> devueltos,
+      {String motivo = '', String autoriza = ''}) async {
+    final f = await db.query('ventas', where: 'id = ?', whereArgs: [ventaId]);
+    if (f.isEmpty) throw StateError('no existe');
+    final o = f.first;
+    if (o['tipo'] != 'ingreso') throw StateError('no es una venta');
+    final items = await productosDeVenta(ventaId);
+    if (items.isEmpty) throw StateError('sin productos');
+    final quedan = <ItemVenta>[];
+    var hayDevolucion = false;
+    for (final i in items) {
+      final d = (devueltos[i.productoId] ?? 0).clamp(0, i.cantidad).toDouble();
+      if (d > 0) hayDevolucion = true;
+      final q = ((i.cantidad - d) * 1000).round() / 1000;
+      if (q > 0) {
+        quedan.add(ItemVenta(
+            productoId: i.productoId,
+            nombre: i.nombre,
+            cantidad: q,
+            precio: i.precio,
+            costo: i.costo,
+            unidad: i.unidad));
+      }
+    }
+    if (!hayDevolucion) throw ArgumentError('devueltos');
+    final total = LocalDb._dbl(o['monto']);
+    final m = motivo.trim();
+    await anular(ventaId, motivo: m.isEmpty ? 'devolución' : 'devolución · $m', autoriza: autoriza);
+    if (quedan.isEmpty) return (devolver: total, nuevaVenta: null);
+    final nuevo = quedan.fold(0.0, (s, i) => s + i.total);
+    final fiado = (o['credito'] as int? ?? 0) == 1;
+    final antes = leerPagos(o['pagos'], monto: total, tipo: 'ingreso', credito: fiado);
+    final medio = antes.any((p) => p.medio == 'efectivo')
+        ? 'efectivo'
+        : (antes.isEmpty ? 'efectivo' : antes.first.medio);
+    final id = await saveVentaProductos(quedan,
+        fiado: fiado,
+        clienteId: o['cliente_id'] as String?,
+        concepto: 'Tras devolución: ${quedan.map((i) => '${cantidadDoc(i.cantidad)} × ${i.nombre}').join(', ')}',
+        pagos: fiado ? null : [Pago(medio, nuevo)]);
+    return (devolver: ((total - nuevo) * 100).round() / 100, nuevaVenta: id);
+  }
+
   // ----------------------------------------------------------------- turnos
 
   /// Abre un turno con la base de efectivo que hay en el cajón.

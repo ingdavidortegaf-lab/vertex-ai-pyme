@@ -253,7 +253,7 @@ class FilaMovimiento extends StatelessWidget {
           ? () => enviarComprobante(context, v['id'] as String)
           : null,
       // Mantener presionado: anular (dueño o administrador).
-      onLongPress: sePuedeAnular(v) ? () => anularDesdeCaja(context, v) : null,
+      onLongPress: sePuedeAnular(v) ? () => anularODevolver(context, v) : null,
     );
   }
 }

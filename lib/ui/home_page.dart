@@ -6,6 +6,8 @@ import '../domain/roles.dart';
 import '../data/sync_service.dart';
 import 'asistente_page.dart';
 import 'clientes_page.dart';
+import 'buscador_global.dart';
+import 'cliente_detalle_page.dart';
 import 'equipo_page.dart';
 import 'herramientas_page.dart' show HerramientasGrid;
 import 'punto_venta_page.dart';
@@ -305,6 +307,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _buscar(List<SeccionInicio> secciones) async {
+    final r = await buscarGlobal(context, [for (final s in secciones) _datos(s).nombre]);
+    if (r == null || !mounted) return;
+    switch (r) {
+      case IrASeccion(:final indice):
+        setState(() => _actual = secciones[indice]);
+      case AbrirProducto(:final producto):
+        _irA(SeccionInicio.catalogo);
+        await accionesProducto(context, producto);
+      case AbrirCliente(:final clienteId):
+        await Navigator.of(context).push(rutaVertex(ClienteDetallePage(clienteId: clienteId)));
+    }
+  }
+
   /// En el computador: menú lateral de pizarra, barra arriba con el nombre
   /// de la sección y atajos de teclado (F2 abre la caja rápida, Ctrl+1…7
   /// cambia de sección).
@@ -316,6 +332,7 @@ class _HomePageState extends State<HomePage> {
       if (secciones.contains(SeccionInicio.vender))
         const SingleActivator(LogicalKeyboardKey.f2): () =>
             _irA(SeccionInicio.vender),
+      const SingleActivator(LogicalKeyboardKey.keyK, control: true): () => _buscar(secciones),
       for (final (i, s) in secciones.indexed.take(9))
         SingleActivator(LogicalKeyboardKey(LogicalKeyboardKey.digit1.keyId + i),
             control: true): () => _irA(s),
@@ -376,7 +393,23 @@ class _HomePageState extends State<HomePage> {
                   automaticallyImplyLeading: false,
                   titleSpacing: 24,
                   title: Text(_datos(_actual).nombre),
-                  actions: _acciones(context),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: OutlinedButton.icon(
+                        key: const ValueKey('abrir_buscador'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: p.tizaBlanca,
+                          side: BorderSide(color: p.tizaSuave.withValues(alpha: 0.5)),
+                          minimumSize: const Size(0, 40),
+                        ),
+                        onPressed: () => _buscar(secciones),
+                        icon: const Icon(Icons.search, size: 20),
+                        label: const Text('Buscar   Ctrl+K'),
+                      ),
+                    ),
+                    ..._acciones(context),
+                  ],
                 ),
                 body: _cuerpo(context),
               ),

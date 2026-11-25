@@ -161,6 +161,32 @@ extension LocalDbInventario on LocalDb {
     return (nuevos: nuevos, actualizados: actualizados);
   }
 
+  /// Kárdex: todos los movimientos de inventario de un producto, del más
+  /// antiguo al más nuevo, con la venta que los originó.
+  Future<List<LineaKardex>> kardex(String productoId) async => armarKardex(await db.rawQuery(
+      'SELECT i.fecha, i.cantidad, i.motivo, i.costo_unit, i.precio_unit, '
+      'v.concepto, v.perfil FROM inventario i LEFT JOIN ventas v ON v.id = i.venta_id '
+      'WHERE i.producto_id = ? ORDER BY i.fecha, i.rowid',
+      [productoId]));
+
+  /// Cuánto se vendió y cuánto se ganó con cada producto en el periodo (las
+  /// anulaciones restan). De mayor a menor utilidad.
+  Future<List<UtilidadProducto>> utilidadPorProducto(DateTime desde, DateTime hasta) async {
+    final r = await db.rawQuery(
+        'SELECT p.nombre, p.unidad, SUM(-i.cantidad) cant, '
+        'SUM(-i.cantidad * COALESCE(i.precio_unit, 0)) ing, '
+        'SUM(-i.cantidad * COALESCE(i.costo_unit, 0)) cos '
+        'FROM inventario i JOIN productos p ON p.id = i.producto_id '
+        "WHERE i.motivo IN ('venta','anulacion') AND i.fecha >= ? AND i.fecha < ? "
+        'GROUP BY i.producto_id HAVING cant <> 0',
+        [isoUtc(desde), isoUtc(hasta)]);
+    return [
+      for (final x in r)
+        UtilidadProducto(x['nombre'] as String, (x['unidad'] as String?) ?? 'und',
+            LocalDb._dbl(x['cant']), LocalDb._dbl(x['ing']), LocalDb._dbl(x['cos'])),
+    ]..sort((a, b) => b.utilidad.compareTo(a.utilidad));
+  }
+
   Future<void> deleteProducto(String id) async {
     final ts = _ahora();
     await db.transaction((t) async {

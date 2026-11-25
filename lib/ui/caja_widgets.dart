@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../domain/codigos.dart';
+import '../domain/resumen.dart';
 import 'package:intl/intl.dart';
 import '../data/local_db.dart';
 import '../data/sync_service.dart';
@@ -233,6 +235,153 @@ bool sePuedeAnular(Map<String, Object?> v) =>
     LocalDb.instance.equipo.value.puede(Permiso.anularMovimiento) &&
     v['tipo'] != 'anulacion' &&
     (v['anulada'] as num? ?? 0) == 0;
+
+/// Al mantener presionada una venta con productos: devolver algunos o anular
+/// toda la venta. Sin productos, va directo a anular.
+Future<void> anularODevolver(BuildContext context, Map<String, Object?> v) async {
+  final db = LocalDb.instance;
+  final items = v['tipo'] == 'ingreso' ? await db.productosDeVenta(v['id'] as String) : const <ItemVenta>[];
+  if (!context.mounted) return;
+  if (items.isEmpty) return anularDesdeCaja(context, v);
+  final que = await showModalBottomSheet<String>(
+    context: context,
+    builder: (c) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          title: Text('${v['concepto']}', maxLines: 2, overflow: TextOverflow.ellipsis),
+          subtitle: Text(cop((v['monto'] as num).toDouble())),
+        ),
+        const Divider(),
+        ListTile(
+          key: const ValueKey('opcion_devolver'),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: const Icon(Icons.assignment_return_outlined),
+          title: const Text('Devolver productos'),
+          subtitle: const Text('El cliente regresa uno o varios; el resto queda vendido'),
+          onTap: () => Navigator.pop(c, 'devolver'),
+        ),
+        ListTile(
+          key: const ValueKey('opcion_anular'),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: Icon(Icons.block, color: Theme.of(c).colorScheme.error),
+          title: const Text('Anular toda la venta'),
+          onTap: () => Navigator.pop(c, 'anular'),
+        ),
+        const SizedBox(height: 8),
+      ]),
+    ),
+  );
+  if (que == null || !context.mounted) return;
+  if (que == 'anular') return anularDesdeCaja(context, v);
+  final devueltos = await showDialog<Map<String, double>>(
+    context: context,
+    builder: (_) => _DialogoDevolver(items: items),
+  );
+  if (devueltos == null || devueltos.isEmpty || !context.mounted) return;
+  var autoriza = '';
+  if (!db.puede(Permiso.anularMovimiento)) {
+    autoriza = await autorizarSupervisor(context, que: 'la devolución') ?? '';
+    if (autoriza.isEmpty) return;
+  }
+  try {
+    final r = await db.devolverProductos(v['id'] as String, devueltos, autoriza: autoriza);
+    SyncService.instance.sync();
+    final fiado = v['credito'] == 1;
+    avisar(fiado
+        ? 'Devolución guardada: se descuentan ${cop(r.devolver)} de la deuda'
+        : 'Devolución guardada: devuelve ${cop(r.devolver)} al cliente');
+  } on StateError {
+    avisar('No se pudo devolver: la venta ya estaba anulada o tiene factura electrónica.');
+  }
+}
+
+class _DialogoDevolver extends StatefulWidget {
+  final List<ItemVenta> items;
+  const _DialogoDevolver({required this.items});
+  @override
+  State<_DialogoDevolver> createState() => _DialogoDevolverState();
+}
+
+class _DialogoDevolverState extends State<_DialogoDevolver> {
+  final _dev = <String, double>{};
+
+  double get _valor => widget.items.fold(0.0, (s, i) => s + (_dev[i.productoId] ?? 0) * i.precio);
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return AlertDialog(
+      title: const Text('¿Qué devuelve?'),
+      content: SizedBox(
+        width: 460,
+        child: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            for (final i in widget.items)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(i.nombre, style: t.bodyLarge),
+                      Text('Compró ${cantidadConUnidad(i.cantidad, i.unidad)} · ${precioConUnidad(i.precio, i.unidad)}',
+                          style: t.bodySmall),
+                    ]),
+                  ),
+                  IconButton(
+                    tooltip: 'Uno menos',
+                    onPressed: (_dev[i.productoId] ?? 0) <= 0
+                        ? null
+                        : () => setState(() => _dev[i.productoId] =
+                            ((_dev[i.productoId]! - (esFraccionable(i.unidad) ? 0.5 : 1)).clamp(0, i.cantidad))
+                                .toDouble()),
+                    icon: const Icon(Icons.remove_circle_outline),
+                  ),
+                  SizedBox(
+                    width: 56,
+                    child: Text(cantidadConUnidad(_dev[i.productoId] ?? 0, i.unidad),
+                        key: ValueKey('devuelve_${i.nombre}'), textAlign: TextAlign.center),
+                  ),
+                  IconButton(
+                    key: ValueKey('devolver_mas_${i.nombre}'),
+                    tooltip: 'Uno más',
+                    onPressed: (_dev[i.productoId] ?? 0) >= i.cantidad
+                        ? null
+                        : () => setState(() => _dev[i.productoId] =
+                            (((_dev[i.productoId] ?? 0) + (esFraccionable(i.unidad) ? 0.5 : 1)).clamp(0, i.cantidad))
+                                .toDouble()),
+                    icon: const Icon(Icons.add_circle_outline),
+                  ),
+                ]),
+              ),
+            const Divider(),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text('A devolver: ${cop(_valor)}', style: cifras(t.titleMedium)),
+            ),
+            const SizedBox(height: 6),
+            Text('La venta se anula y se registra una nueva con lo que se queda el cliente. '
+                'Lo devuelto vuelve al inventario.',
+                style: t.bodySmall),
+          ]),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        FilledButton(
+          key: const ValueKey('confirmar_devolucion'),
+          onPressed: _valor <= 0
+              ? null
+              : () => Navigator.pop(context, {
+                    for (final e in _dev.entries)
+                      if (e.value > 0) e.key: e.value
+                  }),
+          child: const Text('Devolver'),
+        ),
+      ],
+    );
+  }
+}
 
 /// Anula un movimiento: pide el motivo, y si quien atiende no puede anular,
 /// la autorización de un supervisor con su PIN.
