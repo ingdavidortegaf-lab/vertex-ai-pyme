@@ -27,7 +27,7 @@ enabled = false
 [storage]
 enabled = false
 
-[inbucket]
+[local_smtp]
 enabled = false
 
 [analytics]
