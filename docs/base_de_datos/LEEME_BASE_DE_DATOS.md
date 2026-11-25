@@ -59,7 +59,7 @@
    - **Entre venta y cliente no hay llave foránea, y es a propósito:** como el sistema funciona sin conexión, una venta puede llegar a la nube antes que el cliente que se creó en otro celular. Con la llave foránea, esa venta se rechazaría. La integridad la cuidan la app y los triggers.
 7. **Índices** por fecha y por empresa: las consultas de una tienda no recorren los datos de las demás.
 8. **Transacciones:** cada venta y su entrada en `cola_sync` se guardan juntas: o las dos o ninguna.
-9. **El saldo con el proveedor tampoco se guarda: se calcula** (total de la cuenta − suma de abonos), igual que la existencia. `pagos_proveedor.cuenta_id` sí tiene **llave foránea** a `cuentas_pagar`, porque las dos tablas viven solo en el celular (no hay problema de orden de llegada). Esquema local: **versión 11** (v8 terceros y pagos fijos; v9 perfiles con PIN y quién hizo cada venta; v10 anulaciones, descuentos, turnos y la vista `ventas_netas`; v11 IVA por producto y la cola `facturas_e`). Ver `docs/EQUIPO_CAJA_Y_FACTURACION.md`.
+9. **El saldo con el proveedor tampoco se guarda: se calcula** (total de la cuenta − suma de abonos), igual que la existencia. `pagos_proveedor.cuenta_id` sí tiene **llave foránea** a `cuentas_pagar`, porque las dos tablas viven solo en el celular (no hay problema de orden de llegada). Esquema local: **versión 12** (v8 terceros y pagos fijos; v9 perfiles con PIN y quién hizo cada venta; v10 anulaciones, descuentos, turnos y la vista `ventas_netas`; v11 IVA por producto y la cola `facturas_e`; v12 precio por mayor, vencimiento y unidades nuevas). Ver `docs/EQUIPO_CAJA_Y_FACTURACION.md`.
 
 ---
 

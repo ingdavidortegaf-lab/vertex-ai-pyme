@@ -125,18 +125,22 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 - **Ley 1581 de 2012:** aviso de privacidad, casilla **sin premarcar** con **enlace visible** a la política (se abre sin internet) y formato de autorización para cada cliente, en PDF o por WhatsApp. Ver [`docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md`](docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md). La MiPyme es responsable de los datos; VERTEX TECH es encargada. Ver [`docs/POLITICA_TRATAMIENTO_DATOS.md`](docs/POLITICA_TRATAMIENTO_DATOS.md).
 
 ## Equipo, caja y factura electrónica
-Roles (dueño, administrador, contador, despachador, bodeguero) con invitación por código, perfiles con PIN para el celular compartido, turnos de caja con diferencia, anulaciones como movimiento nuevo, descuentos con tope y la cola de factura electrónica (sin proveedor real conectado). La app oculta y el servidor impide. Detalle en [`docs/EQUIPO_CAJA_Y_FACTURACION.md`](docs/EQUIPO_CAJA_Y_FACTURACION.md).
+Roles (dueño, administrador, contador, vendedor o cajero, bodeguero) con invitación por código, perfiles con PIN para el celular compartido, turnos de caja con diferencia, anulaciones como movimiento nuevo, descuentos con tope y la cola de factura electrónica (sin proveedor real conectado). La app oculta y el servidor impide. Detalle en [`docs/EQUIPO_CAJA_Y_FACTURACION.md`](docs/EQUIPO_CAJA_Y_FACTURACION.md).
+
+## Computador, caja rápida y comercio
+En el computador la app usa toda la pantalla: menú lateral, Inicio en dos columnas, inventario en tabla y atajos de teclado. La **caja rápida** cobra con lector de código de barras USB, calcula el cambio y aplica el precio por mayor. Para supermercados y ferreterías: unidades por metro, litro, galón, caja y paquete; precio por mayor; vencimientos con aviso; y cargar productos pegándolos desde Excel. Detalle en [`docs/COMPUTADOR_Y_COMERCIO.md`](docs/COMPUTADOR_Y_COMERCIO.md).
 
 ## Estado y pendientes
 Probado:
-- 226 pruebas automáticas (`flutter test`), además de pruebas SQL del servidor (aislamiento, roles y caja) que pasan en GitHub Actions contra una base local con todas las migraciones;
+- 247 pruebas automáticas (`flutter test`), además de pruebas SQL del servidor (aislamiento, roles, caja y productos) que pasan en GitHub Actions contra una base local con todas las migraciones;
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
 - versión de Windows compilada y ejecutada;
 - versión web publicada y probada en el navegador del computador.
 
 Pendiente, con el detalle en [`docs/AUDITORIA.md`](docs/AUDITORIA.md):
 - conectar un proveedor de factura electrónica autorizado (la cola y el PDF con CUFE y QR ya están);
-- aplicar en producción las migraciones de roles, caja e IVA (`supabase/migrations/2026112215…` a `…180000`);
+- aplicar en producción las migraciones de roles, caja, IVA y comercio (`supabase/migrations/2026112215…` a `20261125150000…`);
+- probar la caja rápida con un lector de código de barras físico y la versión de Windows en un PC real;
 - cifrado de la base en Windows;
 - probar la versión web en un iPhone real;
 - activar la IA en la nube (secreto `GEMINI_API_KEY` en Supabase).

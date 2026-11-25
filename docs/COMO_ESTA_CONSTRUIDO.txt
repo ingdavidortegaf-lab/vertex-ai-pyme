@@ -528,6 +528,11 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   docs/EQUIPO_CAJA_Y_FACTURACION.md. Las pruebas SQL del servidor pasan en
   GitHub Actions (25 nov.); las migraciones nuevas aun no se han aplicado
   en produccion.
+  Bloque del 25 nov.: en el computador, menu lateral, Inicio en dos
+  columnas e inventario en tabla; caja rapida con lector de codigo de
+  barras; unidades por metro, litro, galon, caja y paquete; precio por
+  mayor; vencimientos; importar desde Excel. Esquema local v12. Ver
+  docs/COMPUTADOR_Y_COMERCIO.md.
   Pendiente: respuesta real de la IA (la funcion esta desplegada, version 2;
   falta el secreto GEMINI_API_KEY), version nativa para iPhone (requiere Mac), cifrado de la base en Windows, conectar
   un proveedor de factura electronica autorizado.

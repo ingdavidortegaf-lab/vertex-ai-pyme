@@ -13,7 +13,7 @@ Cada cuenta tiene un rol en su negocio (tabla `miembros`). El código está en `
 | Dueño | Todo, incluido invitar empleados, cambiar sus roles y fijar el tope de descuento. Uno por negocio. |
 | Administrador | Todo el negocio, menos manejar el equipo. Puede anular. |
 | Contador | Consulta ventas, gastos, costos, informes y turnos. No registra nada. |
-| Despachador | Vende de contado y registra entradas de mercancía. Da descuentos hasta el tope. Fía y recibe abonos solo si el dueño lo activa. No ve costos, gastos ni informes. |
+| Vendedor (cajero) · en la base `despachador` | Vende de contado con la caja rápida y registra entradas de mercancía. Da descuentos hasta el tope. Fía y recibe abonos solo si el dueño lo activa. No ve costos, gastos ni informes. |
 | Bodeguero | Entradas y ajustes de inventario. No ve costos ni ventas. |
 
 - **Invitar:** el dueño crea un código de 8 letras y números, de un solo uso, que vence en 7 días (`crear_invitacion`). El empleado lo escribe en *Menú ⋮ › Equipo › «Tengo un código»* (`unirse_con_codigo`).

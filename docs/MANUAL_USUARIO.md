@@ -95,3 +95,16 @@ Menú ⋮ → **Privacidad y datos**: ver el aviso, escribir para ejercer tus de
 - En cada producto escribe su **IVA %** (pregúntale a tu contador; la app no trae tarifas).
 - **Facturar una venta** la deja en cola. Todavía no hay un proveedor de facturación conectado: las facturas esperan y se envían cuando se conecte uno. Solo cuando la DIAN la acepta, el PDF sale como factura electrónica con su CUFE y su QR.
 
+## 14. En el computador y la caja rápida
+- **En el computador:** el menú queda a la izquierda. **F2** abre la caja rápida y **Ctrl+1…7** cambia de sección.
+- **Caja rápida:**
+  - Pasa el lector por el código de barras, o escribe el nombre y da **Enter**. Para varias unidades: **12\*** y el código.
+  - Para cobrar en efectivo, escribe lo que te dieron: la app te dice el cambio. Luego **F4**, o **F6** para fiar.
+  - En el celular: **Caja** → **Caja rápida**.
+- **Por metro, litro, galón, caja o paquete:** en el producto, **Se vende por**.
+- **Precio por mayor:** en el producto, el precio y **Desde** cuántas unidades aplica. La caja lo cobra sola.
+- **Vence:** en el producto, la fecha de vencimiento. Treinta días antes aparece en **Inicio** y en **Inventario** → **Por vencer**.
+- **Traer productos de Excel:**
+  1. En Excel, copia las columnas con sus títulos (Nombre, Precio, Costo, Stock, Código…).
+  2. En **Inventario**, toca el botón de subir y pega.
+  3. Toca **Revisar** y luego **Importar**.
