@@ -19,7 +19,7 @@ void main() {
     test('el mensaje de WhatsApp dice qué hacer y no lleva datos de clientes', () {
       final m = mensajeInvitacion(negocio: 'Tienda La 14', rol: Rol.despachador, codigo: 'ABCDEFGH');
       expect(m, contains('Tienda La 14'));
-      expect(m, contains('despachador'));
+      expect(m, contains('vendedor (cajero)'));
       expect(m, contains('ABCD-EFGH'));
       expect(m, contains('una sola vez'));
       expect(mensajeInvitacion(negocio: ' ', rol: Rol.contador, codigo: 'ABCDEFGH', dias: 1),

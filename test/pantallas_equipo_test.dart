@@ -143,7 +143,7 @@ void main() {
     srv.yo = 'u-pedro';
     db.equipo.value = const ContextoEquipo(rol: Rol.despachador, empresaId: 'e-tienda');
     await abrir(tester, EquipoPage(servicio: EquipoService(db, srv)));
-    expect(find.text('Tu cuenta: Despachador'), findsOneWidget);
+    expect(find.text('Tu cuenta: Vendedor (cajero)'), findsOneWidget);
     expect(find.byKey(const ValueKey('invitar')), findsNothing);
     expect(find.byKey(const ValueKey('miembro_pedro@correo.co')), findsNothing);
     expect(find.byKey(const ValueKey('switch_fia')), findsNothing);

@@ -48,7 +48,9 @@ String nombreRol(Rol r) => switch (r) {
       Rol.dueno => 'Dueño',
       Rol.administrador => 'Administrador',
       Rol.contador => 'Contador',
-      Rol.despachador => 'Despachador',
+      // En la base sigue llamándose «despachador»; en pantalla, como lo dice
+      // el comercio: vendedor o cajero.
+      Rol.despachador => 'Vendedor (cajero)',
       Rol.bodeguero => 'Bodeguero',
     };
 
@@ -57,8 +59,8 @@ String descripcionRol(Rol r) => switch (r) {
       Rol.dueno => 'Todo, incluido invitar empleados y cambiar sus roles.',
       Rol.administrador => 'Todo el negocio, menos manejar el equipo.',
       Rol.contador => 'Consulta ventas, gastos, costos e informes. No registra nada.',
-      Rol.despachador => 'Vende de contado y registra entradas de mercancía. '
-          'Fía solo si el dueño lo activa. No ve costos, gastos ni informes.',
+      Rol.despachador => 'Atiende la caja: vende de contado, cobra con la caja rápida y registra '
+          'entradas de mercancía. Fía solo si el dueño lo activa. No ve costos, gastos ni informes.',
       Rol.bodeguero => 'Registra entradas y ajustes de inventario. No ve costos ni ventas.',
     };
 

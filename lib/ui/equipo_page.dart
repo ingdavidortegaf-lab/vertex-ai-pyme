@@ -365,7 +365,7 @@ class _EquipoPageState extends State<EquipoPage> {
               SwitchListTile(
                 key: const ValueKey('switch_fia'),
                 contentPadding: EdgeInsets.zero,
-                title: const Text('El despachador puede fiar y recibir abonos'),
+                title: const Text('El vendedor puede fiar y recibir abonos'),
                 subtitle: const Text('Si lo apagas, solo vende de contado.'),
                 value: ctx.despachadorFia,
                 onChanged: (v) => _hacer(() => _servicio!.definirDespachadorFia(v)),
