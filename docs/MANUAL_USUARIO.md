@@ -104,6 +104,12 @@ Menú ⋮ → **Privacidad y datos**: ver el aviso, escribir para ejercer tus de
 - **Por metro, litro, galón, caja o paquete:** en el producto, **Se vende por**.
 - **Precio por mayor:** en el producto, el precio y **Desde** cuántas unidades aplica. La caja lo cobra sola.
 - **Vence:** en el producto, la fecha de vencimiento. Treinta días antes aparece en **Inicio** y en **Inventario** → **Por vencer**.
+- **Llevar a Excel:**
+  - En **Herramientas** → **Informes**, abajo: movimientos, quién debe e inventario.
+  - En el PC quedan en *Documentos › VERTEX_documentos*; en el celular, se comparten.
+- **Kárdex:** en **Inventario**, toca un producto → **Historial (kárdex)**.
+- **Devolver productos:** en **Movimientos**, mantén presionada la venta → **Devolver productos**. Elige cuánto devuelve de cada producto: la app te dice cuánto regresar y lo devuelto vuelve al inventario.
+- **Buscar todo:** en el computador, **Ctrl+K** (productos, códigos, clientes y secciones).
 - **Traer productos de Excel:**
   1. En Excel, copia las columnas con sus títulos (Nombre, Precio, Costo, Stock, Código…).
   2. En **Inventario**, toca el botón de subir y pega.

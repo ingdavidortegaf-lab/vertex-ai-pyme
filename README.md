@@ -128,7 +128,7 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 Roles (dueño, administrador, contador, vendedor o cajero, bodeguero) con invitación por código, perfiles con PIN para el celular compartido, turnos de caja con diferencia, anulaciones como movimiento nuevo, descuentos con tope y la cola de factura electrónica (sin proveedor real conectado). La app oculta y el servidor impide. Detalle en [`docs/EQUIPO_CAJA_Y_FACTURACION.md`](docs/EQUIPO_CAJA_Y_FACTURACION.md).
 
 ## Computador, caja rápida y comercio
-En el computador la app usa toda la pantalla: menú lateral, Inicio en dos columnas, inventario en tabla y atajos de teclado. La **caja rápida** cobra con lector de código de barras USB, calcula el cambio y aplica el precio por mayor. Para supermercados y ferreterías: unidades por metro, litro, galón, caja y paquete; precio por mayor; vencimientos con aviso; y cargar productos pegándolos desde Excel. Detalle en [`docs/COMPUTADOR_Y_COMERCIO.md`](docs/COMPUTADOR_Y_COMERCIO.md).
+En el computador la app usa toda la pantalla: menú lateral, Inicio en dos columnas, inventario en tabla y atajos de teclado. La **caja rápida** cobra con lector de código de barras USB, calcula el cambio y aplica el precio por mayor. Para supermercados y ferreterías: unidades por metro, litro, galón, caja y paquete; precio por mayor; vencimientos con aviso; cargar productos pegándolos desde Excel y exportar a Excel; kárdex por producto; ventas por vendedor y ganancia por producto; devoluciones de productos; y buscador global (Ctrl+K). Detalle en [`docs/COMPUTADOR_Y_COMERCIO.md`](docs/COMPUTADOR_Y_COMERCIO.md).
 
 ## Estado y pendientes
 Probado:
