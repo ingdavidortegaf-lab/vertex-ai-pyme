@@ -104,4 +104,4 @@ Cómo cuenta en los informes:
 ## 6. Pruebas
 
 - **App (`flutter test`):** roles, perfiles y PIN (con el vector del RFC 7914), equipo con un servidor falso que sigue las mismas reglas, caja, facturación con un proveedor de prueba que solo existe en `test/`, pantallas, PDF y migraciones locales v8→v9→v10→v11.
-- **Servidor (`supabase/tests/*.sql`):** aislamiento entre empresas (incluye turnos y anular desde otra empresa), roles y permisos, y caja. Corren en GitHub Actions contra una base local creada con las migraciones. **Aún no han corrido:** el envío a GitHub está detenido hasta que la cuenta tenga el permiso `workflow`. En este PC solo se revisó su sintaxis con `pglast`.
+- **Servidor (`supabase/tests/*.sql`):** aislamiento entre empresas (incluye turnos y anular desde otra empresa), roles y permisos, y caja. Corren en GitHub Actions contra una base local creada con las migraciones. Pasaron por primera vez el 25 de noviembre de 2026.

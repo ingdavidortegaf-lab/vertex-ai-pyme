@@ -129,14 +129,14 @@ Roles (dueño, administrador, contador, despachador, bodeguero) con invitación 
 
 ## Estado y pendientes
 Probado:
-- 226 pruebas automáticas (`flutter test`), además de pruebas SQL del servidor en GitHub Actions (todavía no han corrido: ver abajo);
+- 226 pruebas automáticas (`flutter test`), además de pruebas SQL del servidor (aislamiento, roles y caja) que pasan en GitHub Actions contra una base local con todas las migraciones;
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
 - versión de Windows compilada y ejecutada;
 - versión web publicada y probada en el navegador del computador.
 
 Pendiente, con el detalle en [`docs/AUDITORIA.md`](docs/AUDITORIA.md):
 - conectar un proveedor de factura electrónica autorizado (la cola y el PDF con CUFE y QR ya están);
-- aplicar en producción las migraciones de roles, caja e IVA (`supabase/migrations/2026112215…` a `…180000`) y ver correr en GitHub Actions las pruebas SQL;
+- aplicar en producción las migraciones de roles, caja e IVA (`supabase/migrations/2026112215…` a `…180000`);
 - cifrado de la base en Windows;
 - probar la versión web en un iPhone real;
 - activar la IA en la nube (secreto `GEMINI_API_KEY` en Supabase).
