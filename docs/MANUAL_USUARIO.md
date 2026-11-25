@@ -78,3 +78,20 @@ Si los activaste, la app te avisa cuando **se agota** o **se está acabando** un
 - **Clientes nuevos:** marca la casilla de autorización (no viene marcada) antes de guardar.
 - **Clientes de antes:** en su ficha toca **Formato de autorización de datos (Ley 1581)** para imprimirlo o enviarlo por WhatsApp. Cuando respondan «AUTORIZO», toca **Ya respondió «AUTORIZO»** y guarda el pantallazo.
 Menú ⋮ → **Privacidad y datos**: ver el aviso, escribir para ejercer tus derechos, revocar la autorización o borrar los datos de este celular.
+
+## 11. Equipo y celular compartido
+- **Invitar a un empleado:** menú ⋮ → **Equipo** → **Invitar a alguien**. Escoge qué hará (administrador, contador, despachador o bodeguero) y envía el código por WhatsApp. Sirve una vez y vence en 7 días.
+- **Si te invitaron:** crea tu cuenta, entra a menú ⋮ → **Equipo** → **Tengo un código** y escríbelo.
+- **Cambiar el rol o quitar a alguien:** en **Equipo**, toca los tres puntos al lado de la persona.
+- **Varias personas en el mismo celular:** en **Equipo** → **Empezar a usar perfiles**. El primero es el tuyo. Desde ahí la app pregunta **¿Quién atiende?** y cada uno entra con su PIN. Para cambiar: menú ⋮ → **Cambiar de persona**.
+
+## 12. Caja: turnos, anular y descuentos
+- **Turno:** en **Caja**, toca **Abrir turno de caja** y escribe la base. Al final, **Cerrar turno**, cuenta el efectivo y la app te dice si sobra, falta o cuadra.
+- **Anular:** mantén presionado el movimiento en **Caja** y escribe el motivo. No se borra: queda un movimiento en contra con la fecha de hoy. Solo el dueño o el administrador; si atiende un despachador, un supervisor lo autoriza con su PIN.
+- **Descuento:** al registrar la venta, campo **Descuento**. El dueño fija el tope para los demás en **Equipo** → **Descuentos**.
+
+## 13. Factura electrónica
+- **Herramientas** → **Factura electrónica**: escribe los datos de tu negocio tal como están en tu RUT y tu resolución de la DIAN.
+- En cada producto escribe su **IVA %** (pregúntale a tu contador; la app no trae tarifas).
+- **Facturar una venta** la deja en cola. Todavía no hay un proveedor de facturación conectado: las facturas esperan y se envían cuando se conecte uno. Solo cuando la DIAN la acepta, el PDF sale como factura electrónica con su CUFE y su QR.
+

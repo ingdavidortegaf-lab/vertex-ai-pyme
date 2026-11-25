@@ -124,17 +124,20 @@ flutter build windows --release --dart-define-from-file=dart_defines.json  # Win
 - Claves fuera del código.
 - **Ley 1581 de 2012:** aviso de privacidad, casilla **sin premarcar** con **enlace visible** a la política (se abre sin internet) y formato de autorización para cada cliente, en PDF o por WhatsApp. Ver [`docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md`](docs/AVISO_PRIVACIDAD_Y_AUTORIZACION.md). La MiPyme es responsable de los datos; VERTEX TECH es encargada. Ver [`docs/POLITICA_TRATAMIENTO_DATOS.md`](docs/POLITICA_TRATAMIENTO_DATOS.md).
 
+## Equipo, caja y factura electrónica
+Roles (dueño, administrador, contador, despachador, bodeguero) con invitación por código, perfiles con PIN para el celular compartido, turnos de caja con diferencia, anulaciones como movimiento nuevo, descuentos con tope y la cola de factura electrónica (sin proveedor real conectado). La app oculta y el servidor impide. Detalle en [`docs/EQUIPO_CAJA_Y_FACTURACION.md`](docs/EQUIPO_CAJA_Y_FACTURACION.md).
+
 ## Estado y pendientes
 Probado:
-- 128 pruebas automáticas;
+- 226 pruebas automáticas (`flutter test`), además de pruebas SQL del servidor en GitHub Actions (todavía no han corrido: ver abajo);
 - en un celular Android real: modo avión y sincronización con Supabase sin duplicados;
 - versión de Windows compilada y ejecutada;
 - versión web publicada y probada en el navegador del computador.
 
 Pendiente, con el detalle en [`docs/AUDITORIA.md`](docs/AUDITORIA.md):
-- factura electrónica DIAN con un proveedor autorizado;
+- conectar un proveedor de factura electrónica autorizado (la cola y el PDF con CUFE y QR ya están);
+- aplicar en producción las migraciones de roles, caja e IVA (`supabase/migrations/2026112215…` a `…180000`) y ver correr en GitHub Actions las pruebas SQL;
 - cifrado de la base en Windows;
-- roles de vendedor y administrador;
 - probar la versión web en un iPhone real;
 - activar la IA en la nube (secreto `GEMINI_API_KEY` en Supabase).
 

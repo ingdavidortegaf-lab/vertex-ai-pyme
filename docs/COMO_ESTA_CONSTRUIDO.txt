@@ -522,7 +522,13 @@ Copia para entregar:            D:\ESCRITORIO\VERTEX_AI_Pyme_entrega\codigo_fuen
   oficiales de la Ley 1581: 106 pruebas, capturas en PC, version web
   publicada y probada en el navegador, Windows abre y migro la base a la
   version 7. Falta probarlo en el celular y en un iPhone real.
+  Bloque del 22-24 nov.: roles con invitacion por codigo, perfiles con PIN,
+  turnos de caja, anulaciones, descuentos con tope y factura electronica
+  en cola (sin proveedor real). Esquema local v11; 226 pruebas. Ver
+  docs/EQUIPO_CAJA_Y_FACTURACION.md. Las pruebas SQL del servidor estan en
+  GitHub Actions pero aun no han corrido, y las migraciones nuevas no se
+  han aplicado en produccion.
   Pendiente: respuesta real de la IA (la funcion esta desplegada, version 2;
-  falta el secreto GEMINI_API_KEY), version nativa para iPhone (requiere Mac), cifrado de la base en Windows, factura
-  electronica DIAN (requiere proveedor autorizado), roles vendedor/admin.
+  falta el secreto GEMINI_API_KEY), version nativa para iPhone (requiere Mac), cifrado de la base en Windows, conectar
+  un proveedor de factura electronica autorizado.
 ===============================================================================
