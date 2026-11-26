@@ -62,7 +62,9 @@ La app Android es la más completa: base **cifrada**, **avisos** en el celular y
 - **Compartir foto o video de una promoción:** funciona en Android, en iPhone con Safari y en navegadores que tienen la opción de compartir. En el computador solo se comparte el texto (queda copiado).
 
 ## Cómo se publicó la versión web (para el ingeniero)
-- `flutter build web --release --base-href /vertex-ai-pyme/` genera la app en HTML, JavaScript y WebAssembly.
+- `flutter build web --release --no-web-resources-cdn --base-href /vertex-ai-pyme/ --dart-define-from-file=dart_defines.json` genera la app en HTML, JavaScript y WebAssembly. Con `--no-web-resources-cdn` el motor de dibujo (CanvasKit) va dentro de la página, y la letra Roboto también (`assets/fonts`): al abrirla no se descarga nada de servidores externos.
+- Para publicar: `.\scripts\publicar_web.ps1` (compila y sube a la rama `gh-pages`). **Antes** deben estar aplicadas en producción las migraciones de `supabase/migrations` (ver `supabase/produccion/`).
+- En Git Bash, la ruta `/vertex-ai-pyme/` se convierte sola en una ruta de Windows: ahí hay que anteponer `MSYS_NO_PATHCONV=1`. En PowerShell no pasa.
 - La base del navegador es **SQLite compilada a WebAssembly** (`sqflite_common_ffi_web`), guardada en IndexedDB.
 - El código elige solo qué base abrir: `lib/data/abrir_base.dart` usa importación condicional, con SQLCipher en el celular, SQLite en el PC y WebAssembly en la web.
 - Se publica gratis en **GitHub Pages** (rama `gh-pages`) con HTTPS.

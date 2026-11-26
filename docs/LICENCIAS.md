@@ -13,6 +13,7 @@ a partir del archivo LICENSE de cada paquete instalado (directo y transitivo).
 | Supabase (plan gratuito) | Apache-2.0 (plataforma) / PostgreSQL License | Backend, autenticacion y RLS |
 | Deno (Edge Functions) | MIT | Funcion del asistente de IA |
 | Modelo de IA (capa gratuita via API) | Terminos del proveedor; sin costo en capa gratuita | Opcional; la app funciona sin el |
+| Fuente Roboto (Google) | Apache-2.0 (assets/fonts/LICENSE-Roboto.txt) | Letra de la app, incluida para que la web no la descargue |
 
 Sin imagenes, iconos ni marcas de terceros: los iconos son Material Icons (Apache-2.0, incluidos en Flutter).
 

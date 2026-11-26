@@ -162,6 +162,8 @@ ThemeData temaVertex(Brightness brillo) {
 
   return ThemeData(
     useMaterial3: true,
+    // La misma letra en celular, PC y web (va dentro de la app).
+    fontFamily: 'Roboto',
     brightness: brillo,
     colorScheme: esquema,
     textTheme: texto,
