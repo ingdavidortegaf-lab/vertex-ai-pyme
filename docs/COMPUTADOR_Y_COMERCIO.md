@@ -92,6 +92,8 @@ Archivo: `lib/ui/punto_venta_page.dart`. Funciona sin internet.
 | Kárdex por producto | **Hecho** |
 | Ventas por vendedor y ganancia por producto | **Hecho** |
 | Buscador global en el computador | **Hecho:** Ctrl+K |
+| Etiquetas de precio con código de barras | **Hecho:** hoja carta de 24 (3 × 8), EAN-13 o Code 128, con el precio por mayor si lo hay |
+| Lista de precios para clientes | **Hecho:** PDF sin costos ni stock |
 
 ### Importar desde Excel
 
@@ -137,6 +139,15 @@ Código: `lib/domain/importar.dart`.
   - **Si era fiada:** la deuda baja en el valor devuelto.
   - **Quién puede:** pide el mismo permiso que anular (dueño o administrador, o su PIN como autorización).
   - **Con factura electrónica:** no se puede; haría falta una nota crédito, que no está hecha.
+
+- **Etiquetas y lista de precios:** en **Inventario**, el botón de etiqueta (🏷).
+  - **Qué productos salen:** los que se ven en ese momento; el buscador y los filtros sirven para elegirlos.
+  - **Etiquetas:**
+    - hoja carta de 24, con el nombre, el precio y el precio por mayor si lo hay;
+    - código de barras EAN-13 si el producto tiene uno de supermercado, o Code 128 si tiene un código interno;
+    - se puede elegir cuántas copias de cada una.
+  - **Lista de precios:** PDF para enviar a los clientes, con el nombre del negocio y su teléfono, sin costos ni stock.
+  - **Al terminar:** se abre la impresión, o se comparte si el equipo no imprime.
 
 ## 5. Base de datos
 

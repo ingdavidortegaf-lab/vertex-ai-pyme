@@ -109,6 +109,7 @@ Menú ⋮ → **Privacidad y datos**: ver el aviso, escribir para ejercer tus de
   - En el PC quedan en *Documentos › VERTEX_documentos*; en el celular, se comparten.
 - **Kárdex:** en **Inventario**, toca un producto → **Historial (kárdex)**.
 - **Devolver productos:** en **Movimientos**, mantén presionada la venta → **Devolver productos**. Elige cuánto devuelve de cada producto: la app te dice cuánto regresar y lo devuelto vuelve al inventario.
+- **Etiquetas y lista de precios:** en **Inventario**, botón de etiqueta. Busca primero los productos que quieres (o deja todos), elige etiquetas o lista y genera el PDF.
 - **Buscar todo:** en el computador, **Ctrl+K** (productos, códigos, clientes y secciones).
 - **Traer productos de Excel:**
   1. En Excel, copia las columnas con sus títulos (Nombre, Precio, Costo, Stock, Código…).
