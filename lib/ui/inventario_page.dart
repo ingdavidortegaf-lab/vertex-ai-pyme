@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'escritorio.dart';
+import '../pdf/pdf_etiquetas.dart';
+import '../pdf/archivo.dart';
 import 'exportar_ui.dart';
 import '../domain/exportar.dart';
 import '../domain/ejemplos.dart';
@@ -155,6 +157,13 @@ class _InventarioPageState extends State<InventarioPage> {
                                 hintText: 'Buscar producto',
                                 prefixIcon: Icon(Icons.search)),
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.outlined(
+                          key: const ValueKey('imprimir_precios'),
+                          tooltip: 'Etiquetas y lista de precios',
+                          onPressed: () => imprimirPrecios(context, lista),
+                          icon: const Icon(Icons.sell_outlined),
                         ),
                         const SizedBox(width: 8),
                         IconButton.outlined(
@@ -1066,3 +1075,107 @@ class _DialogoImportarState extends State<_DialogoImportar> {
     );
   }
 }
+
+/// Etiquetas de precio (hoja carta 3 × 8, con código de barras) o lista de
+/// precios en PDF, de los productos que se ven (el buscador y los filtros
+/// sirven para elegir cuáles).
+Future<void> imprimirPrecios(BuildContext context, List<ProductoStock> lista) async {
+  final productos = [for (final p in lista) if (p.precio > 0) p];
+  if (productos.isEmpty) {
+    avisar('No hay productos con precio para imprimir');
+    return;
+  }
+  final r = await showDialog<(String, int)>(
+    context: context,
+    builder: (_) => _DialogoPrecios(n: productos.length),
+  );
+  if (r == null) return;
+  final negocio = await LocalDb.instance.perfilNegocio();
+  final fecha = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  final pdf = r.$1 == 'etiquetas'
+      ? PdfListo(
+          nombre: 'etiquetas_$fecha.pdf',
+          generar: (f) => pdfEtiquetas(productos, copias: r.$2, negocio: negocio.nombre.trim(), formato: f))
+      : PdfListo(
+          nombre: 'lista_de_precios_$fecha.pdf',
+          generar: (f) => pdfListaPrecios(productos,
+              negocio: negocio.nombre.trim(), contacto: negocio.telefono.trim(), formato: f));
+  try {
+    await pdf.imprimir();
+  } catch (_) {
+    try {
+      await pdf.compartir();
+    } catch (_) {
+      avisar('No se pudo abrir el PDF en este equipo');
+    }
+  }
+}
+
+class _DialogoPrecios extends StatefulWidget {
+  final int n;
+  const _DialogoPrecios({required this.n});
+  @override
+  State<_DialogoPrecios> createState() => _DialogoPreciosState();
+}
+
+class _DialogoPreciosState extends State<_DialogoPrecios> {
+  String _que = 'etiquetas';
+  int _copias = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final n = widget.n;
+    return AlertDialog(
+      title: const Text('Imprimir precios'),
+      content: SizedBox(
+        width: 440,
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('De los $n ${n == 1 ? 'producto' : 'productos'} que se ven ahora (usa el buscador para elegir).',
+              style: t.bodySmall),
+          const SizedBox(height: 8),
+          RadioGroup<String>(
+            groupValue: _que,
+            onChanged: (v) => setState(() => _que = v ?? _que),
+            child: const Column(children: [
+              RadioListTile(
+                key: ValueKey('op_etiquetas'),
+                value: 'etiquetas',
+                title: Text('Etiquetas de precio'),
+                subtitle: Text('Hoja carta de 24 etiquetas, con código de barras'),
+              ),
+              RadioListTile(
+                key: ValueKey('op_lista'),
+                value: 'lista',
+                title: Text('Lista de precios'),
+                subtitle: Text('PDF para enviar a tus clientes (sin costos)'),
+              ),
+            ]),
+          ),
+          if (_que == 'etiquetas')
+            Row(children: [
+              const Expanded(child: Text('Copias de cada etiqueta')),
+              IconButton(
+                onPressed: _copias > 1 ? () => setState(() => _copias--) : null,
+                icon: const Icon(Icons.remove_circle_outline),
+              ),
+              Text('$_copias', style: t.titleMedium),
+              IconButton(
+                onPressed: _copias < 50 ? () => setState(() => _copias++) : null,
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+            ]),
+        ]),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        FilledButton(
+          key: const ValueKey('generar_precios'),
+          onPressed: () => Navigator.pop(context, (_que, _copias)),
+          child: const Text('Generar PDF'),
+        ),
+      ],
+    );
+  }
+}
+
